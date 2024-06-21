@@ -14,7 +14,9 @@ query Accounts {
     id
   }
 }`;
-
+function shortId(id: string): string {
+  return id.substring(0, 6) + "..." + id.substring(id.length - 4)
+}
 
 export default function Accounts() {
   const { loading, error, data } = useQuery(GET_ACCOUNTS);
@@ -46,7 +48,7 @@ export function AccountListItem({ account }: { account: any }) {
 
         <View>
           <ThemedText style={styles.name}>{account.label}</ThemedText>
-          <ThemedText style={styles.secondary}>{account.id}</ThemedText>
+          <ThemedText style={styles.secondary}>{shortId(account.id)}</ThemedText>
         </View>
       </TouchableOpacity>
     </ThemedView>
