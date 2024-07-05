@@ -8,7 +8,6 @@ export default function Avatar({ image, style, size = 36 }) {
     height: size,
     width: size,
   };
-  console.log('avatar', image);
   return (
     <View style={style}>
       {image ? (

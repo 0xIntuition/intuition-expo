@@ -10,7 +10,11 @@ import { Ionicons } from '@expo/vector-icons';
 
 const GET_SIGNALS = gql`
 query Signals {
-  signals(where: {relativeStrength_gt: "0"}) {
+  signals(
+    orderBy: blockTimestamp,
+    orderDirection: desc,
+    where: {relativeStrength_gt: "0"}
+    ) {
     delta
     relativeStrength
     account {
@@ -20,7 +24,7 @@ query Signals {
     redemption {
       vault {
         positions {
-          balance
+          shares
           account {
             label
             image
@@ -49,7 +53,7 @@ query Signals {
     deposit {
       vault {
         positions {
-          balance
+          shares
           account {
             label
             image
@@ -93,6 +97,7 @@ export default function Signals() {
   );
 }
 export function SignalListItem({ signal }: { signal: any }) {
+  const positions = signal.deposit !== null ? signal.deposit.vault.positions : signal.redemption.vault.positions;
   return (
     <ThemedView style={styles.listContainer}>
 
@@ -133,7 +138,7 @@ export function SignalListItem({ signal }: { signal: any }) {
             color="#aaa"
             style={styles.icon}
           />
-          <ThemedText style={styles.secondary}>{3}</ThemedText>
+          <ThemedText style={styles.secondary}>{positions.length}</ThemedText>
         </View>
       </View>
     </ThemedView>
