@@ -1,8 +1,8 @@
 {
   "expo": {
     "name": "intuition-expo",
-    "slug": "intuition-expo",
-    "version": "1.0.0",
+    "slug": "intuition",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -39,8 +39,9 @@
         "origin": false
       },
       "eas": {
-        "projectId": "5e84031b-13ad-4cd4-913e-fbed37d719e0"
+        "projectId": "3fb69fd4-fbcd-4631-80ea-550700baf159"
       }
-    }
+    },
+    "owner": "intuition"
   }
 }

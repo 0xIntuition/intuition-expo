@@ -1,4 +1,4 @@
-import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery, gql } from '@apollo/client';
 import React from 'react';
@@ -8,7 +8,7 @@ import { ThemedView } from '@/components/ThemedView';
 
 const GET_ACCOUNTS = gql`
 query Accounts {
-  accounts(where: {type: Default}) {
+  accounts(where: {type: {_eq: "Default"}}) {
     image
     label
     id
@@ -19,20 +19,27 @@ function shortId(id: string): string {
 }
 
 export default function Accounts() {
-  const { loading, error, data } = useQuery(GET_ACCOUNTS);
-  console.log(data);
+  const { loading, error, data, refetch } = useQuery(GET_ACCOUNTS);
+
   return (
     <ThemedView style={styles.container}>
+      {loading && <ThemedText>loading</ThemedText>}
+      {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && <FlashList
         data={data.accounts}
         renderItem={({ item }) => <AccountListItem account={item} />}
         estimatedItemSize={150}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={refetch}
+          />
+        }
       />}
     </ThemedView>
   );
 }
 export function AccountListItem({ account }: { account: any }) {
-  console.log('aeaeae', account);
   return (
     <ThemedView style={styles.listContainer}>
 

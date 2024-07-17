@@ -1,70 +1,133 @@
-import { Image, StyleSheet, Platform } from 'react-native';
-
-import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
+import { View, StyleSheet, TouchableOpacity } from 'react-native';
+import { FlashList } from '@shopify/flash-list';
+import { useQuery, gql, useSubscription } from '@apollo/client';
+import React from 'react';
+import Avatar from '@/components/Avatar';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { formatEther } from 'viem';
+import { Ionicons } from '@expo/vector-icons';
 
-export default function HomeScreen() {
+const GET_SIGNALS = gql`
+subscription Signals {
+  signals(limit: 5, order_by: {block_timestamp: desc}) {
+    account {
+      label
+    }
+    delta
+    block_number
+  }
+}
+`;
+
+
+export default function Signals() {
+  const { loading, error, data } = useSubscription(GET_SIGNALS);
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#A1CEDC', dark: '#1D3D47' }}
-      headerImage={
-        <Image
-          source={require('@/assets/images/partial-react-logo.png')}
-          style={styles.reactLogo}
-        />
-      }>
-      <ThemedView style={styles.titleContainer}>
-        <ThemedText type="title">Welcome!</ThemedText>
-        <HelloWave />
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 1: Try it</ThemedText>
-        <ThemedText>
-          Edit <ThemedText type="defaultSemiBold">app/(tabs)/index.tsx</ThemedText> to see changes.
-          Press{' '}
-          <ThemedText type="defaultSemiBold">
-            {Platform.select({ ios: 'cmd + d', android: 'cmd + m' })}
-          </ThemedText>{' '}
-          to open developer tools.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 2: Explore</ThemedText>
-        <ThemedText>
-          Tap the Explore tab to learn more about what's included in this starter app.
-        </ThemedText>
-      </ThemedView>
-      <ThemedView style={styles.stepContainer}>
-        <ThemedText type="subtitle">Step 3: Get a fresh start</ThemedText>
-        <ThemedText>
-          When you're ready, run{' '}
-          <ThemedText type="defaultSemiBold">npm run reset-project</ThemedText> to get a fresh{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> directory. This will move the current{' '}
-          <ThemedText type="defaultSemiBold">app</ThemedText> to{' '}
-          <ThemedText type="defaultSemiBold">app-example</ThemedText>.
-        </ThemedText>
-      </ThemedView>
-    </ParallaxScrollView>
+    <ThemedView style={styles.container}>
+      {error && <ThemedText>{error.message}</ThemedText>}
+      {!loading && data && <FlashList
+        data={data.signals}
+        renderItem={({ item }) => <SignalListItem signal={item} />}
+        estimatedItemSize={150}
+      />}
+    </ThemedView>
+  );
+}
+export function SignalListItem({ signal }: { signal: any }) {
+  return (
+    <ThemedView style={styles.listContainer}>
+
+      <TouchableOpacity
+        activeOpacity={0.75}
+        onPress={() => {
+          // navigation.navigate('Profile', {
+          //   userId,
+          // });
+        }}
+        style={styles.profileLayout}>
+
+        <View style={styles.header}>
+          <ThemedText style={styles.secondary}>{signal.account.label} -  {formatEther(signal.delta)}</ThemedText>
+          <ThemedText style={styles.secondary}> - {signal.block_number}</ThemedText>
+        </View>
+      </TouchableOpacity>
+
+
+
+    </ThemedView>
   );
 }
 
+
 const styles = StyleSheet.create({
-  titleContainer: {
+  shortText: {
+    fontSize: 11,
+  },
+
+  vaultContent: {
+    flex: 1,
+    padding: 16,
+    marginLeft: 32,
+
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+  },
+  container: {
+    flex: 1,
+    paddingLeft: 16,
+  },
+  listContainer: {
+    flex: 1,
+    paddingVertical: 16,
+    paddingRight: 16,
+    borderBottomWidth: 1,
+    // borderBottomStyle: 'solid',
+    borderBottomColor: '#ddd',
+  },
+  masonryContainer: {
+    flex: 1,
+    marginTop: 10,
+    marginRight: 10,
+    padding: 10,
+    borderWidth: 1,
+    borderStyle: 'solid',
+    borderColor: '#ddd',
+    borderRadius: 8,
+  },
+  avatar: {
+    marginRight: 10,
+  },
+  name: {
+    fontSize: 15,
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  secondary: {
+    color: '#888',
+  },
+  profileLayout: {
+    flexDirection: 'row',
+    marginBottom: 12,
+  },
+  interactionsLayout: {
+    flexDirection: 'row',
+  },
+  header: {
+    flexDirection: 'row',
+    alignContent: 'space-between',
+  },
+  interaction: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
+    color: '#aaa',
+    marginRight: 20,
+    marginTop: 12,
   },
-  stepContainer: {
-    gap: 8,
-    marginBottom: 8,
-  },
-  reactLogo: {
-    height: 178,
-    width: 290,
-    bottom: 0,
-    left: 0,
-    position: 'absolute',
+  icon: {
+    marginRight: 4,
   },
 });
+
+
