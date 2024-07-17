@@ -1,0 +1,16 @@
+{
+  "configVersion": 0,
+  "apple": {
+    "info": {
+      "en-US": {
+        "title": "Intuition",
+        "subtitle": "The Trust Protocol",
+        "description": "Bringing human trust to trustless systems",
+        "keywords": ["trust", "reputation"],
+        "marketingUrl": "https://intuition.systems",
+        "supportUrl": "https://intuition.systems",
+        "privacyPolicyUrl": "https://intuition.systems"
+      }
+    }
+  }
+}

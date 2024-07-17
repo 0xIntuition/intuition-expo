@@ -42,6 +42,12 @@
         "projectId": "3fb69fd4-fbcd-4631-80ea-550700baf159"
       }
     },
-    "owner": "intuition"
+    "owner": "intuition",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/3fb69fd4-fbcd-4631-80ea-550700baf159"
+    }
   }
 }
