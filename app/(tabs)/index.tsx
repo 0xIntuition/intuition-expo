@@ -20,11 +20,29 @@ const GET_SIGNALS = gql`
     }
     delta
     block_timestamp
+    atom {
+      id
+      emoji
+      label
+    }
+    triple{
+      id
+      subject {
+        emoji
+        label 
+      }
+      predicate {
+        emoji
+        label
+      }
+      object {
+        emoji
+        label
+      }
+    }
     }
   }
 `;
-
-
 
 export default function Signals() {
   const [offset, setOffset] = useState(0);
@@ -87,12 +105,36 @@ export function SignalListItem({ signal }: { signal: any }) {
           {signal.account.image !== null && <Image style={styles.image} source={{ uri: signal.account.image }} />}
           <ThemedText style={styles.secondary}>{signal.account.label}</ThemedText>
         </Link>
+
         <ThemedText style={styles.date}>{formatRelative(signal.block_timestamp * 1000, new Date())}</ThemedText>
       </View>
 
       <View style={styles.header}>
-        <ThemedText style={styles.secondary}>{convertToCurrency(signal.delta)}</ThemedText>
+        <ThemedText >{convertToCurrency(signal.delta)}</ThemedText>
       </View>
+
+      {signal.atom !== null && <Link
+        style={styles.vaultContent}
+        href={{
+          pathname: '/atom/[id]',
+          params: { id: signal.atom.id }
+        }}>
+        <ThemedText style={styles.secondary} numberOfLines={1}>{signal.atom.emoji} {signal.atom.label}</ThemedText>
+      </Link>}
+
+
+      {signal.triple !== null && <Link
+        style={styles.tripleLink}
+        href={{
+          pathname: '/triple/[id]',
+          params: { id: signal.triple.id }
+        }}>
+        <View style={styles.vaultContent}>
+          <ThemedText style={styles.secondary} numberOfLines={1}>{signal.triple.subject.emoji} {signal.triple.subject.label}</ThemedText>
+          <ThemedText style={styles.secondary}>{signal.triple.predicate.label}</ThemedText>
+          <ThemedText style={styles.secondary}>{signal.triple.object.emoji} {signal.triple.object.label}</ThemedText>
+        </View>
+      </Link>}
 
     </ThemedView>
   );
@@ -100,6 +142,9 @@ export function SignalListItem({ signal }: { signal: any }) {
 
 
 const styles = StyleSheet.create({
+  tripleLink: {
+    marginTop: 10,
+  },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -121,11 +166,11 @@ const styles = StyleSheet.create({
   },
   vaultContent: {
     flex: 1,
-    padding: 16,
-    marginLeft: 32,
+    padding: 8,
+    margin: 8,
 
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: 'rgba(100,100,100,0.5)',
     borderRadius: 8,
   },
   container: {
@@ -159,6 +204,7 @@ const styles = StyleSheet.create({
   },
   secondary: {
     color: '#888',
+
   },
   profileLayout: {
     flexDirection: 'row',
