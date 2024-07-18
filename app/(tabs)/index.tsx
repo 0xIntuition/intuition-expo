@@ -7,6 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { formatEther } from 'viem';
 import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
+import { convertToCurrency } from '@/hooks/useCurrency';
 
 const GET_SIGNALS = gql`
   query GetSignals($offset: Int!) {
@@ -90,7 +91,7 @@ export function SignalListItem({ signal }: { signal: any }) {
       </View>
 
       <View style={styles.header}>
-        <ThemedText style={styles.secondary}>{formatEther(signal.delta)} ETH</ThemedText>
+        <ThemedText style={styles.secondary}>{convertToCurrency(signal.delta)}</ThemedText>
       </View>
 
     </ThemedView>
