@@ -1,10 +1,11 @@
-import { View, StyleSheet, TouchableOpacity, RefreshControl } from 'react-native';
+import { View, StyleSheet, RefreshControl } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery, gql } from '@apollo/client';
 import React from 'react';
 import Avatar from '@/components/Avatar';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { Link } from 'expo-router';
 
 const GET_ACCOUNTS = gql`
 query Accounts {
@@ -43,21 +44,18 @@ export function AccountListItem({ account }: { account: any }) {
   return (
     <ThemedView style={styles.listContainer}>
 
-      <TouchableOpacity
-        activeOpacity={0.75}
-        onPress={() => {
-          // navigation.navigate('Profile', {
-          //   userId,
-          // });
-        }}
-        style={styles.profileLayout}>
+      <Link
+        href={{
+          pathname: '/account/[id]',
+          params: { id: account.id }
+        }}>
         <Avatar image={account.image} style={styles.avatar} />
 
         <View>
           <ThemedText style={styles.name}>{account.label}</ThemedText>
           <ThemedText style={styles.secondary}>{shortId(account.id)}</ThemedText>
         </View>
-      </TouchableOpacity>
+      </Link>
     </ThemedView>
   );
 }
@@ -72,8 +70,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingRight: 16,
     borderBottomWidth: 1,
-    // borderBottomStyle: 'solid',
-    borderBottomColor: '#ddd',
+    borderBottomColor: 'rgba(100,100,100,0.5)',
   },
   masonryContainer: {
     flex: 1,
@@ -95,6 +92,7 @@ const styles = StyleSheet.create({
   },
   secondary: {
     color: '#888',
+    fontSize: 13,
   },
   profileLayout: {
     flexDirection: 'row',
