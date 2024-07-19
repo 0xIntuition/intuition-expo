@@ -1,15 +1,16 @@
-import { View, StyleSheet, RefreshControl } from 'react-native';
+import { View, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery, gql } from '@apollo/client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import Avatar from '@/components/Avatar';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 
 const GET_ACCOUNTS = gql`
-query Accounts {
-  accounts(where: {type: {_eq: "Default"}}) {
+query Accounts($offset: Int!){
+  accounts(order_by: {vid: desc}, limit: 10, offset: $offset, where: {type: {_eq: "Default"}}) {
+    vid
     image
     label
     id
@@ -20,20 +21,50 @@ function shortId(id: string): string {
 }
 
 export default function Accounts() {
-  const { loading, error, data, refetch } = useQuery(GET_ACCOUNTS);
+  const [offset, setOffset] = useState(0);
+
+  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ACCOUNTS, {
+    variables: { offset: 0 },
+  });
+
+  const fullRefetch = () => {
+    setOffset(0);
+    refetch();
+  }
+
+  const loadMore = () => {
+    setOffset(prevOffset => prevOffset + 10);
+    fetchMore({
+      variables: {
+        offset: offset + 10,
+      },
+      updateQuery: (previousResult, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return previousResult;
+        return {
+          accounts: [...previousResult.accounts, ...fetchMoreResult.accounts],
+        };
+      },
+    });
+  };
+
+  if (loading && !data) return <ActivityIndicator size="large" />;
+
 
   return (
     <ThemedView style={styles.container}>
-      {loading && <ThemedText>loading</ThemedText>}
       {error && <ThemedText>{error.message}</ThemedText>}
-      {!loading && <FlashList
+      {!loading && data && <FlashList
         data={data.accounts}
-        renderItem={({ item }) => <AccountListItem account={item} />}
-        estimatedItemSize={150}
+        keyExtractor={(item) => item.vid}
+        renderItem={({ item }: { item: any }) => <AccountListItem account={item} />}
+        estimatedItemSize={300}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={loading ? <ActivityIndicator /> : null}
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={refetch}
+            onRefresh={fullRefetch}
           />
         }
       />}
