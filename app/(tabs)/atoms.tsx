@@ -1,51 +1,43 @@
-import { View, StyleSheet, Image, ActivityIndicator, RefreshControl } from 'react-native';
+import { View, StyleSheet, RefreshControl, ActivityIndicator, Image } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import React, { useState } from 'react';
 import { useQuery, gql } from '@apollo/client';
+import React, { useState } from 'react';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 
-const GET_SIGNALS = gql`
-  query GetSignals($offset: Int!) {
-    signals(order_by: {vid: desc}, limit: 10, offset: $offset) {
+const GET_ATOMS = gql`
+query Atoms($offset: Int!){
+  atoms(order_by: {vid: desc}, limit: 10, offset: $offset) {
     vid
-    account {
+    id
+    image
+    emoji
+    label
+    creator {
       id
       label
       image
     }
-    delta
     block_timestamp
-    atom {
-      id
-      emoji
-      label
-    }
-    triple{
-      id
-      subject {
-        emoji
-        label 
+    vault {
+      total_shares
+      positions_aggregate{
+        aggregate {
+          count
+        }
       }
-      predicate {
-        emoji
-        label
-      }
-      object {
-        emoji
-        label
-      }
-    }
     }
   }
-`;
+}`;
 
-export default function Signals() {
+export default function Atoms() {
   const [offset, setOffset] = useState(0);
-  const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS, {
+
+  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ATOMS, {
     variables: { offset: 0 },
   });
 
@@ -63,7 +55,7 @@ export default function Signals() {
       updateQuery: (previousResult, { fetchMoreResult }) => {
         if (!fetchMoreResult) return previousResult;
         return {
-          signals: [...previousResult.signals, ...fetchMoreResult.signals],
+          atoms: [...previousResult.atoms, ...fetchMoreResult.atoms],
         };
       },
     });
@@ -71,13 +63,14 @@ export default function Signals() {
 
   if (loading && !data) return <ActivityIndicator size="large" />;
 
+
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.signals}
+        data={data.atoms}
         keyExtractor={(item) => item.vid}
-        renderItem={({ item }: { item: any }) => <SignalListItem signal={item} />}
+        renderItem={({ item }: { item: any }) => <AtomListItem atom={item} />}
         estimatedItemSize={300}
         onEndReached={loadMore}
         onEndReachedThreshold={0.5}
@@ -92,56 +85,38 @@ export default function Signals() {
     </ThemedView>
   );
 }
-export function SignalListItem({ signal }: { signal: any }) {
+export function AtomListItem({ atom }: { atom: any }) {
   return (
     <ThemedView style={styles.listContainer}>
       <View style={styles.topRow}>
         <Link
           href={{
             pathname: '/account/[id]',
-            params: { id: signal.account.id }
+            params: { id: atom.creator.id }
           }}>
-          {signal.account.image !== null && <Image style={styles.image} source={{ uri: signal.account.image }} />}
-          <ThemedText style={styles.secondary}>{signal.account.label}</ThemedText>
+          {atom.creator.image !== null && <Image style={styles.image} source={{ uri: atom.creator.image }} />}
+          <ThemedText style={styles.secondary}>{atom.creator.label}</ThemedText>
         </Link>
 
-        <ThemedText style={styles.date}>{formatRelative(signal.block_timestamp * 1000, new Date())}</ThemedText>
+        <ThemedText style={styles.date}>{formatRelative(atom.block_timestamp * 1000, new Date())}</ThemedText>
       </View>
 
-      <View style={styles.header}>
-        <ThemedText >{convertToCurrency(signal.delta)}</ThemedText>
-      </View>
-
-      {signal.atom !== null && <Link
+      <Link
         style={styles.vaultLink}
         href={{
           pathname: '/atom/[id]',
-          params: { id: signal.atom.id }
+          params: { id: atom.id }
         }}>
         <View style={styles.vaultContent}>
-          <ThemedText style={styles.secondary} numberOfLines={1}>{signal.atom.emoji} {signal.atom.label}</ThemedText>
+          <ThemedText numberOfLines={1}>{atom.emoji} {atom.label}</ThemedText>
         </View>
+      </Link>
+      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.positions_aggregate.aggregate.count} ∙ {convertToCurrency(atom.vault.total_shares)} </ThemedText>
 
-      </Link>}
-
-
-      {signal.triple !== null && <Link
-        style={styles.vaultLink}
-        href={{
-          pathname: '/triple/[id]',
-          params: { id: signal.triple.id }
-        }}>
-        <View style={styles.vaultContent}>
-          <ThemedText style={styles.secondary} numberOfLines={1}>{signal.triple.subject.emoji} {signal.triple.subject.label}</ThemedText>
-          <ThemedText style={styles.secondary}>{signal.triple.predicate.label}</ThemedText>
-          <ThemedText style={styles.secondary}>{signal.triple.object.emoji} {signal.triple.object.label}</ThemedText>
-        </View>
-      </Link>}
 
     </ThemedView>
   );
 }
-
 
 const styles = StyleSheet.create({
   vaultLink: {
@@ -230,5 +205,7 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
 });
+
+
 
 

@@ -25,6 +25,15 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="atoms"
+        options={{
+          title: 'Atoms',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'extension-puzzle' : 'extension-puzzle-outline'} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="accounts"
         options={{
           title: 'Accounts',
