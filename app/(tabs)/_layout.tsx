@@ -34,6 +34,16 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
+        name="triples"
+        options={{
+          title: 'Triples',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'git-merge' : 'git-merge-outline'} color={color} />
+          ),
+        }}
+      />
+
+      <Tabs.Screen
         name="accounts"
         options={{
           title: 'Accounts',
