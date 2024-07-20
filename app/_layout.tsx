@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+import { defaultDataIdFromObject } from '@apollo/client';
 
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -15,6 +16,7 @@ import { getMainDefinition } from '@apollo/client/utilities';
 SplashScreen.preventAutoHideAsync();
 const httpLink = new HttpLink({
   uri: 'https://smiling-macaw-41.hasura.app/v1/graphql'
+  // uri: 'http://localhost:8080/v1/graphql'
 });
 const wsLink = new GraphQLWsLink(createClient({
   url: 'wss://smiling-macaw-41.hasura.app/v1/graphql',
@@ -34,7 +36,15 @@ const splitLink = split(
 
 const client = new ApolloClient({
   link: splitLink,
-  cache: new InMemoryCache()
+  cache: new InMemoryCache({
+    dataIdFromObject(responseObject) {
+      switch (responseObject.__typename) {
+        // TODO: Add more types here
+        case 'account': return `account:${responseObject.vid}`;
+        default: return defaultDataIdFromObject(responseObject);
+      }
+    }
+  })
 });
 export default function RootLayout() {
   const colorScheme = useColorScheme();

@@ -1,7 +1,7 @@
 import { View, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery, gql } from '@apollo/client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Avatar from '@/components/Avatar';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -24,6 +24,8 @@ export default function Accounts() {
   const [offset, setOffset] = useState(0);
 
   const { loading, error, data, refetch, fetchMore } = useQuery(GET_ACCOUNTS, {
+    // fetchPolicy: 'cache-and-network',
+    // nextFetchPolicy: 'cache-first',
     variables: { offset: 0 },
   });
 
@@ -38,24 +40,22 @@ export default function Accounts() {
       variables: {
         offset: offset + 10,
       },
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return previousResult;
-        return {
-          accounts: [...previousResult.accounts, ...fetchMoreResult.accounts],
-        };
-      },
+      updateQuery: (prev, { fetchMoreResult }) => {
+        if (!fetchMoreResult) return prev;
+        return Object.assign({}, prev, {
+          accounts: [...prev.accounts, ...fetchMoreResult.accounts]
+        });
+      }
     });
   };
 
   if (loading && !data) return <ActivityIndicator size="large" />;
-
-
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
         data={data.accounts}
-        keyExtractor={(item) => item.vid}
+        keyExtractor={(item: any, i: number) => `${i}-${item.vid}`}
         renderItem={({ item }: { item: any }) => <AccountListItem account={item} />}
         estimatedItemSize={300}
         onEndReached={loadMore}

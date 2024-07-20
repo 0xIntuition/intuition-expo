@@ -9,5 +9,6 @@ export function convertToCurrency(amount: string) {
   const eth = formatEther(wei);
   // TODO: Replace this with a real exchange rate
   const usd = parseFloat(eth) * 3410;
+  // return amount + ' WEI';
   return usd.toFixed(2) + ' USD';
 }
