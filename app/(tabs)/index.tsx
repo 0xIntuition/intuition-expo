@@ -13,6 +13,7 @@ const GET_SIGNALS = gql`
     signals(order_by: {vid: desc}, limit: 10, offset: $offset) {
     vid
     account {
+      vid
       id
       label
       image
@@ -48,6 +49,8 @@ export default function Signals() {
   const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS, {
     variables: { offset: 0 },
   });
+
+  console.log(JSON.stringify(data, null, 2));
 
   const fullRefetch = () => {
     setOffset(0);

@@ -18,6 +18,7 @@ query Atoms($offset: Int!){
     emoji
     label
     creator {
+      vid
       id
       label
       image

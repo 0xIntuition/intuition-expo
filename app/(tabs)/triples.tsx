@@ -27,6 +27,7 @@ query Triples($offset: Int!){
         label
       }
     creator {
+      vid
       id
       label
       image

@@ -15,8 +15,8 @@ import { getMainDefinition } from '@apollo/client/utilities';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 const httpLink = new HttpLink({
-  uri: 'https://smiling-macaw-41.hasura.app/v1/graphql'
-  // uri: 'http://localhost:8080/v1/graphql'
+  // uri: 'https://smiling-macaw-41.hasura.app/v1/graphql'
+  uri: 'http://localhost:8080/v1/graphql'
 });
 const wsLink = new GraphQLWsLink(createClient({
   url: 'wss://smiling-macaw-41.hasura.app/v1/graphql',

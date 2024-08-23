@@ -9,7 +9,7 @@ import { Link } from 'expo-router';
 
 const GET_ACCOUNTS = gql`
 query Accounts($offset: Int!){
-  accounts(order_by: {vid: desc}, limit: 10, offset: $offset, where: {type: {_eq: "Default"}}) {
+  accounts(order_by: {vid: desc}, limit: 10, offset: $offset, where: {type: {_eq: 0}}) {
     vid
     image
     label
