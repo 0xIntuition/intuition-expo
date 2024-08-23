@@ -4,47 +4,29 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
-import { defaultDataIdFromObject } from '@apollo/client';
-
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
-import { createClient } from 'graphql-ws';
-import { split, HttpLink } from '@apollo/client';
-import { getMainDefinition } from '@apollo/client/utilities';
+import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
+import { relayStylePagination } from '@apollo/client/utilities';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
-const httpLink = new HttpLink({
-  // uri: 'https://smiling-macaw-41.hasura.app/v1/graphql'
-  uri: 'http://localhost:8080/v1/graphql'
-});
-const wsLink = new GraphQLWsLink(createClient({
-  url: 'wss://smiling-macaw-41.hasura.app/v1/graphql',
-}));
 
-const splitLink = split(
-  ({ query }) => {
-    const definition = getMainDefinition(query);
-    return (
-      definition.kind === 'OperationDefinition' &&
-      definition.operation === 'subscription'
-    );
-  },
-  wsLink,
-  httpLink,
-);
+if (__DEV__) {
+  loadDevMessages();
+  loadErrorMessages();
+}
 
 const client = new ApolloClient({
-  link: splitLink,
+  uri: 'https://i7n.app/graphql',
   cache: new InMemoryCache({
-    dataIdFromObject(responseObject) {
-      switch (responseObject.__typename) {
-        // TODO: Add more types here
-        case 'account': return `account:${responseObject.vid}`;
-        default: return defaultDataIdFromObject(responseObject);
-      }
-    }
-  })
+    typePolicies: {
+      Query: {
+        fields: {
+          comments: relayStylePagination(),
+        },
+      },
+    },
+  }),
 });
 export default function RootLayout() {
   const colorScheme = useColorScheme();

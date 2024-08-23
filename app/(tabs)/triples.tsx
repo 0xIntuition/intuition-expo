@@ -10,13 +10,18 @@ import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 
 const GET_TRIPLES = gql`
-query Triples($offset: Int!){
-  triples(order_by: {vid: desc}, limit: 10, offset: $offset) {
-    vid
-    id
+query Triples($after: String) {
+  triples(
+    orderBy: "blockTimestamp"
+    limit: 10
+    after: $after
+    orderDirection: "desc"
+  ) {
+    items {
+      id
       subject {
         emoji
-        label 
+        label
       }
       predicate {
         emoji
@@ -26,77 +31,66 @@ query Triples($offset: Int!){
         emoji
         label
       }
-    creator {
-      vid
-      id
-      label
-      image
-    }
-    block_timestamp
-    vault {
-      total_shares
-      positions_aggregate{
-        aggregate {
-          count
-        }
+      creator {
+        id
+        label
+        image
+      }
+      blockTimestamp
+      vault {
+        totalShares
+        positionCount
+      }
+      counterVault {
+        totalShares
+        positionCount
       }
     }
-    counterVault {
-      total_shares
-      positions_aggregate{
-        aggregate {
-          count
-        }
-      }
+    pageInfo {
+      endCursor
+      hasNextPage
     }
   }
 }`;
 
 export default function Triple() {
-  const [offset, setOffset] = useState(0);
 
-  const { loading, error, data, refetch, fetchMore } = useQuery(GET_TRIPLES, {
-    variables: { offset: 0 },
-  });
-
-  const fullRefetch = () => {
-    setOffset(0);
-    refetch();
-  }
-
-  const loadMore = () => {
-    setOffset(prevOffset => prevOffset + 10);
-    fetchMore({
-      variables: {
-        offset: offset + 10,
-      },
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return previousResult;
-        return {
-          triples: [...previousResult.triples, ...fetchMoreResult.triples],
-        };
-      },
-    });
-  };
+  const { loading, error, data, refetch, fetchMore } = useQuery(GET_TRIPLES);
 
   if (loading && !data) return <ActivityIndicator size="large" />;
-
 
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.triples}
-        keyExtractor={(item) => item.vid}
+        data={data.triples.items}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }: { item: any }) => <TripleListItem triple={item} />}
         estimatedItemSize={300}
-        onEndReached={loadMore}
+        onEndReached={() => {
+          if (data.triples.pageInfo.hasNextPage) {
+            fetchMore({
+              variables: {
+                after: data.triples.pageInfo.endCursor,
+              },
+              updateQuery: (previousResult, { fetchMoreResult }) => {
+                if (!fetchMoreResult) return previousResult;
+                return {
+                  triples: {
+                    items: [...previousResult.triples.items, ...fetchMoreResult.triples.items],
+                    pageInfo: fetchMoreResult.triples.pageInfo,
+                  }
+                };
+              },
+            });
+          }
+        }}
         onEndReachedThreshold={0.5}
         ListFooterComponent={loading ? <ActivityIndicator /> : null}
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={fullRefetch}
+            onRefresh={() => refetch({ after: null })}
           />
         }
       />}
@@ -116,7 +110,7 @@ export function TripleListItem({ triple }: { triple: any }) {
           <ThemedText style={styles.secondary}>{triple.creator.label}</ThemedText>
         </Link>
 
-        <ThemedText style={styles.date}>{formatRelative(triple.block_timestamp * 1000, new Date())}</ThemedText>
+        <ThemedText style={styles.date}>{formatRelative(triple.blockTimestamp * 1000, new Date())}</ThemedText>
       </View>
 
       <Link
@@ -132,9 +126,9 @@ export function TripleListItem({ triple }: { triple: any }) {
         </View>
       </Link>
       <View style={styles.positionsRow}>
-        <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {triple.vault.positions_aggregate.aggregate.count} ∙ {convertToCurrency(triple.vault.total_shares)} </ThemedText>
+        <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {triple.vault.positionsCount} ∙ {convertToCurrency(triple.vault.totalShares)} </ThemedText>
 
-        <ThemedText numberOfLines={1} style={styles.counterVault}><Ionicons size={13} name='person' /> {triple.counterVault.positions_aggregate.aggregate.count} ∙ {convertToCurrency(triple.counterVault.total_shares)} </ThemedText>
+        <ThemedText numberOfLines={1} style={styles.counterVault}><Ionicons size={13} name='person' /> {triple.counterVault.positionsCount} ∙ {convertToCurrency(triple.counterVault.totalShares)} </ThemedText>
       </View>
 
     </ThemedView>

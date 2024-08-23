@@ -6,8 +6,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 const GET_TRIPLE = gql`
-query Triple ($id: String!){
-  triples(where: {id: {_eq: $id}}) {
+query Triple ($id: BigInt!){
+  triple(id: $id) {
     id
       subject {
         emoji
@@ -23,6 +23,7 @@ query Triple ($id: String!){
       }
   }
 }`;
+
 export default function Triple() {
   const { id } = useLocalSearchParams();
   const { loading, error, data, refetch } = useQuery(GET_TRIPLE, { variables: { id } });
@@ -30,12 +31,11 @@ export default function Triple() {
   if (loading) return <ThemedText>Loading...</ThemedText>;
   if (error) return <ThemedText>{error.message}</ThemedText>;
 
-  if (data.triples.length === 0) {
+  if (!data.triple) {
     return <ThemedText>Triple not found</ThemedText>;
   }
 
-  const triple = data.triples[0];
-
+  const { triple } = data;
 
   return (
     <ThemedView style={styles.container}>

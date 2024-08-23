@@ -10,76 +10,74 @@ import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 
 const GET_ATOMS = gql`
-query Atoms($offset: Int!){
-  atoms(order_by: {vid: desc}, limit: 10, offset: $offset) {
-    vid
-    id
-    image
-    emoji
-    label
-    creator {
-      vid
+query Atoms($after: String) {
+  atoms(
+    orderBy: "blockTimestamp"
+    limit: 10
+    after: $after
+    orderDirection: "desc"
+  ) {
+    items {
       id
-      label
       image
-    }
-    block_timestamp
-    vault {
-      total_shares
-      positions_aggregate{
-        aggregate {
-          count
-        }
+      emoji
+      label
+      creator {
+        id
+        label
+        image
       }
+      blockTimestamp
+      vault {
+        totalShares
+        currentSharePrice
+        positionCount
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
     }
   }
 }`;
 
 export default function Atoms() {
-  const [offset, setOffset] = useState(0);
-
-  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ATOMS, {
-    variables: { offset: 0 },
-  });
-
-  const fullRefetch = () => {
-    setOffset(0);
-    refetch();
-  }
-
-  const loadMore = () => {
-    setOffset(prevOffset => prevOffset + 10);
-    fetchMore({
-      variables: {
-        offset: offset + 10,
-      },
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return previousResult;
-        return {
-          atoms: [...previousResult.atoms, ...fetchMoreResult.atoms],
-        };
-      },
-    });
-  };
+  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ATOMS);
 
   if (loading && !data) return <ActivityIndicator size="large" />;
-
 
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.atoms}
-        keyExtractor={(item) => item.vid}
+        data={data.atoms.items}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }: { item: any }) => <AtomListItem atom={item} />}
         estimatedItemSize={300}
-        onEndReached={loadMore}
+        onEndReached={() => {
+          if (data.atoms.pageInfo.hasNextPage) {
+            fetchMore({
+              variables: {
+                after: data.atoms.pageInfo.endCursor,
+              },
+              updateQuery: (previousResult, { fetchMoreResult }) => {
+                if (!fetchMoreResult) return previousResult;
+                return {
+                  atoms: {
+                    items: [...previousResult.atoms.items, ...fetchMoreResult.atoms.items],
+                    pageInfo: fetchMoreResult.atoms.pageInfo,
+                  }
+                };
+              },
+            });
+          }
+        }}
         onEndReachedThreshold={0.5}
         ListFooterComponent={loading ? <ActivityIndicator /> : null}
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={fullRefetch}
+            onRefresh={() => refetch({ after: null })}
           />
         }
       />}
@@ -99,7 +97,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           <ThemedText style={styles.secondary}>{atom.creator.label}</ThemedText>
         </Link>
 
-        <ThemedText style={styles.date}>{formatRelative(atom.block_timestamp * 1000, new Date())}</ThemedText>
+        <ThemedText style={styles.date}>{formatRelative(atom.blockTimestamp * 1000, new Date())}</ThemedText>
       </View>
 
       <Link
@@ -112,7 +110,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           <ThemedText numberOfLines={1}>{atom.emoji} {atom.label}</ThemedText>
         </View>
       </Link>
-      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.positions_aggregate.aggregate.count} ∙ {convertToCurrency(atom.vault.total_shares)} </ThemedText>
+      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.positionCount} ∙ {convertToCurrency(atom.vault.totalShares)} </ThemedText>
 
 
     </ThemedView>

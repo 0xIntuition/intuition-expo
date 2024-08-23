@@ -8,12 +8,23 @@ import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 
 const GET_ACCOUNTS = gql`
-query Accounts($offset: Int!){
-  accounts(order_by: {vid: desc}, limit: 10, offset: $offset, where: {type: {_eq: 0}}) {
-    vid
-    image
-    label
-    id
+query Accounts($after: String) {
+  accounts(
+    orderBy: "label"
+    limit: 10
+    after: $after
+    orderDirection: "asc"
+    where: { type: Default }
+  ) {
+    items {
+      image
+      label
+      id
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
   }
 }`;
 function shortId(id: string): string {
@@ -21,50 +32,43 @@ function shortId(id: string): string {
 }
 
 export default function Accounts() {
-  const [offset, setOffset] = useState(0);
 
-  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ACCOUNTS, {
-    // fetchPolicy: 'cache-and-network',
-    // nextFetchPolicy: 'cache-first',
-    variables: { offset: 0 },
-  });
+  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ACCOUNTS);
 
-  const fullRefetch = () => {
-    setOffset(0);
-    refetch();
-  }
-
-  const loadMore = () => {
-    setOffset(prevOffset => prevOffset + 10);
-    fetchMore({
-      variables: {
-        offset: offset + 10,
-      },
-      updateQuery: (prev, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return prev;
-        return Object.assign({}, prev, {
-          accounts: [...prev.accounts, ...fetchMoreResult.accounts]
-        });
-      }
-    });
-  };
 
   if (loading && !data) return <ActivityIndicator size="large" />;
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.accounts}
-        keyExtractor={(item: any, i: number) => `${i}-${item.vid}`}
+        data={data.accounts.items}
+        keyExtractor={(item: any) => `${item.id}`}
         renderItem={({ item }: { item: any }) => <AccountListItem account={item} />}
         estimatedItemSize={300}
-        onEndReached={loadMore}
+        onEndReached={() => {
+          if (data.accounts.pageInfo.hasNextPage) {
+            fetchMore({
+              variables: {
+                after: data.accounts.pageInfo.endCursor,
+              },
+              updateQuery: (previousResult, { fetchMoreResult }) => {
+                if (!fetchMoreResult) return previousResult;
+                return {
+                  accounts: {
+                    items: [...previousResult.accounts.items, ...fetchMoreResult.accounts.items],
+                    pageInfo: fetchMoreResult.accounts.pageInfo,
+                  }
+                };
+              },
+            });
+          }
+        }}
         onEndReachedThreshold={0.5}
         ListFooterComponent={loading ? <ActivityIndicator /> : null}
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={fullRefetch}
+            onRefresh={() => refetch({ after: null })}
           />
         }
       />}

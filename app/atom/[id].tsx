@@ -6,8 +6,8 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 const GET_ATOM = gql`
-query Atom ($id: String!){
-  atoms(where: {id: {_eq: $id}}) {
+query Atom ($id: BigInt!){
+  atom(id: $id) {
     id
     label
     image
@@ -22,11 +22,11 @@ export default function Atom() {
   if (loading) return <ThemedText>Loading...</ThemedText>;
   if (error) return <ThemedText>{error.message}</ThemedText>;
 
-  if (data.atoms.length === 0) {
+  if (!data.atom) {
     return <ThemedText>Atom not found</ThemedText>;
   }
 
-  const atom = data.atoms[0];
+  const { atom } = data;
 
 
   return (

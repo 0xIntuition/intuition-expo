@@ -9,86 +9,87 @@ import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 
 const GET_SIGNALS = gql`
-  query GetSignals($offset: Int!) {
-    signals(order_by: {vid: desc}, limit: 10, offset: $offset) {
-    vid
-    account {
-      vid
+query GetSignals($after: String) {
+  signals(
+    after: $after
+    orderBy: "blockTimestamp"
+    orderDirection: "desc"
+    limit: 10
+  ) {
+    items {
       id
-      label
-      image
-    }
-    delta
-    block_timestamp
-    atom {
-      id
-      emoji
-      label
-    }
-    triple{
-      id
-      subject {
-        emoji
-        label 
+      account {
+        id
+        label
+        image
       }
-      predicate {
+      delta
+      blockTimestamp
+      atom {
+        id
         emoji
         label
       }
-      object {
-        emoji
-        label
+      triple {
+        id
+        subject {
+          emoji
+          label
+        }
+        predicate {
+          emoji
+          label
+        }
+        object {
+          emoji
+          label
+        }
       }
     }
+    pageInfo {
+      endCursor
+      hasNextPage
     }
   }
+}
 `;
 
 export default function Signals() {
-  const [offset, setOffset] = useState(0);
-  const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS, {
-    variables: { offset: 0 },
-  });
-
-  console.log(JSON.stringify(data, null, 2));
-
-  const fullRefetch = () => {
-    setOffset(0);
-    refetch();
-  }
-
-  const loadMore = () => {
-    setOffset(prevOffset => prevOffset + 10);
-    fetchMore({
-      variables: {
-        offset: offset + 10,
-      },
-      updateQuery: (previousResult, { fetchMoreResult }) => {
-        if (!fetchMoreResult) return previousResult;
-        return {
-          signals: [...previousResult.signals, ...fetchMoreResult.signals],
-        };
-      },
-    });
-  };
+  const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS);
 
   if (loading && !data) return <ActivityIndicator size="large" />;
-
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.signals}
-        keyExtractor={(item) => item.vid}
+        data={data.signals.items}
+        keyExtractor={(item) => item.id}
         renderItem={({ item }: { item: any }) => <SignalListItem signal={item} />}
         estimatedItemSize={300}
-        onEndReached={loadMore}
+        onEndReached={() => {
+          if (data.signals.pageInfo.hasNextPage) {
+            fetchMore({
+              variables: {
+                after: data.signals.pageInfo.endCursor,
+              },
+              updateQuery: (previousResult, { fetchMoreResult }) => {
+                if (!fetchMoreResult) return previousResult;
+                return {
+                  signals: {
+                    items: [...previousResult.signals.items, ...fetchMoreResult.signals.items],
+                    pageInfo: fetchMoreResult.signals.pageInfo,
+                  }
+                };
+              },
+            });
+          }
+        }}
         onEndReachedThreshold={0.5}
         ListFooterComponent={loading ? <ActivityIndicator /> : null}
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={fullRefetch}
+            onRefresh={() => refetch({ after: null })}
           />
         }
       />}
@@ -108,7 +109,7 @@ export function SignalListItem({ signal }: { signal: any }) {
           <ThemedText style={styles.secondary}>{signal.account.label}</ThemedText>
         </Link>
 
-        <ThemedText style={styles.date}>{formatRelative(signal.block_timestamp * 1000, new Date())}</ThemedText>
+        <ThemedText style={styles.date}>{formatRelative(signal.blockTimestamp * 1000, new Date())}</ThemedText>
       </View>
 
       <View style={styles.header}>

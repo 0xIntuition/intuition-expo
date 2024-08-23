@@ -6,19 +6,21 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 const GET_ACCOUNT = gql`
-query Account ($id: String!){
-  accounts(where: {id: {_eq: $id}}) {
+query Account($id: String!) {
+  account(id: $id) {
     id
     label
     image
     atom {
       id
       asSubject {
-        predicate {
-          label
-        }
-        object {
-          label
+        items {
+          predicate {
+            label
+          }
+          object {
+            label
+          }
         }
       }
     }
@@ -31,13 +33,11 @@ export default function Account() {
   if (loading) return <ThemedText>Loading...</ThemedText>;
   if (error) return <ThemedText>{error.message}</ThemedText>;
 
-  if (data.accounts.length === 0) {
+  if (!data.account) {
     return <ThemedText>Account not found</ThemedText>;
   }
 
-  const account = data.accounts[0];
-
-
+  const account = data.account;
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen
