@@ -90,7 +90,7 @@ export function AtomListItem({ atom }: { atom: any }) {
       <View style={styles.topRow}>
         <Link
           href={{
-            pathname: '/account/[id]',
+            pathname: '/acc/[id]',
             params: { id: atom.creator.id }
           }}>
           {atom.creator.image !== null && <Image style={styles.image} source={{ uri: atom.creator.image }} />}
@@ -103,7 +103,7 @@ export function AtomListItem({ atom }: { atom: any }) {
       <Link
         style={styles.vaultLink}
         href={{
-          pathname: '/atom/[id]',
+          pathname: '/a/[id]',
           params: { id: atom.id }
         }}>
         <View style={styles.vaultContent}>

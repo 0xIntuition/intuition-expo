@@ -103,7 +103,7 @@ export function TripleListItem({ triple }: { triple: any }) {
       <View style={styles.topRow}>
         <Link
           href={{
-            pathname: '/account/[id]',
+            pathname: '/acc/[id]',
             params: { id: triple.creator.id }
           }}>
           {triple.creator.image !== null && <Image style={styles.image} source={{ uri: triple.creator.image }} />}
@@ -116,7 +116,7 @@ export function TripleListItem({ triple }: { triple: any }) {
       <Link
         style={styles.vaultLink}
         href={{
-          pathname: '/triple/[id]',
+          pathname: '/t/[id]',
           params: { id: triple.id }
         }}>
         <View style={styles.vaultContent}>
