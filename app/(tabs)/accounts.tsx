@@ -81,7 +81,7 @@ export function AccountListItem({ account }: { account: any }) {
 
       <Link
         href={{
-          pathname: '/account/[id]',
+          pathname: '/acc/[id]',
           params: { id: account.id }
         }}>
         <Avatar image={account.image} style={styles.avatar} />

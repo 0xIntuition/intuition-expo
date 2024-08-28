@@ -50,21 +50,21 @@ export default function RootLayout() {
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
           <Stack.Screen
-            name="atom"
+            name="a"
             options={{
               presentation: 'modal',
               headerShown: false,
             }}
           />
           <Stack.Screen
-            name="triple"
+            name="t"
             options={{
               presentation: 'modal',
               headerShown: false,
             }}
           />
           <Stack.Screen
-            name="account"
+            name="acc"
             options={{
               presentation: 'modal',
               headerShown: false,

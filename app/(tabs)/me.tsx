@@ -44,6 +44,15 @@ export default function Me() {
         <ThemedText>{isConnected ? "Disconnect" : "Connect"}</ThemedText>
       </Pressable>
       <WalletConnectModal projectId={projectId} providerMetadata={providerMetadata} />
+      {isConnected && address !== undefined && (
+        <Link
+          href={{
+            pathname: '/acc/[id]',
+            params: { id: address }
+          }}>
+          <ThemedText>{address}</ThemedText>
+        </Link>
+      )}
 
     </ThemedView>
   );

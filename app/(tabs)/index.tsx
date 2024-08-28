@@ -102,7 +102,7 @@ export function SignalListItem({ signal }: { signal: any }) {
       <View style={styles.topRow}>
         <Link
           href={{
-            pathname: '/account/[id]',
+            pathname: '/acc/[id]',
             params: { id: signal.account.id }
           }}>
           {signal.account.image !== null && <Image style={styles.image} source={{ uri: signal.account.image }} />}
@@ -119,7 +119,7 @@ export function SignalListItem({ signal }: { signal: any }) {
       {signal.atom !== null && <Link
         style={styles.vaultLink}
         href={{
-          pathname: '/atom/[id]',
+          pathname: '/a/[id]',
           params: { id: signal.atom.id }
         }}>
         <View style={styles.vaultContent}>
@@ -132,7 +132,7 @@ export function SignalListItem({ signal }: { signal: any }) {
       {signal.triple !== null && <Link
         style={styles.vaultLink}
         href={{
-          pathname: '/triple/[id]',
+          pathname: '/t/[id]',
           params: { id: signal.triple.id }
         }}>
         <View style={styles.vaultContent}>

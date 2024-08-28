@@ -14,9 +14,24 @@
     },
     "ios": {
       "supportsTablet": true,
+      "associatedDomains": ["applinks:i7n.app"],
       "bundleIdentifier": "systems.intuition.expo"
     },
     "android": {
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "i7n.app",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": ["BROWSABLE", "DEFAULT"]
+        }
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
