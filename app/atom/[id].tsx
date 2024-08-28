@@ -1,10 +1,10 @@
-import { View } from 'react-native';
+import { Button, View } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery, gql } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-
+import { shareAsync } from 'expo-sharing';
 const GET_ATOM = gql`
 query Atom ($id: BigInt!){
   atom(id: $id) {
@@ -40,6 +40,9 @@ export default function Atom() {
         }}
       />
       <ThemedText>{atom.emoji} {atom.type}</ThemedText>
+      <Button title="Share" onPress={async () => {
+        await shareAsync('https://i7n.app/a/' + id);
+      }} />
 
     </ThemedView>
   );

@@ -1,9 +1,10 @@
-import { View } from 'react-native';
+import { Button, View } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery, gql } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { shareAsync } from 'expo-sharing';
 
 const GET_TRIPLE = gql`
 query Triple ($id: BigInt!){
@@ -45,7 +46,9 @@ export default function Triple() {
         <ThemedText >{triple.predicate.label}</ThemedText>
         <ThemedText >{triple.object.emoji} {triple.object.label}</ThemedText>
       </View>
-
+      <Button title="Share" onPress={async () => {
+        await shareAsync('https://i7n.app/t/' + id);
+      }} />
     </ThemedView>
   );
 }

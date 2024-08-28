@@ -1,9 +1,10 @@
-import { View } from 'react-native';
+import { Button, View } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery, gql } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
+import { shareAsync } from 'expo-sharing';
 
 const GET_ACCOUNT = gql`
 query Account($id: String!) {
@@ -49,7 +50,9 @@ export default function Account() {
         }}
       />
       <ThemedText>Account {id}</ThemedText>
-
+      <Button title="Share" onPress={async () => {
+        await shareAsync('https://i7n.app/acc/' + id);
+      }} />
     </ThemedView>
   );
 }
