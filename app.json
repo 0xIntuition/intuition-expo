@@ -5,17 +5,20 @@
     "version": "1.0.3",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "myapp",
+    "scheme": "i7n",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
       "associatedDomains": ["applinks:i7n.app"],
-      "bundleIdentifier": "systems.intuition.expo"
+      "bundleIdentifier": "systems.intuition.expo",
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["metamask", "trust", "rainbow", "uniswap"]
+      }
     },
     "android": {
       "intentFilters": [
