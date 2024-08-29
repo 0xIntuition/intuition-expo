@@ -5,6 +5,12 @@ import { useQuery, gql } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { shareAsync } from 'expo-sharing';
+import { useCallback, useMemo, useState } from 'react';
+import { useWalletConnectModal } from '@walletconnect/modal-react-native';
+import { Address, createPublicClient, createWalletClient, custom, http, parseEther } from 'viem';
+import { base } from 'viem/chains';
+import { Multivault } from '@/lib/protocol';
+
 const GET_ATOM = gql`
 query Atom ($id: BigInt!){
   atom(id: $id) {
@@ -18,6 +24,8 @@ query Atom ($id: BigInt!){
 export default function Atom() {
   const { id } = useLocalSearchParams();
   const { loading, error, data, refetch } = useQuery(GET_ATOM, { variables: { id } });
+  const { open, isConnected, address, provider } = useWalletConnectModal();
+  const [errorMesage, setErrorMesage] = useState<string | null>(null);
 
   if (loading) return <ThemedText>Loading...</ThemedText>;
   if (error) return <ThemedText>{error.message}</ThemedText>;
@@ -27,6 +35,47 @@ export default function Atom() {
   }
 
   const { atom } = data;
+
+  const handleDeposit = async () => {
+
+    if (!isConnected || !address || !provider) {
+      open();
+      return;
+    }
+
+    const publicClient = createPublicClient({
+      chain: base,
+      transport: http(),
+    })
+
+    const walletClient = createWalletClient({
+      chain: base,
+      account: address as Address,
+      transport: custom({
+        async request({ method, params }) {
+          return await provider?.request({ method, params });
+        },
+      }),
+    })
+
+    const multivault = new Multivault({
+      // @ts-ignore
+      publicClient,
+      // @ts-ignore
+      walletClient,
+    });
+
+
+    multivault?.depositAtom(BigInt(atom.id), parseEther('0.00042'))
+      .then(({ shares }) => {
+        setErrorMesage(`Bought ${shares} shares`);
+      })
+      .catch((error) => {
+        console.error(error);
+        setErrorMesage(error.message);
+      });
+
+  };
 
 
   return (
@@ -43,6 +92,9 @@ export default function Atom() {
       <Button title="Share" onPress={async () => {
         await shareAsync('https://i7n.app/a/' + id);
       }} />
+
+      <Button title="Deposit" onPress={handleDeposit} />
+      <ThemedText>{errorMesage}</ThemedText>
 
     </ThemedView>
   );

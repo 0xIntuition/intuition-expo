@@ -9,22 +9,8 @@ import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 import {
-  WalletConnectModal,
   useWalletConnectModal,
 } from "@walletconnect/modal-react-native";
-
-const projectId = '5e71a895f4587af8d1ac0df79b81f86e';
-
-const providerMetadata = {
-  name: 'Intuition',
-  description: 'Disruptive Trustformation',
-  url: 'https://intuition.systems/',
-  icons: ['https://avatars.githubusercontent.com/u/94311139?s=200&v=4'],
-  redirect: {
-    native: 'YOUR_APP_SCHEME://',
-    universal: 'YOUR_APP_UNIVERSAL_LINK.com'
-  }
-};
 
 export default function Me() {
   const { open, isConnected, address, provider } = useWalletConnectModal();
@@ -43,7 +29,6 @@ export default function Me() {
       <Pressable onPress={handleButtonPress} style={styles.pressableMargin}>
         <ThemedText>{isConnected ? "Disconnect" : "Connect"}</ThemedText>
       </Pressable>
-      <WalletConnectModal projectId={projectId} providerMetadata={providerMetadata} />
       {isConnected && address !== undefined && (
         <Link
           href={{
