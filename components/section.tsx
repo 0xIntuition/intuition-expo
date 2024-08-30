@@ -4,7 +4,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { useThemeColor } from '@/hooks/useThemeColor';
 
 interface SectionProps extends PropsWithChildren {
-  title: string;
+  title?: string;
 }
 
 export const Section: FC<SectionProps> = ({ title, children }) => {
@@ -13,7 +13,7 @@ export const Section: FC<SectionProps> = ({ title, children }) => {
 
   return (
     <View style={styles.container}>
-      <ThemedText style={[styles.title, { color: titleColor }]}>{title}</ThemedText>
+      {title !== undefined && <ThemedText style={[styles.title, { color: titleColor }]}>{title}</ThemedText>}
       <View style={[styles.content, { backgroundColor }]}>{children}</View>
     </View>
   );
