@@ -1,6 +1,6 @@
-# Intuition Mobile App
+# Intuition POC Mobile App
 
-The **Intuition Mobile App** brings the power of decentralized knowledge to your fingertips, allowing you to access, contribute, and interact with the Intuition knowledge graph directly from your mobile device. With the Intuition Mobile App, you can explore insights, follow trusted sources, and make informed decisions on the go.
+The **Intuition POC Mobile App** brings the power of decentralized knowledge to your fingertips, allowing you to access, contribute, and interact with the Intuition knowledge graph directly from your mobile device. With the Intuition POC Mobile App, you can explore insights, follow trusted sources, and make informed decisions on the go.
 
 ## Overview
 
