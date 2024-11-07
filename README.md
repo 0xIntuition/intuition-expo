@@ -1,3 +1,8 @@
+> **⚠️ DISCLAIMER**
+>
+> This project is currently in early development and is a work in progress. It is not meant for production use or evaluation at this time. Features may be incomplete, unstable, or subject to significant changes. Please check back later for a more complete version.
+
+
 # Intuition POC Mobile App
 
 The **Intuition POC Mobile App** brings the power of decentralized knowledge to your fingertips, allowing you to access, contribute, and interact with the Intuition knowledge graph directly from your mobile device. With the Intuition POC Mobile App, you can explore insights, follow trusted sources, and make informed decisions on the go.
