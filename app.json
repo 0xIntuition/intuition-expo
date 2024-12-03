@@ -14,10 +14,17 @@
     },
     "ios": {
       "supportsTablet": true,
-      "associatedDomains": ["applinks:i7n.app"],
+      "associatedDomains": [
+        "applinks:i7n.app"
+      ],
       "bundleIdentifier": "systems.intuition.expo",
       "infoPlist": {
-        "LSApplicationQueriesSchemes": ["metamask", "trust", "rainbow", "uniswap"]
+        "LSApplicationQueriesSchemes": [
+          "metamask",
+          "trust",
+          "rainbow",
+          "uniswap"
+        ]
       }
     },
     "android": {
@@ -32,7 +39,10 @@
               "pathPrefix": "/"
             }
           ],
-          "category": ["BROWSABLE", "DEFAULT"]
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
         }
       ],
       "adaptiveIcon": {
@@ -47,7 +57,8 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-font"
     ],
     "experiments": {
       "typedRoutes": true
