@@ -55,6 +55,7 @@ export default function Accounts() {
                 if (!fetchMoreResult) return previousResult;
                 return {
                   accounts: {
+                    __typename: previousResult.accounts.__typename,
                     items: [...previousResult.accounts.items, ...fetchMoreResult.accounts.items],
                     pageInfo: fetchMoreResult.accounts.pageInfo,
                   }

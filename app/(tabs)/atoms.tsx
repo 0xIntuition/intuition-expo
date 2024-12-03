@@ -64,6 +64,7 @@ export default function Atoms() {
                 if (!fetchMoreResult) return previousResult;
                 return {
                   atoms: {
+                    __typename: previousResult.__typename,
                     items: [...previousResult.atoms.items, ...fetchMoreResult.atoms.items],
                     pageInfo: fetchMoreResult.atoms.pageInfo,
                   }

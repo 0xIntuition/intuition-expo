@@ -182,6 +182,7 @@ export default function Atom() {
             id={account.id}
             image={account.image}
             label={account.label}
+            href={{ pathname: '/acc/[id]', params: { id: account.id } }}
             value={`${(
               parseFloat(formatEther(atom.vault.currentSharePrice))
               * parseFloat(formatEther(shares))

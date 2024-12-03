@@ -77,6 +77,7 @@ export default function Triple() {
                 if (!fetchMoreResult) return previousResult;
                 return {
                   triples: {
+                    __typename: previousResult.__typename,
                     items: [...previousResult.triples.items, ...fetchMoreResult.triples.items],
                     pageInfo: fetchMoreResult.triples.pageInfo,
                   }

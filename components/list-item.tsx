@@ -2,10 +2,13 @@ import React, { FC } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Address } from 'viem';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { ExpoRouter } from 'expo-router/types/expo-router';
+import { Link } from 'expo-router';
+import Ionicons from '@expo/vector-icons/Ionicons'
 
 interface ListItemProps {
   id?: Address;
-  href?: string;
+  href?: ExpoRouter.Href;
   emoji?: string | null;
   image?: string | null;
   label: string;
@@ -61,31 +64,15 @@ export const ListItem: FC<ListItemProps> = ({
           {subValue && <Text style={[styles.subValue, { color: subTextColor }]}>{subValue}</Text>}
         </View>
       )}
+      {href && <Link href={href} >
+        <Ionicons name="chevron-forward" size={24} color={textColor} />
+      </Link>}
     </View>
   );
 
-  const ChevronIcon = () => (
-    <svg width="20" height="20" viewBox="0 0 20 20" fill={subTextColor}>
-      <path
-        fillRule="evenodd"
-        d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"
-        clipRule="evenodd"
-      />
-    </svg>
-  );
 
-  return (
-    <View style={[styles.container]}>
-      {href ? (
-        <TouchableOpacity onPress={() => {/* Handle navigation */ }}>
-          {content}
-          <ChevronIcon />
-        </TouchableOpacity>
-      ) : (
-        content
-      )}
-    </View>
-  );
+  return <View style={styles.container}>{content}</View>;
+
 };
 
 const styles = StyleSheet.create({
@@ -96,9 +83,9 @@ const styles = StyleSheet.create({
     padding: 16,
     paddingRight: 0,
     paddingBottom: 0,
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 1,
+    // shadowOffset: { width: 0, height: 1 },
+    // shadowOpacity: 0.1,
+    // shadowRadius: 1,
     elevation: 1,
     marginTop: 4,
 

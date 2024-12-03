@@ -7,6 +7,8 @@ import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
+import { ListItem } from '@/components/list-item';
+import { Address, formatEther } from 'viem';
 
 const GET_SIGNALS = gql`
 query GetSignals($after: String) {
@@ -32,6 +34,7 @@ query GetSignals($after: String) {
       }
       triple {
         id
+        label
         subject {
           emoji
           label
@@ -51,6 +54,11 @@ query GetSignals($after: String) {
       hasNextPage
     }
   }
+  chainlinkPrices(limit: 1, orderBy: "id", orderDirection: "desc") {
+    items {
+      usd
+    }
+  }
 }
 `;
 
@@ -58,13 +66,24 @@ export default function Signals() {
   const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS);
 
   if (loading && !data) return <ActivityIndicator size="large" />;
+  const usd = data.chainlinkPrices.items[0].usd;
+
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
         data={data.signals.items}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }: { item: any }) => <SignalListItem signal={item} />}
+        renderItem={({ item }: { item: any }) => (<ListItem
+          image={item.account?.image}
+          id={item.account?.id.toString()! as Address}
+          label={`${item.atom?.label || item.triple?.label || ''} `}
+          subLabel={`${item.account?.label}  ∙ ${formatRelative(new Date(parseInt(item.blockTimestamp.toString()) * 1000), new Date())} `}
+          value={`${item.delta > 0 ? '+' : ''}${(parseFloat(formatEther(item.delta)) * usd).toFixed(2)}`}
+          subValue='USD'
+          href={item.atom?.id ? `/a/${item.atom.id}` : `/t/${item.triple?.id}`}
+        />)
+        }
         estimatedItemSize={300}
         onEndReached={() => {
           if (data.signals.pageInfo.hasNextPage) {
@@ -76,9 +95,11 @@ export default function Signals() {
                 if (!fetchMoreResult) return previousResult;
                 return {
                   signals: {
+                    __typename: previousResult.signals.__typename,
                     items: [...previousResult.signals.items, ...fetchMoreResult.signals.items],
                     pageInfo: fetchMoreResult.signals.pageInfo,
-                  }
+                  },
+                  chainlinkPrices: previousResult.chainlinkPrices,
                 };
               },
             });
@@ -96,56 +117,6 @@ export default function Signals() {
     </ThemedView>
   );
 }
-export function SignalListItem({ signal }: { signal: any }) {
-  return (
-    <ThemedView style={styles.listContainer}>
-      <View style={styles.topRow}>
-        <Link
-          href={{
-            pathname: '/acc/[id]',
-            params: { id: signal.account.id }
-          }}>
-          {signal.account.image !== null && <Image style={styles.image} source={{ uri: signal.account.image }} />}
-          <ThemedText style={styles.secondary}>{signal.account.label}</ThemedText>
-        </Link>
-
-        <ThemedText style={styles.date}>{formatRelative(signal.blockTimestamp * 1000, new Date())}</ThemedText>
-      </View>
-
-      <View style={styles.header}>
-        <ThemedText >{convertToCurrency(signal.delta)}</ThemedText>
-      </View>
-
-      {signal.atom !== null && <Link
-        style={styles.vaultLink}
-        href={{
-          pathname: '/a/[id]',
-          params: { id: signal.atom.id }
-        }}>
-        <View style={styles.vaultContent}>
-          <ThemedText style={styles.secondary} numberOfLines={1}>{signal.atom.emoji} {signal.atom.label}</ThemedText>
-        </View>
-
-      </Link>}
-
-
-      {signal.triple !== null && <Link
-        style={styles.vaultLink}
-        href={{
-          pathname: '/t/[id]',
-          params: { id: signal.triple.id }
-        }}>
-        <View style={styles.vaultContent}>
-          <ThemedText style={styles.secondary} numberOfLines={1}>{signal.triple.subject.emoji} {signal.triple.subject.label}</ThemedText>
-          <ThemedText style={styles.secondary}>{signal.triple.predicate.label}</ThemedText>
-          <ThemedText style={styles.secondary}>{signal.triple.object.emoji} {signal.triple.object.label}</ThemedText>
-        </View>
-      </Link>}
-
-    </ThemedView>
-  );
-}
-
 
 const styles = StyleSheet.create({
   vaultLink: {
