@@ -17,7 +17,7 @@
       "associatedDomains": [
         "applinks:i7n.app"
       ],
-      "bundleIdentifier": "systems.intuition.expo",
+      "bundleIdentifier": "systems.intuition.mobile",
       "infoPlist": {
         "LSApplicationQueriesSchemes": [
           "metamask",
@@ -49,7 +49,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "systems.intuition.expo"
+      "package": "systems.intuition.mobile"
     },
     "web": {
       "bundler": "metro",
