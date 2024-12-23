@@ -174,7 +174,7 @@ export default function Atom() {
       </View>
 
       <ThemedText>{errorMesage}</ThemedText>
-      {errorMesage && <Link href={{ pathname: '(tabs)/me' }}><ThemedText>Go to me</ThemedText></Link>}
+      {errorMesage && <Link href={{ pathname: '/(tabs)/me' }}><ThemedText>Go to me</ThemedText></Link>}
       <Section title="Top Holders">
         {atom.vault.positions.items.map(({ shares, account }: any) => (
           <ListItem
