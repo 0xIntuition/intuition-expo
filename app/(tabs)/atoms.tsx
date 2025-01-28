@@ -1,6 +1,6 @@
 import { View, StyleSheet, RefreshControl, ActivityIndicator, Image } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import React, { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
@@ -8,41 +8,36 @@ import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
+import { gql } from '@/lib/generated';
 
-const GET_ATOMS = gql`
-query Atoms($after: String) {
-  atoms(
-    orderBy: "blockTimestamp"
-    limit: 10
-    after: $after
-    orderDirection: "desc"
-  ) {
-    items {
-      id
-      image
-      emoji
-      label
-      creator {
-        id
-        label
-        image
-      }
-      blockTimestamp
-      vault {
-        totalShares
-        currentSharePrice
-        positionCount
-      }
-    }
-    pageInfo {
-      endCursor
-      hasNextPage
+const GetAtomsQuery = gql(`
+query GetAtoms($offset: Int) {
+  atoms_aggregate {
+    aggregate {
+      count
     }
   }
-}`;
+  atoms(order_by: { block_timestamp: desc }, limit: 10, offset: $offset) {
+    id
+    image
+    emoji
+    label
+    creator {
+      id
+      label
+      image
+    }
+    block_timestamp
+    vault {
+      total_shares
+      current_share_price
+      position_count
+    }
+  }
+}`);
 
 export default function Atoms() {
-  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ATOMS);
+  const { loading, error, data, refetch, fetchMore } = useQuery(GetAtomsQuery);
 
   if (loading && !data) return <ActivityIndicator size="large" />;
 

@@ -1,6 +1,6 @@
 import { View, StyleSheet, RefreshControl, ActivityIndicator, Image } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import React, { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
@@ -8,54 +8,50 @@ import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
+import { gql } from '@/lib/generated';
 
-const GET_TRIPLES = gql`
-query Triples($after: String) {
-  triples(
-    orderBy: "blockTimestamp"
-    limit: 10
-    after: $after
-    orderDirection: "desc"
-  ) {
-    items {
-      id
-      subject {
-        emoji
-        label
-      }
-      predicate {
-        emoji
-        label
-      }
-      object {
-        emoji
-        label
-      }
-      creator {
-        id
-        label
-        image
-      }
-      blockTimestamp
-      vault {
-        totalShares
-        positionCount
-      }
-      counterVault {
-        totalShares
-        positionCount
-      }
-    }
-    pageInfo {
-      endCursor
-      hasNextPage
+const GetTriplesQuery = gql(`
+query GetTriples($offset: Int) {
+  triples_aggregate {
+    aggregate {
+      count
     }
   }
-}`;
+  triples(order_by: { block_timestamp: desc }, limit: 10, offset: $offset) {
+    id
+    subject {
+      emoji
+      label
+    }
+    predicate {
+      emoji
+      label
+    }
+    object {
+      emoji
+      label
+    }
+    creator {
+      id
+      label
+      image
+    }
+    block_timestamp
+    vault {
+      total_shares
+      position_count
+    }
+    counter_vault {
+      total_shares
+      position_count
+    }
+  }
+}
+`);
 
 export default function Triple() {
 
-  const { loading, error, data, refetch, fetchMore } = useQuery(GET_TRIPLES);
+  const { loading, error, data, refetch, fetchMore } = useQuery(GetTriplesQuery);
 
   if (loading && !data) return <ActivityIndicator size="large" />;
 

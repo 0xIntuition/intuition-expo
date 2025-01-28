@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { shareAsync } from 'expo-sharing';
 
 const GET_TRIPLE = gql`
-query Triple ($id: BigInt!){
+query Triple ($id: numeric!){
   triple(id: $id) {
     id
       subject {

@@ -1,39 +1,39 @@
 import { View, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import React, { useState, useEffect, useCallback } from 'react';
 import Avatar from '@/components/Avatar';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
+import { gql } from '@/lib/generated';
 
-const GET_ACCOUNTS = gql`
-query Accounts($after: String) {
-  accounts(
-    orderBy: "label"
-    limit: 10
-    after: $after
-    orderDirection: "asc"
-    where: { type: Default }
-  ) {
-    items {
-      image
-      label
-      id
-    }
-    pageInfo {
-      endCursor
-      hasNextPage
+const GetAccountsQuery = gql(`
+query GetAccounts($offset: Int) {
+  accounts_aggregate(where: { type: { _eq: Default } }) {
+    aggregate {
+      count
     }
   }
-}`;
+  accounts(
+    order_by: { label: asc }
+    limit: 10
+    offset: $offset
+    where: { type: { _eq: Default } }
+  ) {
+    image
+    label
+    id
+  }
+}`);
+
 function shortId(id: string): string {
   return id.substring(0, 6) + "..." + id.substring(id.length - 4)
 }
 
 export default function Accounts() {
 
-  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ACCOUNTS);
+  const { loading, error, data, refetch, fetchMore } = useQuery(GetAccountsQuery);
 
 
   if (loading && !data) return <ActivityIndicator size="large" />;

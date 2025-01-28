@@ -1,7 +1,7 @@
 import { Button, View, TouchableOpacity } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { shareAsync } from 'expo-sharing';
@@ -11,9 +11,10 @@ import { useMultiVault } from '@/hooks/useMultiVault';
 import { Section } from '@/components/section';
 import { ListItem } from '@/components/list-item';
 import { useWalletConnectModal } from '@walletconnect/modal-react-native';
+import { gql } from '@/lib/generated';
 
-const GET_ATOM = gql`
-query Atom($id: BigInt!, $address: String) {
+const GetAtomQuery = gql(`
+query GetAtom($id: numeric!, $address: String) {
   atom(id: $id) {
     id
     label
@@ -21,17 +22,15 @@ query Atom($id: BigInt!, $address: String) {
     emoji
     type
     vault {
-      totalShares
-      positionCount
-      currentSharePrice
-      positions(orderBy: "shares", orderDirection: "desc") {
-        items {
-          shares
-          account {
-            id
-            image
-            label
-          }
+      total_shares
+      position_count
+      current_share_price
+      positions(order_by: { shares: desc }) {
+        shares
+        account {
+          id
+          image
+          label
         }
       }
     }
@@ -56,21 +55,16 @@ query Atom($id: BigInt!, $address: String) {
       }
     }
   }
-  chainlinkPrices(limit: 1, orderBy: "id", orderDirection: "desc") {
-    items {
-      usd
-    }
+
+  positions(where: { account_id: {_eq: $address}, vault_id: { _eq: $id} }, limit: 1) {
+    shares
   }
-  positions(where: { accountId: $address, vaultId: $id }, limit: 1) {
-    items {
-      shares
-    }
-  }
-}`;
+}`);
+
 export default function Atom() {
   const { id } = useLocalSearchParams();
   const { address } = useWalletConnectModal();
-  const { loading, error, data, refetch } = useQuery(GET_ATOM, {
+  const { loading, error, data, refetch } = useQuery(GetAtomQuery, {
     fetchPolicy: 'network-only',
     variables: { id, address: address }
   });

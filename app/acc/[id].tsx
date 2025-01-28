@@ -14,19 +14,18 @@ query Account($id: String!) {
     image
     atom {
       id
-      asSubject {
-        items {
-          predicate {
-            label
-          }
-          object {
-            label
-          }
+      as_subject_claims {
+        predicate {
+          label
+        }
+        object {
+          label
         }
       }
     }
   }
 }`;
+
 export default function Account() {
   const { id } = useLocalSearchParams();
   const { loading, error, data, refetch } = useQuery(GET_ACCOUNT, { variables: { id } });

@@ -11,52 +11,41 @@ import { ListItem } from '@/components/list-item';
 import { Address, formatEther } from 'viem';
 
 const GET_SIGNALS = gql`
-query GetSignals($after: String) {
-  signals(
-    after: $after
-    orderBy: "blockTimestamp"
-    orderDirection: "desc"
-    limit: 10
-  ) {
-    items {
+uery GetSignals($offset: Int) {
+  signals_aggregate {
+    aggregate {
+      count
+    }
+  }
+  signals(order_by: { block_timestamp: desc }, limit: 10, offset: $offset) {
+    id
+    account {
       id
-      account {
-        id
-        label
-        image
-      }
-      delta
-      blockTimestamp
-      atom {
-        id
+      label
+      image
+    }
+    delta
+    block_timestamp
+    atom {
+      id
+      emoji
+      label
+    }
+    triple {
+      id
+
+      subject {
         emoji
         label
       }
-      triple {
-        id
+      predicate {
+        emoji
         label
-        subject {
-          emoji
-          label
-        }
-        predicate {
-          emoji
-          label
-        }
-        object {
-          emoji
-          label
-        }
       }
-    }
-    pageInfo {
-      endCursor
-      hasNextPage
-    }
-  }
-  chainlinkPrices(limit: 1, orderBy: "id", orderDirection: "desc") {
-    items {
-      usd
+      object {
+        emoji
+        label
+      }
     }
   }
 }
