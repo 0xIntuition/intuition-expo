@@ -41,24 +41,22 @@ export default function Accounts() {
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.accounts.items}
+        data={data.accounts}
         keyExtractor={(item: any) => `${item.id}`}
         renderItem={({ item }: { item: any }) => <AccountListItem account={item} />}
         estimatedItemSize={300}
         onEndReached={() => {
-          if (data.accounts.pageInfo.hasNextPage) {
+          if (data.accounts_aggregate.aggregate?.count && data.accounts_aggregate.aggregate.count > data.accounts.length) {
             fetchMore({
               variables: {
-                after: data.accounts.pageInfo.endCursor,
+                offset: data.accounts.length,
               },
               updateQuery: (previousResult, { fetchMoreResult }) => {
                 if (!fetchMoreResult) return previousResult;
                 return {
-                  accounts: {
-                    __typename: previousResult.accounts.__typename,
-                    items: [...previousResult.accounts.items, ...fetchMoreResult.accounts.items],
-                    pageInfo: fetchMoreResult.accounts.pageInfo,
-                  }
+                  ...previousResult,
+                  accounts: [...previousResult.accounts, ...fetchMoreResult.accounts],
+                  accounts_aggregate: fetchMoreResult.accounts_aggregate,
                 };
               },
             });
@@ -69,7 +67,7 @@ export default function Accounts() {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={() => refetch({ after: null })}
+            onRefresh={() => refetch({ offset: 0 })}
           />
         }
       />}

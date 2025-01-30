@@ -59,24 +59,22 @@ export default function Triple() {
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.triples.items}
+        data={data.triples}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }: { item: any }) => <TripleListItem triple={item} />}
+        renderItem={({ item }) => <TripleListItem triple={item} />}
         estimatedItemSize={300}
         onEndReached={() => {
-          if (data.triples.pageInfo.hasNextPage) {
+          if (data.triples_aggregate.aggregate?.count && data.triples_aggregate.aggregate.count > data.triples.length) {
             fetchMore({
               variables: {
-                after: data.triples.pageInfo.endCursor,
+                offset: data.triples.length,
               },
               updateQuery: (previousResult, { fetchMoreResult }) => {
                 if (!fetchMoreResult) return previousResult;
                 return {
-                  triples: {
-                    __typename: previousResult.__typename,
-                    items: [...previousResult.triples.items, ...fetchMoreResult.triples.items],
-                    pageInfo: fetchMoreResult.triples.pageInfo,
-                  }
+                  ...previousResult,
+                  triples_aggregate: fetchMoreResult.triples_aggregate,
+                  triples: [...previousResult.triples, ...fetchMoreResult.triples],
                 };
               },
             });
@@ -87,7 +85,7 @@ export default function Triple() {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={() => refetch({ after: null })}
+            onRefresh={() => refetch({ offset: 0 })}
           />
         }
       />}
@@ -107,7 +105,7 @@ export function TripleListItem({ triple }: { triple: any }) {
           <ThemedText style={styles.secondary}>{triple.creator.label}</ThemedText>
         </Link>
 
-        <ThemedText style={styles.date}>{formatRelative(triple.blockTimestamp * 1000, new Date())}</ThemedText>
+        <ThemedText style={styles.date}>{formatRelative(new Date(parseInt(triple.block_timestamp.toString()) * 1000), new Date())}</ThemedText>
       </View>
 
       <Link
@@ -123,9 +121,9 @@ export function TripleListItem({ triple }: { triple: any }) {
         </View>
       </Link>
       <View style={styles.positionsRow}>
-        <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {triple.vault.positionsCount} ∙ {convertToCurrency(triple.vault.totalShares)} </ThemedText>
+        <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {triple.vault.position_count} ∙ {convertToCurrency(triple.vault.total_shares)} </ThemedText>
 
-        <ThemedText numberOfLines={1} style={styles.counterVault}><Ionicons size={13} name='person' /> {triple.counterVault.positionsCount} ∙ {convertToCurrency(triple.counterVault.totalShares)} </ThemedText>
+        <ThemedText numberOfLines={1} style={styles.counterVault}><Ionicons size={13} name='person' /> {triple.counter_vault.position_count} ∙ {convertToCurrency(triple.counter_vault.total_shares)} </ThemedText>
       </View>
 
     </ThemedView>

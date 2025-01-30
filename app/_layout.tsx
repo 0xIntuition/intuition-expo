@@ -40,7 +40,7 @@ const sessionParams = {
   }
 }
 const client = new ApolloClient({
-  uri: 'https://i7n.app/graphql',
+  uri: 'https://prod.base.intuition-api.com/v1/graphql',
   cache: new InMemoryCache({
     typePolicies: {
       Query: {

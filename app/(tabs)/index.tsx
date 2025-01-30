@@ -1,7 +1,7 @@
 import { View, StyleSheet, Image, ActivityIndicator, RefreshControl } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import React, { useState } from 'react';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
@@ -9,9 +9,10 @@ import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 import { ListItem } from '@/components/list-item';
 import { Address, formatEther } from 'viem';
-
-const GET_SIGNALS = gql`
-uery GetSignals($offset: Int) {
+import { gql } from '@/lib/generated';
+import { getTripleLabel } from '@/lib/utils';
+const GET_SIGNALS = gql(`
+query GetSignals($offset: Int) {
   signals_aggregate {
     aggregate {
       count
@@ -49,25 +50,25 @@ uery GetSignals($offset: Int) {
     }
   }
 }
-`;
+`);
 
 export default function Signals() {
   const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS);
 
   if (loading && !data) return <ActivityIndicator size="large" />;
-  const usd = data.chainlinkPrices.items[0].usd;
+  const usd = 1;
 
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.signals.items}
+        data={data.signals}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }: { item: any }) => (<ListItem
+        renderItem={({ item }) => (<ListItem
           image={item.account?.image}
           id={item.account?.id.toString()! as Address}
-          label={`${item.atom?.label || item.triple?.label || ''} `}
-          subLabel={`${item.account?.label}  ∙ ${formatRelative(new Date(parseInt(item.blockTimestamp.toString()) * 1000), new Date())} `}
+          label={`${item.atom?.label || getTripleLabel(item.triple) || ''} `}
+          subLabel={`${item.account?.label}  ∙ ${formatRelative(new Date(parseInt(item.block_timestamp.toString()) * 1000), new Date())} `}
           value={`${item.delta > 0 ? '+' : ''}${(parseFloat(formatEther(item.delta)) * usd).toFixed(2)}`}
           subValue='USD'
           href={item.atom?.id ? `/a/${item.atom.id}` : `/t/${item.triple?.id}`}
@@ -75,20 +76,16 @@ export default function Signals() {
         }
         estimatedItemSize={300}
         onEndReached={() => {
-          if (data.signals.pageInfo.hasNextPage) {
+          if (data.signals_aggregate.aggregate?.count && data.signals_aggregate.aggregate.count > data.signals.length) {
             fetchMore({
               variables: {
-                after: data.signals.pageInfo.endCursor,
+                offset: data.signals.length,
               },
               updateQuery: (previousResult, { fetchMoreResult }) => {
                 if (!fetchMoreResult) return previousResult;
                 return {
-                  signals: {
-                    __typename: previousResult.signals.__typename,
-                    items: [...previousResult.signals.items, ...fetchMoreResult.signals.items],
-                    pageInfo: fetchMoreResult.signals.pageInfo,
-                  },
-                  chainlinkPrices: previousResult.chainlinkPrices,
+                  signals: [...previousResult.signals, ...fetchMoreResult.signals],
+                  signals_aggregate: fetchMoreResult.signals_aggregate,
                 };
               },
             });
@@ -99,7 +96,7 @@ export default function Signals() {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={() => refetch({ after: null })}
+            onRefresh={() => refetch({ offset: 0 })}
           />
         }
       />}

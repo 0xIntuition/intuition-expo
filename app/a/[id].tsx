@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { shareAsync } from 'expo-sharing';
 import { useState } from 'react';
-import { formatEther, parseEther } from 'viem';
+import { Address, formatEther, parseEther } from 'viem';
 import { useMultiVault } from '@/hooks/useMultiVault';
 import { Section } from '@/components/section';
 import { ListItem } from '@/components/list-item';
@@ -75,10 +75,9 @@ export default function Atom() {
   if (loading) return <ThemedText>Loading...</ThemedText>;
   if (error) return <ThemedText>{error.message}</ThemedText>;
 
-  if (!data.atom) {
+  if (!loading && !data?.atom) {
     return <ThemedText>Atom not found</ThemedText>;
   }
-  const { atom } = data;
 
   const handleDeposit = async () => {
 
@@ -87,9 +86,14 @@ export default function Atom() {
       return;
     }
 
+    if (!data?.atom) {
+      setErrorMesage('Atom not found');
+      return;
+    }
+
     setSignalInProgress(true);
 
-    multivault?.depositAtom(BigInt(atom.id), parseEther('0.00042'))
+    multivault?.depositAtom(BigInt(data.atom.id), parseEther('0.00042'))
       .then(() => {
         refetch();
       })
@@ -108,7 +112,12 @@ export default function Atom() {
       return;
     }
 
-    multivault?.redeemAtom(BigInt(atom.id), parseEther('0.00042'))
+    if (!data?.atom) {
+      setErrorMesage('Atom not found');
+      return;
+    }
+
+    multivault?.redeemAtom(BigInt(data.atom.id), parseEther('0.00042'))
       .then(() => {
         refetch();
       })
@@ -120,38 +129,38 @@ export default function Atom() {
       });
   };
 
-  const description = atom.value?.thing?.description || atom.value?.person?.description || atom.value?.organization?.description || '';
-  const totalStaked = parseFloat(formatEther(atom.vault.totalShares))
-    * parseFloat(formatEther(atom.vault.currentSharePrice));
-  const usd = data.chainlinkPrices.items[0].usd;
+  const description = data?.atom?.value?.thing?.description || data?.atom?.value?.person?.description || data?.atom?.value?.organization?.description || '';
+  const totalStaked = parseFloat(formatEther(data?.atom?.vault?.total_shares))
+    * parseFloat(formatEther(data?.atom?.vault?.current_share_price));
+  const usd = 1;
 
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen
         options={{
           headerTitle: () => <View style={styles.header} >
-            {atom.image !== null && <Image style={styles.image} source={{ uri: atom.image }} />}
-            <ThemedText>{atom.label}</ThemedText>
+            {data?.atom?.image !== null && <Image style={styles.image} source={{ uri: data?.atom?.image }} />}
+            <ThemedText>{data?.atom?.label}</ThemedText>
           </View>,
         }}
       />
       <Section >
         <ListItem
           label={description}
-          subLabel={`${atom.type} ∙ ID: ${atom.id}`}
+          subLabel={`${data?.atom?.type} ∙ ID: ${data?.atom?.id}`}
         />
-        {data.positions.items.length > 0 && (
+        {data && data.positions && data.positions.length > 0 && (
           <ListItem
             label="My stake"
             value={`${(
-              parseFloat(formatEther(atom.vault.currentSharePrice))
-              * parseFloat(formatEther(data.positions.items[0].shares))
+              parseFloat(formatEther(data?.atom?.vault?.current_share_price))
+              * parseFloat(formatEther(data?.positions[0]?.shares))
               * usd).toFixed(2)} USD`}
           />
         )}
         <ListItem
           label="Total staked"
-          subLabel={`Holders: ${atom.vault.positionCount}`}
+          subLabel={`Holders: ${data?.atom?.vault?.position_count}`}
           value={`${(totalStaked * usd).toFixed(2)} USD`}
           last
         />
@@ -161,7 +170,7 @@ export default function Atom() {
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: 8, paddingLeft: 8 }}>
         {signalInProgress && <ThemedText>Signal in progress...</ThemedText>}
         {!signalInProgress && <Button title="Deposit" onPress={handleDeposit} />}
-        {!signalInProgress && data.positions.items.length > 0 && <Button title="Withdraw" onPress={handleWithdraw} />}
+        {!signalInProgress && data?.positions && data?.positions.length > 0 && <Button title="Withdraw" onPress={handleWithdraw} />}
         <Button title="Share" onPress={async () => {
           await shareAsync('https://i7n.app/a/' + id);
         }} />
@@ -170,15 +179,15 @@ export default function Atom() {
       <ThemedText>{errorMesage}</ThemedText>
       {errorMesage && <Link href={{ pathname: '/(tabs)/me' }}><ThemedText>Go to me</ThemedText></Link>}
       <Section title="Top Holders">
-        {atom.vault.positions.items.map(({ shares, account }: any) => (
+        {data?.atom?.vault?.positions.map(({ shares, account }) => (
           <ListItem
-            key={account.id}
-            id={account.id}
-            image={account.image}
-            label={account.label}
-            href={{ pathname: '/acc/[id]', params: { id: account.id } }}
+            key={account?.id || ''}
+            id={account?.id as Address}
+            image={account?.image || ''}
+            label={account?.label || ''}
+            href={{ pathname: '/acc/[id]', params: { id: account?.id || '' } }}
             value={`${(
-              parseFloat(formatEther(atom.vault.currentSharePrice))
+              parseFloat(formatEther(data?.atom?.vault?.current_share_price))
               * parseFloat(formatEther(shares))
               * usd).toFixed(2)} USD`}
           />

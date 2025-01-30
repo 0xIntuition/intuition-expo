@@ -45,24 +45,22 @@ export default function Atoms() {
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.atoms.items}
+        data={data.atoms}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }: { item: any }) => <AtomListItem atom={item} />}
+        renderItem={({ item }) => <AtomListItem atom={item} />}
         estimatedItemSize={300}
         onEndReached={() => {
-          if (data.atoms.pageInfo.hasNextPage) {
+          if (data.atoms_aggregate.aggregate?.count && data.atoms_aggregate.aggregate.count > data.atoms.length) {
             fetchMore({
               variables: {
-                after: data.atoms.pageInfo.endCursor,
+                offset: data.atoms.length,
               },
               updateQuery: (previousResult, { fetchMoreResult }) => {
                 if (!fetchMoreResult) return previousResult;
                 return {
-                  atoms: {
-                    __typename: previousResult.__typename,
-                    items: [...previousResult.atoms.items, ...fetchMoreResult.atoms.items],
-                    pageInfo: fetchMoreResult.atoms.pageInfo,
-                  }
+                  ...previousResult,
+                  atoms: [...previousResult.atoms, ...fetchMoreResult.atoms],
+                  atoms_aggregate: fetchMoreResult.atoms_aggregate,
                 };
               },
             });
@@ -73,7 +71,7 @@ export default function Atoms() {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={() => refetch({ after: null })}
+            onRefresh={() => refetch({ offset: 0 })}
           />
         }
       />}
@@ -93,7 +91,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           <ThemedText style={styles.secondary}>{atom.creator.label}</ThemedText>
         </Link>
 
-        <ThemedText style={styles.date}>{formatRelative(atom.blockTimestamp * 1000, new Date())}</ThemedText>
+        <ThemedText style={styles.date}>{formatRelative(new Date(parseInt(atom.block_timestamp.toString()) * 1000), new Date())}</ThemedText>
       </View>
 
       <Link
@@ -106,7 +104,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           <ThemedText numberOfLines={1}>{atom.emoji} {atom.label}</ThemedText>
         </View>
       </Link>
-      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.positionCount} ∙ {convertToCurrency(atom.vault.totalShares)} </ThemedText>
+      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.position_count} ∙ {convertToCurrency(atom.vault.total_shares)} </ThemedText>
 
 
     </ThemedView>
