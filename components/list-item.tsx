@@ -46,12 +46,7 @@ export const ListItem: FC<ListItemProps> = ({
     <View style={[styles.contentContainer, { borderBottomWidth: last ? 0 : 1 }]}>
       <View style={styles.leftContent}>
         {icon && <View style={styles.iconContainer}>{icon}</View>}
-        {!icon && id !== undefined && (
-          <Image
-            style={styles.idIcon}
-            source={{ uri: `https://i7n.app/blo/${id}` }}
-          />
-        )}
+
         <View style={styles.labelContainer}>
           <Text style={[styles.label, { color: textColor }]}>{label}</Text>
           {subLabel && <Text style={[styles.subLabel, { color: subTextColor }]}>{subLabel}</Text>}

@@ -15,7 +15,7 @@
     "ios": {
       "supportsTablet": true,
       "associatedDomains": [
-        "applinks:i7n.app"
+        "applinks:app.i7n.xyz"
       ],
       "bundleIdentifier": "systems.intuition.mobile",
       "infoPlist": {
@@ -35,7 +35,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "i7n.app",
+              "host": "app.i7n.xyz",
               "pathPrefix": "/"
             }
           ],

@@ -66,7 +66,7 @@ export default function Atom() {
   const { address } = useWalletConnectModal();
   const { loading, error, data, refetch } = useQuery(GetAtomQuery, {
     fetchPolicy: 'network-only',
-    variables: { id, address: address }
+    variables: { id: Number(id), address: (address !== undefined ? address : '') }
   });
   const [signalInProgress, setSignalInProgress] = useState(false);
   const multivault = useMultiVault();
