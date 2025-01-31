@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { GiftedChat, IMessage } from 'react-native-gifted-chat'
+import { GiftedChat, IMessage, Bubble, InputToolbar, Composer } from 'react-native-gifted-chat'
 import OpenAI from 'openai';
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import { z } from "zod";
@@ -100,6 +100,50 @@ export default function Ask() {
       onSend={messages => onSend(messages)}
       user={{
         _id: 1,
+      }}
+      renderBubble={props => (
+        <Bubble
+          {...props}
+          wrapperStyle={{
+            right: {
+              backgroundColor: '#0a7ea4'
+            },
+            left: {
+              backgroundColor: '#282c2e',
+            }
+          }}
+          textStyle={{
+            left: {
+              color: 'white'
+            }
+          }}
+        />
+      )}
+      renderInputToolbar={props => (
+        <InputToolbar
+          {...props}
+          containerStyle={{
+            backgroundColor: '#151718',
+            borderTopColor: '#282c2e'
+          }}
+        />
+      )}
+      renderComposer={props => (
+        <Composer
+          {...props}
+          textInputStyle={{
+            color: '#ECEDEE',
+            backgroundColor: '#282c2e'
+          }}
+        />
+      )}
+      timeTextStyle={{
+        right: {
+          color: '#073b4d'
+        },
+        left: {
+          color: 'gray'
+        }
       }}
     />
   )
