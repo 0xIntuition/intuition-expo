@@ -34,33 +34,15 @@ export default function TabLayout() {
       />
 
       <Tabs.Screen
-        name="atoms"
+        name="explore"
         options={{
-          title: 'Atoms',
+          title: 'Explore',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'extension-puzzle' : 'extension-puzzle-outline'} color={color} />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="triples"
-        options={{
-          title: 'Triples',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'git-merge' : 'git-merge-outline'} color={color} />
+            <TabBarIcon name={focused ? 'search' : 'search-outline'} color={color} />
           ),
         }}
       />
 
-      <Tabs.Screen
-        name="accounts"
-        options={{
-          title: 'Accounts',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'people' : 'people-outline'} color={color} />
-          ),
-        }}
-      />
 
       <Tabs.Screen
         name="me"
