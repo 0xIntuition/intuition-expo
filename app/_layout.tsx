@@ -11,6 +11,10 @@ import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
 import { relayStylePagination } from '@apollo/client/utilities';
 import { WalletConnectModal } from '@walletconnect/modal-react-native';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
+import { Platform } from 'react-native';
+
+const isWeb = Platform.OS === 'web';
+
 SplashScreen.preventAutoHideAsync();
 
 if (__DEV__) {
@@ -40,7 +44,7 @@ const sessionParams = {
   }
 }
 const client = new ApolloClient({
-  uri: 'https://prod.base.intuition-api.com/v1/graphql',
+  uri: process.env.EXPO_PUBLIC_API_URL,
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -95,7 +99,9 @@ export default function RootLayout() {
           />
           <Stack.Screen name="+not-found" />
         </Stack>
-        <WalletConnectModal projectId={projectId} providerMetadata={providerMetadata} sessionParams={sessionParams} />
+        {!isWeb &&
+          <WalletConnectModal projectId={projectId} providerMetadata={providerMetadata} sessionParams={sessionParams} />
+        }
 
       </ApolloProvider>
     </ThemeProvider>
