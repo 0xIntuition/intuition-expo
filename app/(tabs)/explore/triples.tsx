@@ -17,7 +17,9 @@ query GetTriples($offset: Int) {
       count
     }
   }
-  triples(order_by: { block_timestamp: desc }, limit: 10, offset: $offset) {
+  triples(order_by: { vault:  {
+     total_shares: desc
+  } }, limit: 10, offset: $offset) {
     id
     subject {
       emoji

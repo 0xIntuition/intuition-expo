@@ -15,7 +15,11 @@ query GetAccounts($offset: Int) {
     }
   }
   accounts(
-    order_by: { label: asc }
+    order_by: { atom:  {
+       vault:  {
+          total_shares: desc
+       }
+    } }
     limit: 10
     offset: $offset
     where: { type: { _eq: Default } }

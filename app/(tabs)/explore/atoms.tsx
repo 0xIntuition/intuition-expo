@@ -16,7 +16,11 @@ query GetAtoms($offset: Int) {
       count
     }
   }
-  atoms(order_by: { block_timestamp: desc }, limit: 10, offset: $offset) {
+  atoms(
+    order_by: { vault: { total_shares: desc } }
+    limit: 10
+    offset: $offset
+  ) {
     id
     image
     emoji
