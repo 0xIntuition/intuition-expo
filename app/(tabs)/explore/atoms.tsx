@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     paddingVertical: 16,
-    paddingRight: 16,
+    paddingRight: 36,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(100,100,100,0.5)',
   },
