@@ -1,7 +1,6 @@
 import { View, StyleSheet, RefreshControl, ActivityIndicator, Image } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@apollo/client';
-import React, { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';

@@ -1,12 +1,9 @@
-import { View, StyleSheet, Image, ActivityIndicator, RefreshControl } from 'react-native';
+import { StyleSheet, ActivityIndicator, RefreshControl } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import React, { useState } from 'react';
 import { useQuery } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
-import { convertToCurrency } from '@/hooks/useCurrency';
 import { ListItem } from '@/components/list-item';
 import { Address, formatEther } from 'viem';
 import { gql } from '@/lib/generated';
