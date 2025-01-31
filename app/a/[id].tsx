@@ -172,7 +172,7 @@ export default function Atom() {
         {!signalInProgress && <Button title="Deposit" onPress={handleDeposit} />}
         {!signalInProgress && data?.positions && data?.positions.length > 0 && <Button title="Withdraw" onPress={handleWithdraw} />}
         <Button title="Share" onPress={async () => {
-          await shareAsync('https://i7n.app/a/' + id);
+          await shareAsync('https://app.i7n.xyz/a/' + id);
         }} />
       </View>
 

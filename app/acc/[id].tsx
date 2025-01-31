@@ -50,7 +50,7 @@ export default function Account() {
       />
       <ThemedText>Account {id}</ThemedText>
       <Button title="Share" onPress={async () => {
-        await shareAsync('https://i7n.app/acc/' + id);
+        await shareAsync('https://app.i7n.xyz/acc/' + id);
       }} />
     </ThemedView>
   );

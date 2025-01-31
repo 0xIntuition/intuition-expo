@@ -47,7 +47,7 @@ export default function Triple() {
         <ThemedText >{triple.object.emoji} {triple.object.label}</ThemedText>
       </View>
       <Button title="Share" onPress={async () => {
-        await shareAsync('https://i7n.app/t/' + id);
+        await shareAsync('https://app.i7n.xyz/t/' + id);
       }} />
     </ThemedView>
   );

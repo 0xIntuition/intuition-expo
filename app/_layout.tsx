@@ -27,7 +27,7 @@ const projectId = '5e71a895f4587af8d1ac0df79b81f86e';
 const providerMetadata = {
   name: 'Intuition',
   description: 'Disruptive Trustformation',
-  url: 'https://i7n.app/',
+  url: 'https://app.i7n.xyz/',
   icons: ['https://avatars.githubusercontent.com/u/94311139?s=200&v=4'],
   redirect: {
     native: 'i7n://',
