@@ -1,3 +1,3 @@
 export function getTripleLabel(triple: any) {
-  return `${triple.subject.label} ${triple.predicate.label} ${triple.object.label}`;
+  return `${triple?.subject?.label} ${triple?.predicate?.label} ${triple?.object?.label}`;
 }
