@@ -8,7 +8,7 @@ import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 import { gql } from '@/lib/generated';
-
+import Atom from '@/components/Atom';
 const GetAtomsQuery = gql(`
 query GetAtoms($offset: Int) {
   atoms_aggregate {
@@ -104,7 +104,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           params: { id: atom.id }
         }}>
         <View style={styles.vaultContent}>
-          <ThemedText numberOfLines={1}>{atom.emoji} {atom.label}</ThemedText>
+          <Atom atom={atom} layout='text-avatar' />
         </View>
       </Link>
       <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.position_count} ∙ {convertToCurrency(atom.vault.total_shares)} </ThemedText>

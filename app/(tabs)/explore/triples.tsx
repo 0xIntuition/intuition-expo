@@ -9,6 +9,7 @@ import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 import { gql } from '@/lib/generated';
+import Atom from '@/components/Atom';
 
 const GetTriplesQuery = gql(`
 query GetTriples($offset: Int) {
@@ -117,9 +118,9 @@ export function TripleListItem({ triple }: { triple: any }) {
           params: { id: triple.id }
         }}>
         <View style={styles.vaultContent}>
-          <ThemedText numberOfLines={1}>{triple.subject.emoji} {triple.subject.label}</ThemedText>
-          <ThemedText >{triple.predicate.label}</ThemedText>
-          <ThemedText >{triple.object.emoji} {triple.object.label}</ThemedText>
+          <Atom atom={triple.subject} layout='text-avatar' />
+          <Atom atom={triple.predicate} layout='text-avatar' />
+          <Atom atom={triple.object} layout='text-avatar' />
         </View>
       </Link>
       <View style={styles.positionsRow}>
@@ -165,6 +166,8 @@ const styles = StyleSheet.create({
   },
   vaultContent: {
     flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     padding: 8,
     marginTop: 8,
 

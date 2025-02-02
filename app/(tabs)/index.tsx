@@ -8,6 +8,7 @@ import { ListItem } from '@/components/list-item';
 import { Address, formatEther } from 'viem';
 import { gql } from '@/lib/generated';
 import { getTripleLabel } from '@/lib/utils';
+
 const GET_SIGNALS = gql(`
 query GetSignals($offset: Int) {
   signals_aggregate {
