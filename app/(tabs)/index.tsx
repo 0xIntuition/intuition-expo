@@ -17,32 +17,60 @@ query GetSignals($offset: Int) {
   }
   signals(order_by: { block_timestamp: desc }, limit: 10, offset: $offset) {
     id
+    delta
+    block_timestamp
     account {
       id
       label
       image
     }
-    delta
-    block_timestamp
+    
     atom {
       id
       emoji
+      image
+      cached_image {
+        safe
+        url
+      }
       label
+      type
     }
+
     triple {
       id
-
       subject {
+        id
+        image
+        cached_image {
+          safe
+          url
+        }
         emoji
         label
+        type
       }
       predicate {
+        id
+        image
+        cached_image {
+          safe
+          url
+        }
         emoji
         label
+        type
       }
       object {
+        id
+        image
+        cached_image {
+          safe
+          url
+        }
         emoji
         label
+        type
       }
     }
   }
