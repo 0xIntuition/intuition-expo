@@ -51,7 +51,7 @@ export default function Atoms() {
         data={data.atoms}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <AtomListItem atom={item} />}
-        estimatedItemSize={300}
+        estimatedItemSize={150}
         onEndReached={() => {
           if (data.atoms_aggregate.aggregate?.count && data.atoms_aggregate.aggregate.count > data.atoms.length) {
             fetchMore({

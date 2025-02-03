@@ -135,7 +135,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   wideContainer: {
-    paddingHorizontal: '10%',
+    paddingLeft: '20%',
+    paddingRight: '20%',
   },
   wideInner: {
     flex: 1,

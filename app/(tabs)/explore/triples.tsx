@@ -65,7 +65,7 @@ export default function Triple() {
         data={data.triples}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <TripleListItem triple={item} />}
-        estimatedItemSize={300}
+        estimatedItemSize={150}
         onEndReached={() => {
           if (data.triples_aggregate.aggregate?.count && data.triples_aggregate.aggregate.count > data.triples.length) {
             fetchMore({

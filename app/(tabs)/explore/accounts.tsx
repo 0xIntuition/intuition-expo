@@ -47,7 +47,7 @@ export default function Accounts() {
         data={data.accounts}
         keyExtractor={(item: any) => `${item.id}`}
         renderItem={({ item }: { item: any }) => <AccountListItem account={item} />}
-        estimatedItemSize={300}
+        estimatedItemSize={100}
         onEndReached={() => {
           if (data.accounts_aggregate.aggregate?.count && data.accounts_aggregate.aggregate.count > data.accounts.length) {
             fetchMore({
