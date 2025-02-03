@@ -48,8 +48,8 @@ export const ListItem: FC<ListItemProps> = ({
         {icon && <View style={styles.iconContainer}>{icon}</View>}
 
         <View style={styles.labelContainer}>
-          <Text style={[styles.label, { color: textColor }]}>{label}</Text>
           {subLabel && <Text style={[styles.subLabel, { color: subTextColor }]}>{subLabel}</Text>}
+          <Text style={[styles.label, { color: textColor }]}>{label}</Text>
         </View>
       </View>
       <View style={styles.centerContent}>{children}</View>
@@ -82,7 +82,6 @@ const styles = StyleSheet.create({
     // shadowOpacity: 0.1,
     // shadowRadius: 1,
     elevation: 1,
-    marginTop: 4,
 
   },
   contentContainer: {
@@ -124,6 +123,7 @@ const styles = StyleSheet.create({
   },
   subLabel: {
     fontSize: 12,
+    marginBottom: 4,
   },
   centerContent: {
     flex: 1,

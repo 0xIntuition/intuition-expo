@@ -9,6 +9,7 @@ import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 import { gql } from '@/lib/generated';
 import Atom from '@/components/Atom';
+import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 const GetAtomsQuery = gql(`
 query GetAtoms($offset: Int) {
   atoms_aggregate {
@@ -82,6 +83,8 @@ export default function Atoms() {
   );
 }
 export function AtomListItem({ atom }: { atom: any }) {
+  const generalConfig = useGeneralConfig();
+  const upvote = BigInt(generalConfig.minDeposit);
   return (
     <ThemedView style={styles.listContainer}>
       <View style={styles.topRow}>
@@ -107,7 +110,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           <Atom atom={atom} layout='text-avatar' />
         </View>
       </Link>
-      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.position_count} ∙ {convertToCurrency(atom.vault.total_shares)} </ThemedText>
+      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.position_count} ∙ ⬆{(BigInt(atom.vault.total_shares) / upvote).toString(10)} </ThemedText>
 
 
     </ThemedView>

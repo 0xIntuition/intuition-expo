@@ -32,3 +32,17 @@ export function useMultiVault() {
   });
   return multivault;
 }
+
+export function usePublicMultivault() {
+  const publicClient = createPublicClient({
+    chain: base,
+    transport: http(),
+  })
+  const multivault = new Multivault({
+    // @ts-ignore
+    publicClient,
+    // @ts-ignore
+    walletClient: publicClient,
+  });
+  return multivault;
+}

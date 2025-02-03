@@ -10,6 +10,7 @@ import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 import { gql } from '@/lib/generated';
 import Atom from '@/components/Atom';
+import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 
 const GetTriplesQuery = gql(`
 query GetTriples($offset: Int) {
@@ -53,7 +54,8 @@ query GetTriples($offset: Int) {
 `);
 
 export default function Triple() {
-
+  const generalConfig = useGeneralConfig();
+  const upvote = BigInt(generalConfig.minDeposit);
   const { loading, error, data, refetch, fetchMore } = useQuery(GetTriplesQuery);
 
   if (loading && !data) return <ActivityIndicator size="large" />;
@@ -96,6 +98,8 @@ export default function Triple() {
   );
 }
 export function TripleListItem({ triple }: { triple: any }) {
+  const generalConfig = useGeneralConfig();
+  const upvote = BigInt(generalConfig.minDeposit);
   return (
     <ThemedView style={styles.listContainer}>
       <View style={styles.topRow}>
@@ -124,9 +128,9 @@ export function TripleListItem({ triple }: { triple: any }) {
         </View>
       </Link>
       <View style={styles.positionsRow}>
-        <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {triple.vault.position_count} ∙ {convertToCurrency(triple.vault.total_shares)} </ThemedText>
+        <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {triple.vault.position_count} ∙ ⬆{(BigInt(triple.vault.total_shares) / upvote).toString(10)} </ThemedText>
 
-        <ThemedText numberOfLines={1} style={styles.counterVault}><Ionicons size={13} name='person' /> {triple.counter_vault.position_count} ∙ {convertToCurrency(triple.counter_vault.total_shares)} </ThemedText>
+        {triple.counter_vault.position_count > 0 && <ThemedText numberOfLines={1} style={styles.counterVault}><Ionicons size={13} name='person' /> {triple.counter_vault.position_count} ∙ ⬇{(BigInt(triple.counter_vault.total_shares) / upvote).toString(10)} </ThemedText>}
       </View>
 
     </ThemedView>
@@ -144,6 +148,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    marginTop: 16,
   },
   topRow: {
     flexDirection: 'row',

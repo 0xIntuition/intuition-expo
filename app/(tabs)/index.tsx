@@ -11,13 +11,13 @@ import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 import { useQuery } from '@apollo/client';
 import React, { useMemo } from 'react';
 const GET_SIGNALS = gql(`
-query GetSignals($offset: Int) {
+query GetSignals($offset: Int, $limit: Int) {
   signals_aggregate {
     aggregate {
       count
     }
   }
-  signals(order_by: { block_timestamp: desc }, limit: 10, offset: $offset) {
+  signals(order_by: { block_timestamp: desc }, limit: $limit, offset: $offset) {
     id
     delta
     block_timestamp
@@ -81,18 +81,17 @@ query GetSignals($offset: Int) {
 
 export default function Signals() {
 
-  const generalConfig = useMemo(async () => {
-    return await useGeneralConfig();
-  }, []);
-
-  console.log(generalConfig);
-
-  const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS);
+  const generalConfig = useGeneralConfig();
+  const upvote = BigInt(generalConfig.minDeposit);
+  const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS, {
+    variables: {
+      limit: 100,
+    },
+  });
   const { width } = useWindowDimensions();
   const isWideScreen = width >= 768;
 
   if (loading && !data) return <ActivityIndicator size="large" />;
-  const usd = 1;
 
   return (
     <ThemedView style={[styles.container, isWideScreen && styles.wideContainer]}>
@@ -101,15 +100,14 @@ export default function Signals() {
         {!loading && data && <FlashList
           data={data.signals}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (<ListItem
+          renderItem={({ item }) => ((BigInt(item.delta) / BigInt(upvote)) > 0 ? <ListItem
             image={item.account?.image}
             id={item.account?.id.toString()! as Address}
             label={`${item.atom?.label || getTripleLabel(item.triple) || ''} `}
             subLabel={`${item.account?.label}  ∙ ${formatRelative(new Date(parseInt(item.block_timestamp.toString()) * 1000), new Date())} `}
-            value={`${item.delta > 0 ? '+' : ''}${(parseFloat(formatEther(item.delta)) * usd).toFixed(2)}`}
-            subValue='USD'
+            value={`${item.delta > 0 ? '⬆' : '⬇'}${(BigInt(item.delta) / BigInt(upvote))}`}
             href={item.atom?.id ? `/a/${item.atom.id}` : `/t/${item.triple?.id}`}
-          />)
+          /> : null)
           }
           estimatedItemSize={150}
           onEndReached={() => {
@@ -117,6 +115,7 @@ export default function Signals() {
               fetchMore({
                 variables: {
                   offset: data.signals.length,
+                  limit: 100,
                 },
                 updateQuery: (previousResult, { fetchMoreResult }) => {
                   if (!fetchMoreResult) return previousResult;
