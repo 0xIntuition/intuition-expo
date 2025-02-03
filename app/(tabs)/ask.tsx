@@ -2,12 +2,12 @@ import React, { useState, useCallback, useEffect } from 'react'
 import { GiftedChat, IMessage, Bubble, InputToolbar, Composer } from 'react-native-gifted-chat'
 import OpenAI from 'openai';
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
-import { z } from "zod";
-import { zodFunction } from "openai/helpers/zod";
+import { useApolloClient } from '@apollo/client';
+import { getTools } from '@/lib/openai/tools';
 
 export default function Ask() {
   const [messages, setMessages] = useState<IMessage[]>([])
-
+  const client = useApolloClient();
   const openAI = React.useMemo(
     () =>
       new OpenAI({
@@ -24,34 +24,14 @@ export default function Ask() {
         createdAt: new Date(),
         user: {
           _id: 2,
-          name: 'React Native',
-          avatar: 'https://placeimg.com/140/140/any',
         },
       },
     ])
   }, [])
 
-  const getAccountInfo = async ({ account_id }: { account_id: string }) => {
-    try {
-      return "Account not found";
-    } catch (error) {
-      console.error(error);
-      return "Account not found";
-    }
-  }
-
-  const tools = [
-    zodFunction({
-      function: getAccountInfo,
-      name: "getAccountInfo",
-      description: "Get account info, such as label, their preferences, their favorites, and their opinions on different subjects.",
-      parameters: z.object({
-        account_id: z.string().describe("Account ID (ethereum address), example: 0x61d0ef4be9e8a14793001ad33258383dd48618d8"),
-      })
-    }),
-  ];
 
   const onSend = useCallback(async (newMessages: IMessage[] = []) => {
+    const tools = await getTools(client);
     // Immediately append user message
     setMessages(previousMessages =>
       GiftedChat.append(previousMessages, newMessages)

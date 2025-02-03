@@ -2,13 +2,12 @@ import React, { FC } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Address } from 'viem';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { ExpoRouter } from 'expo-router/types/expo-router';
-import { Link } from 'expo-router';
+import { Link, Href } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons'
 
 interface ListItemProps {
   id?: Address;
-  href?: ExpoRouter.Href;
+  href?: Href;
   emoji?: string | null;
   image?: string | null;
   label: string;
