@@ -4,6 +4,8 @@ import OpenAI from 'openai';
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import { useApolloClient } from '@apollo/client';
 import { getTools } from '@/lib/openai/tools';
+import Markdown from 'react-native-markdown-display';
+import { styles } from '@/lib/chat-styles';
 
 export default function Ask() {
   const [messages, setMessages] = useState<IMessage[]>([])
@@ -97,6 +99,9 @@ export default function Ask() {
               color: 'white'
             }
           }}
+          renderMessageText={props => (
+            <Markdown style={styles}>{props.currentMessage.text}</Markdown>
+          )}
         />
       )}
       renderInputToolbar={props => (
