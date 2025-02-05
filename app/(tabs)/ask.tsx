@@ -22,10 +22,12 @@ export default function Ask() {
     setMessages([
       {
         _id: 1,
-        text: 'Hello developer',
+        text: 'Hello how can I help you?',
         createdAt: new Date(),
         user: {
           _id: 2,
+          name: 'Intuition',
+          avatar: 'https://avatars.githubusercontent.com/u/94311139?s=200&v=4'
         },
       },
     ])
@@ -66,7 +68,7 @@ export default function Ask() {
     const aiResponse: IMessage = {
       _id: Math.random().toString(),
       createdAt: new Date(),
-      user: { _id: 2, name: 'React Native', avatar: 'https://placeimg.com/140/140/any' },
+      user: { _id: 2, name: 'Intuition', avatar: 'https://avatars.githubusercontent.com/u/94311139?s=200&v=4' },
       text: finalContent || ''
     };
 
@@ -118,7 +120,7 @@ export default function Ask() {
           {...props}
           textInputStyle={{
             color: '#ECEDEE',
-            backgroundColor: '#282c2e'
+            backgroundColor: 'transparent'
           }}
         />
       )}
