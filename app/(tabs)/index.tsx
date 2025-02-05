@@ -31,10 +31,7 @@ query GetSignals($offset: Int, $limit: Int) {
       id
       emoji
       image
-      cached_image {
-        safe
-        url
-      }
+
       label
       type
     }
@@ -44,10 +41,6 @@ query GetSignals($offset: Int, $limit: Int) {
       subject {
         id
         image
-        cached_image {
-          safe
-          url
-        }
         emoji
         label
         type
@@ -55,10 +48,6 @@ query GetSignals($offset: Int, $limit: Int) {
       predicate {
         id
         image
-        cached_image {
-          safe
-          url
-        }
         emoji
         label
         type
@@ -66,10 +55,6 @@ query GetSignals($offset: Int, $limit: Int) {
       object {
         id
         image
-        cached_image {
-          safe
-          url
-        }
         emoji
         label
         type
