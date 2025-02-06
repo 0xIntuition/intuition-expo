@@ -3,7 +3,7 @@ import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import 'react-native-reanimated';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { useColorScheme } from '@/hooks/useColorScheme';
@@ -12,6 +12,7 @@ import { relayStylePagination } from '@apollo/client/utilities';
 import { WalletConnectModal } from '@walletconnect/modal-react-native';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 import { Platform } from 'react-native';
+if (typeof window !== 'undefined') { window.React = React; }
 
 const isWeb = Platform.OS === 'web';
 
@@ -31,6 +32,7 @@ const providerMetadata = {
   icons: ['https://avatars.githubusercontent.com/u/94311139?s=200&v=4'],
   redirect: {
     native: 'i7n://',
+    universal: 'https://app.i7n.xyz/'
   }
 };
 const sessionParams = {
@@ -99,9 +101,7 @@ export default function RootLayout() {
           />
           <Stack.Screen name="+not-found" />
         </Stack>
-        {!isWeb &&
-          <WalletConnectModal projectId={projectId} providerMetadata={providerMetadata} sessionParams={sessionParams} />
-        }
+        <WalletConnectModal projectId={projectId} providerMetadata={providerMetadata} sessionParams={sessionParams} />
 
       </ApolloProvider>
     </ThemeProvider>

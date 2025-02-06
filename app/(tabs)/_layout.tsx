@@ -13,16 +13,6 @@ export default function TabLayout() {
         headerTintColor: Colors[colorScheme ?? 'light'].text,
         headerShown: true,
       }}>
-
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Activity',
-          tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'list' : 'list-outline'} color={color} />
-          ),
-        }}
-      />
       <Tabs.Screen
         name="ask"
         options={{
@@ -32,6 +22,16 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="index"
+        options={{
+          title: 'Activity',
+          tabBarIcon: ({ color, focused }) => (
+            <TabBarIcon name={focused ? 'list' : 'list-outline'} color={color} />
+          ),
+        }}
+      />
+
 
       <Tabs.Screen
         name="explore"
