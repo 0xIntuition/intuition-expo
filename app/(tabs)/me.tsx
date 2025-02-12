@@ -8,25 +8,42 @@ import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
-
+import { usePrivy, useLogin, useEmbeddedEthereumWallet, isNotCreated } from '@privy-io/expo';
 export default function Me() {
-  const { open, isConnected, address, provider } = { open: () => { }, isConnected: false, address: undefined, provider: undefined };
+  const { login } = useLogin();
+  const { user, logout, error, isReady } = usePrivy();
+  const { wallets } = useEmbeddedEthereumWallet();
+  const address = wallets[0]?.address;
 
   // Function to handle the
   const handleButtonPress = async () => {
-    if (isConnected) {
-      // return provgcider?.disconnect();
+    if (user) {
+      console.log('logging out');
+      logout();
+    } else {
+      console.log('logging in');
+      login({
+        loginMethods: ['email'],
+        appearance: {
+          logo: 'https://avatars.githubusercontent.com/u/94311139?s=200&v=4',
+        },
+      }).then(() => {
+        console.log('logged in');
+      }).catch((err) => {
+        console.log('error', err);
+      });
     }
-    return open();
   };
   return (
     <ThemedView style={styles.container}>
-      <ThemedText>Me</ThemedText>
-      <ThemedText>{isConnected ? address : "No Connected"}</ThemedText>
+      {error && <ThemedText>{error.message}</ThemedText>}
+      {isReady && (
+        <ThemedText>{user ? user.id : "No Connected"}</ThemedText>
+      )}
       <Pressable onPress={handleButtonPress} style={styles.pressableMargin}>
-        <ThemedText>{isConnected ? "Disconnect" : "Connect"}</ThemedText>
+        <ThemedText>{user ? "Disconnect" : "Connect"}</ThemedText>
       </Pressable>
-      {isConnected && address !== undefined && (
+      {address !== undefined && (
         <Link
           href={{
             pathname: '/acc/[id]',

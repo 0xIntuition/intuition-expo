@@ -8,6 +8,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
 import { relayStylePagination } from '@apollo/client/utilities';
+import { PrivyProvider } from '@privy-io/expo';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 import { Platform } from 'react-native';
 if (typeof window !== 'undefined') { window.React = React; }
@@ -21,28 +22,8 @@ if (__DEV__) {
   loadErrorMessages();
 }
 
-const projectId = '5e71a895f4587af8d1ac0df79b81f86e';
 
-const providerMetadata = {
-  name: 'Intuition',
-  description: 'Disruptive Trustformation',
-  url: 'https://app.i7n.xyz/',
-  icons: ['https://avatars.githubusercontent.com/u/94311139?s=200&v=4'],
-  redirect: {
-    native: 'i7n://',
-    universal: 'https://app.i7n.xyz/'
-  }
-};
-const sessionParams = {
-  namespaces: {
-    eip155: {
-      methods: ['eth_sendTransaction'],
-      chains: ['eip155:8453'],
-      events: ['chainChanged', 'accountsChanged'],
-      rpcMap: {}
-    }
-  }
-}
+
 const client = new ApolloClient({
   uri: process.env.EXPO_PUBLIC_API_URL,
   cache: new InMemoryCache({
@@ -70,36 +51,52 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
-
+  if (!process.env.EXPO_PUBLIC_PRIVY_APP_ID || !process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID) {
+    throw new Error('Privy app ID and client ID are not set');
+  }
   return (
+
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <ApolloProvider client={client}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="a"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="t"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="acc"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <PrivyProvider
+          appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID}
+          clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID}
+          config={{
+            embedded: {
+              ethereum: {
+                createOnLogin: 'users-without-wallets', // defaults to 'off'
+              },
+            },
+          }}
+        >
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen
+              name="a"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="t"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="acc"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </PrivyProvider>
       </ApolloProvider>
     </ThemeProvider>
+
   );
 }
