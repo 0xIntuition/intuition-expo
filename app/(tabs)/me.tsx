@@ -8,19 +8,20 @@ import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
-import {
-  useWalletConnectModal,
-} from "@walletconnect/modal-react-native";
+import { useLogin, usePrivy } from '@privy-io/expo';
 
 export default function Me() {
-  const { open, isConnected, address, provider } = useWalletConnectModal();
+  const { login } = useLogin();
+  const { logout, user } = usePrivy();
+  const address = user?.wallet?.address;
+  const isConnected = !!address;
 
   // Function to handle the
-  const handleButtonPress = async () => {
+  const handleButtonPress = () => {
     if (isConnected) {
-      return provider?.disconnect();
+      logout();
     }
-    return open();
+    login();
   };
   return (
     <ThemedView style={styles.container}>

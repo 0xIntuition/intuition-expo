@@ -1,13 +1,20 @@
 import { Multivault } from '@/lib/protocol';
-import { useWalletConnectModal } from '@walletconnect/modal-react-native';
 import { Address, createPublicClient, createWalletClient, custom, http } from 'viem';
 import { base } from 'viem/chains';
-
+import { usePrivy, useWallets } from '@privy-io/react-auth';
 export function useMultiVault() {
-  const { isConnected, address, provider } = useWalletConnectModal();
-  if (!isConnected || !address || !provider) {
+  const { user } = usePrivy();
+  if (!user) {
     return null;
   }
+
+  const address = user.wallet?.address;
+  if (!address) {
+    return null;
+  }
+  const { wallets } = useWallets();
+  const wallet = wallets[0]; // Replace this with your desired wallet
+  // const provider = await wallet.getEthereumProvider();
 
   const publicClient = createPublicClient({
     chain: base,
@@ -19,7 +26,8 @@ export function useMultiVault() {
     account: address as Address,
     transport: custom({
       async request({ method, params }) {
-        return await provider?.request({ method, params });
+        // return await provider?.request({ method, params });
+        return null
       },
     }),
   })

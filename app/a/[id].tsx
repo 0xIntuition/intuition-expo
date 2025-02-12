@@ -10,7 +10,7 @@ import { Address, formatEther, parseEther } from 'viem';
 import { useMultiVault } from '@/hooks/useMultiVault';
 import { Section } from '@/components/section';
 import { ListItem } from '@/components/list-item';
-import { useWalletConnectModal } from '@walletconnect/modal-react-native';
+import { usePrivy } from '@privy-io/react-auth';
 import { gql } from '@/lib/generated';
 
 const GetAtomQuery = gql(`
@@ -63,7 +63,8 @@ query GetAtom($id: numeric!, $address: String) {
 
 export default function Atom() {
   const { id } = useLocalSearchParams();
-  const { address } = useWalletConnectModal();
+  const { user } = usePrivy();
+  const address = user?.wallet?.address;
   const { loading, error, data, refetch } = useQuery(GetAtomQuery, {
     fetchPolicy: 'network-only',
     variables: { id: Number(id), address: (address !== undefined ? address : '') }

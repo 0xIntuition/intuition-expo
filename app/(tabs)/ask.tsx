@@ -6,10 +6,12 @@ import { useApolloClient } from '@apollo/client';
 import { getTools } from '@/lib/openai/tools';
 import Markdown from 'react-native-markdown-display';
 import { styles } from '@/lib/chat-styles';
-import { useWalletConnectModal } from '@walletconnect/modal-react-native';
+import { usePrivy } from '@privy-io/react-auth';
 
 export default function Ask() {
-  const { open, isConnected, address, provider } = useWalletConnectModal();
+  const { user } = usePrivy();
+  const address = user?.wallet?.address;
+  const isConnected = !!address;
   const [messages, setMessages] = useState<IMessage[]>([])
   const client = useApolloClient();
   const openAI = React.useMemo(
