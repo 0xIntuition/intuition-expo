@@ -1,4 +1,3 @@
-import '@walletconnect/react-native-compat';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
@@ -9,7 +8,6 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
 import { relayStylePagination } from '@apollo/client/utilities';
-import { WalletConnectModal } from '@walletconnect/modal-react-native';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 import { Platform } from 'react-native';
 if (typeof window !== 'undefined') { window.React = React; }
@@ -101,8 +99,6 @@ export default function RootLayout() {
           />
           <Stack.Screen name="+not-found" />
         </Stack>
-        <WalletConnectModal projectId={projectId} providerMetadata={providerMetadata} sessionParams={sessionParams} />
-
       </ApolloProvider>
     </ThemeProvider>
   );

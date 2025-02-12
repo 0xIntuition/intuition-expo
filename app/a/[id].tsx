@@ -10,7 +10,6 @@ import { Address, formatEther, parseEther } from 'viem';
 import { useMultiVault } from '@/hooks/useMultiVault';
 import { Section } from '@/components/section';
 import { ListItem } from '@/components/list-item';
-import { useWalletConnectModal } from '@walletconnect/modal-react-native';
 import { gql } from '@/lib/generated';
 
 const GetAtomQuery = gql(`
@@ -63,7 +62,7 @@ query GetAtom($id: numeric!, $address: String) {
 
 export default function Atom() {
   const { id } = useLocalSearchParams();
-  const { address } = useWalletConnectModal();
+  const { address } = { address: '0x0000000000000000000000000000000000000000' }; //useWalletConnectModal();
   const { loading, error, data, refetch } = useQuery(GetAtomQuery, {
     fetchPolicy: 'network-only',
     variables: { id: Number(id), address: (address !== undefined ? address : '') }

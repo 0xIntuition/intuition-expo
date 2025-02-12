@@ -8,17 +8,14 @@ import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
-import {
-  useWalletConnectModal,
-} from "@walletconnect/modal-react-native";
 
 export default function Me() {
-  const { open, isConnected, address, provider } = useWalletConnectModal();
+  const { open, isConnected, address, provider } = { open: () => { }, isConnected: false, address: undefined, provider: undefined };
 
   // Function to handle the
   const handleButtonPress = async () => {
     if (isConnected) {
-      return provider?.disconnect();
+      // return provgcider?.disconnect();
     }
     return open();
   };
