@@ -8,7 +8,7 @@ import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
 import { relayStylePagination } from '@apollo/client/utilities';
-import { PrivyProvider } from '@privy-io/expo';
+import { PrivyProvider, PrivyElements } from '@privy-io/expo';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 import { Platform } from 'react-native';
 if (typeof window !== 'undefined') { window.React = React; }
@@ -54,49 +54,54 @@ export default function RootLayout() {
   if (!process.env.EXPO_PUBLIC_PRIVY_APP_ID || !process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID) {
     throw new Error('Privy app ID and client ID are not set');
   }
-  return (
+  const App = <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ApolloProvider client={client}>
 
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <ApolloProvider client={client}>
-        <PrivyProvider
-          appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID}
-          clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID}
-          config={{
-            embedded: {
-              ethereum: {
-                createOnLogin: 'users-without-wallets', // defaults to 'off'
-              },
-            },
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="a"
+          options={{
+            presentation: 'modal',
+            headerShown: false,
           }}
-        >
-          <Stack>
-            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-            <Stack.Screen
-              name="a"
-              options={{
-                presentation: 'modal',
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="t"
-              options={{
-                presentation: 'modal',
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen
-              name="acc"
-              options={{
-                presentation: 'modal',
-                headerShown: false,
-              }}
-            />
-            <Stack.Screen name="+not-found" />
-          </Stack>
-        </PrivyProvider>
-      </ApolloProvider>
-    </ThemeProvider>
+        />
+        <Stack.Screen
+          name="t"
+          options={{
+            presentation: 'modal',
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="acc"
+          options={{
+            presentation: 'modal',
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+    </ApolloProvider>
+  </ThemeProvider>;
+  if (isWeb) {
+    return App;
+  }
+  return (
+    <PrivyProvider
+      appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID}
+      clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID}
+      config={{
+        embedded: {
+          ethereum: {
+            createOnLogin: 'users-without-wallets', // defaults to 'off'
+          },
+        },
+      }}
+    >
+      {App}
+      <PrivyElements />
+    </PrivyProvider>
 
   );
 }

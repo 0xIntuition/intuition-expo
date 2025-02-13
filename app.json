@@ -13,12 +13,16 @@
       "backgroundColor": "#000000"
     },
     "ios": {
+      "usesAppleSignIn": true,
       "supportsTablet": true,
       "associatedDomains": [
         "applinks:app.i7n.xyz"
       ],
       "bundleIdentifier": "systems.intuition.mobile",
       "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
         "LSApplicationQueriesSchemes": [
           "metamask",
           "trust",
@@ -60,7 +64,19 @@
       "expo-router",
       "expo-font",
       "expo-asset",
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-apple-authentication",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "17.5"
+          },
+          "android": {
+            "compileSdkVersion": 34
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

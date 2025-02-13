@@ -1,226 +1,138 @@
-import { StyleSheet, ActivityIndicator, RefreshControl, useWindowDimensions, View } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
-import { ThemedText } from '@/components/ThemedText';
-import { ThemedView } from '@/components/ThemedView';
-import { formatRelative } from 'date-fns';
-import { ListItem } from '@/components/list-item';
-import { Address, formatEther } from 'viem';
-import { gql } from '@/lib/generated';
-import { getTripleLabel } from '@/lib/utils';
-import { useGeneralConfig } from '@/hooks/useGeneralConfig';
-import { useQuery } from '@apollo/client';
-import React, { useMemo } from 'react';
-const GET_SIGNALS = gql(`
-query GetSignals($offset: Int, $limit: Int) {
-  signals_aggregate {
-    aggregate {
-      count
-    }
-  }
-  signals(order_by: { block_timestamp: desc }, limit: $limit, offset: $offset) {
-    id
-    delta
-    block_timestamp
-    account {
-      id
-      label
-      image
-    }
-    
-    atom {
-      id
-      emoji
-      image
+import React, { useState, useCallback, useEffect } from 'react'
+import { GiftedChat, IMessage, Bubble, InputToolbar, Composer } from 'react-native-gifted-chat'
+import OpenAI from 'openai';
+import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
+import { useApolloClient } from '@apollo/client';
+import { getTools } from '@/lib/openai/tools';
+import Markdown from 'react-native-markdown-display';
+import { styles } from '@/lib/chat-styles';
 
-      label
-      type
-    }
+export default function Ask() {
+  const { isConnected, address, provider } = { isConnected: false, address: undefined, provider: undefined };
+  const [messages, setMessages] = useState<IMessage[]>([])
+  const client = useApolloClient();
+  const openAI = React.useMemo(
+    () =>
+      new OpenAI({
+        apiKey: process.env.EXPO_PUBLIC_OPENAI_API_KEY,
+        dangerouslyAllowBrowser: true,
+      }),
+    []
+  );
+  useEffect(() => {
+    setMessages([
+      {
+        _id: 1,
+        text: 'Hello how can I help you?' + (isConnected ? ' You are connected as ' + address : ''),
+        createdAt: new Date(),
+        user: {
+          _id: 2,
+          name: 'Intuition',
+          avatar: 'https://avatars.githubusercontent.com/u/94311139?s=200&v=4'
+        },
+      },
+    ])
+  }, [])
 
-    triple {
-      id
-      subject {
-        id
-        image
-        emoji
-        label
-        type
-      }
-      predicate {
-        id
-        image
-        emoji
-        label
-        type
-      }
-      object {
-        id
-        image
-        emoji
-        label
-        type
-      }
-    }
-  }
-}
-`);
 
-export default function Signals() {
+  const onSend = useCallback(async (newMessages: IMessage[] = []) => {
+    const tools = await getTools(client);
+    // Immediately append user message
+    setMessages(previousMessages =>
+      GiftedChat.append(previousMessages, newMessages)
+    );
 
-  const generalConfig = useGeneralConfig();
-  const upvote = BigInt(generalConfig.minDeposit);
-  const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS, {
-    variables: {
-      limit: 100,
-    },
-  });
-  const { width } = useWindowDimensions();
-  const isWideScreen = width >= 768;
+    const giftedMessages = [...messages, ...newMessages];
+    const openaiMessages: ChatCompletionMessageParam[] = giftedMessages.map(message => ({
+      role: message.user._id === 1 ? 'user' : 'assistant',
+      content: message.text,
+    }));
 
-  if (loading && !data) return <ActivityIndicator size="large" />;
+    const runner = openAI.beta.chat.completions.runTools({
+      model: "gpt-4o-mini",
+      messages: openaiMessages,
+      tools: tools,
+      max_tokens: 2048
+    })
+      .on("connect", () => console.log("Connecting..."))
+      .on("functionCall", (event: any) => {
+        console.log("functionCall", event)
+        // setProgressMessage(`Calling function ${event.name}...`)
+      })
+      .on("message", () => console.log("Processing..."))
+      .on("finalContent", () => console.log("Finalizing..."))
+      .on("error", (error: any) => console.error(error));
+
+    const finalContent = await runner.finalContent();
+
+    // Create AI response message
+    const aiResponse: IMessage = {
+      _id: Math.random().toString(),
+      createdAt: new Date(),
+      user: { _id: 2, name: 'Intuition', avatar: 'https://avatars.githubusercontent.com/u/94311139?s=200&v=4' },
+      text: finalContent || ''
+    };
+
+    // Append AI response
+    setMessages(previousMessages =>
+      GiftedChat.append(previousMessages, [aiResponse])
+    );
+  }, [messages, openAI]);
 
   return (
-    <ThemedView style={[styles.container, isWideScreen && styles.wideContainer]}>
-      <View style={styles.wideInner}>
-        {error && <ThemedText>{error.message}</ThemedText>}
-        {!loading && data && <FlashList
-          data={data.signals}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => ((BigInt(item.delta) / BigInt(upvote)) > 0 ? <ListItem
-            image={item.account?.image}
-            id={item.account?.id.toString()! as Address}
-            label={`${item.atom?.label || getTripleLabel(item.triple) || ''} `}
-            subLabel={`${item.account?.label}  ∙ ${formatRelative(new Date(parseInt(item.block_timestamp.toString()) * 1000), new Date())} `}
-            value={`${item.delta > 0 ? '⬆' : '⬇'}${(BigInt(item.delta) / BigInt(upvote))}`}
-            href={item.atom?.id ? `/a/${item.atom.id}` : `/t/${item.triple?.id}`}
-          /> : null)
-          }
-          estimatedItemSize={150}
-          onEndReached={() => {
-            if (data.signals_aggregate.aggregate?.count && data.signals_aggregate.aggregate.count > data.signals.length) {
-              fetchMore({
-                variables: {
-                  offset: data.signals.length,
-                  limit: 100,
-                },
-                updateQuery: (previousResult, { fetchMoreResult }) => {
-                  if (!fetchMoreResult) return previousResult;
-                  return {
-                    signals: [...previousResult.signals, ...fetchMoreResult.signals],
-                    signals_aggregate: fetchMoreResult.signals_aggregate,
-                  };
-                },
-              });
+    <GiftedChat
+      messages={messages}
+      onSend={messages => onSend(messages)}
+      user={{
+        _id: 1,
+      }}
+      renderBubble={props => (
+        <Bubble
+          {...props}
+          wrapperStyle={{
+            right: {
+              backgroundColor: '#0a7ea4'
+            },
+            left: {
+              backgroundColor: '#282c2e',
             }
           }}
-          onEndReachedThreshold={0.5}
-          ListFooterComponent={loading ? <ActivityIndicator /> : null}
-          refreshControl={
-            <RefreshControl
-              refreshing={loading}
-              onRefresh={() => refetch({ offset: 0 })}
-            />
-          }
-        />}
-      </View>
-    </ThemedView>
-
-  );
+          textStyle={{
+            left: {
+              color: 'white'
+            }
+          }}
+          renderMessageText={props => (
+            <Markdown style={styles}>{props.currentMessage.text}</Markdown>
+          )}
+        />
+      )}
+      renderInputToolbar={props => (
+        <InputToolbar
+          {...props}
+          containerStyle={{
+            backgroundColor: '#151718',
+            borderTopColor: '#282c2e'
+          }}
+        />
+      )}
+      renderComposer={props => (
+        <Composer
+          {...props}
+          textInputStyle={{
+            color: '#ECEDEE',
+            backgroundColor: 'transparent'
+          }}
+        />
+      )}
+      timeTextStyle={{
+        right: {
+          color: '#073b4d'
+        },
+        left: {
+          color: 'gray'
+        }
+      }}
+    />
+  )
 }
-
-const styles = StyleSheet.create({
-  vaultLink: {
-    marginTop: 10,
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  date: {
-    fontSize: 11,
-    color: '#888',
-
-  },
-  shortText: {
-    fontSize: 11,
-  },
-  image: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 5,
-  },
-  vaultContent: {
-    flex: 1,
-    padding: 8,
-    marginTop: 8,
-
-    borderWidth: 1,
-    borderColor: 'rgba(100,100,100,0.5)',
-    borderRadius: 8,
-  },
-  container: {
-    flex: 1,
-    paddingLeft: 16,
-  },
-  wideContainer: {
-    paddingLeft: '30%',
-    paddingRight: '30%',
-  },
-  wideInner: {
-    flex: 1,
-    flexDirection: 'row',
-  },
-  listContainer: {
-    flex: 1,
-    paddingVertical: 16,
-    paddingRight: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(100,100,100,0.5)',
-  },
-  masonryContainer: {
-    flex: 1,
-    marginTop: 10,
-    marginRight: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#ddd',
-    borderRadius: 8,
-  },
-  avatar: {
-    marginRight: 10,
-  },
-  name: {
-    fontSize: 15,
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  secondary: {
-    color: '#888',
-
-  },
-  profileLayout: {
-    flexDirection: 'row',
-    marginBottom: 12,
-  },
-  interactionsLayout: {
-    flexDirection: 'row',
-  },
-  header: {
-    flexDirection: 'row',
-    alignContent: 'space-between',
-  },
-  interaction: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    color: '#aaa',
-    marginRight: 20,
-    marginTop: 12,
-  },
-  icon: {
-    marginRight: 4,
-  },
-});
-
-
