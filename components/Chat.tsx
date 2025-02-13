@@ -6,9 +6,9 @@ import { useApolloClient } from '@apollo/client';
 import { getTools } from '@/lib/openai/tools';
 import Markdown from 'react-native-markdown-display';
 import { styles } from '@/lib/chat-styles';
+import { Link } from 'expo-router';
 
-export default function Chat({ systemPrompt }: { systemPrompt?: string }) {
-  const { isConnected, address, provider } = { isConnected: false, address: undefined, provider: undefined };
+export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?: string, assistantMessage?: string }) {
   const [messages, setMessages] = useState<IMessage[]>([])
   const client = useApolloClient();
   const openAI = React.useMemo(
@@ -35,16 +35,18 @@ export default function Chat({ systemPrompt }: { systemPrompt?: string }) {
         },
       })
     }
-    initialMessages.push({
-      _id: 1,
-      text: 'Hello how can I help you?' + (isConnected ? ' You are connected as ' + address : ''),
-      createdAt: new Date(),
-      user: {
-        _id: 2,
-        name: 'Intuition',
-        avatar: 'https://avatars.githubusercontent.com/u/94311139?s=200&v=4'
-      },
-    })
+    if (assistantMessage) {
+      initialMessages.push({
+        _id: 1,
+        text: (assistantMessage ? ' ' + assistantMessage : ''),
+        createdAt: new Date(),
+        user: {
+          _id: 2,
+          name: 'Intuition',
+          avatar: 'https://avatars.githubusercontent.com/u/94311139?s=200&v=4'
+        },
+      })
+    }
     setMessages(initialMessages)
   }, [])
 
@@ -118,7 +120,24 @@ export default function Chat({ systemPrompt }: { systemPrompt?: string }) {
             }
           }}
           renderMessageText={props => (
-            <Markdown style={styles}>{props.currentMessage.text}</Markdown>
+            <Markdown
+              style={styles}
+              rules={{
+                link: (node, children, parent, styles) => {
+                  return (
+                    <Link
+                      key={node.key}
+                      href={node.attributes.href}
+                      style={[styles.link, { color: '#1e90ff' }]}
+                    >
+                      {children}
+                    </Link>
+                  );
+                }
+              }}
+            >
+              {props.currentMessage?.text}
+            </Markdown>
           )}
         />
       )}

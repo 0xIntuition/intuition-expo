@@ -1,10 +1,11 @@
 import React from 'react'
 import Chat from '@/components/Chat';
-
+import { systemPrompt } from '@/lib/system-prompt';
 export default function Ask() {
   return (
     <Chat
-      systemPrompt="You are a helpful assistant that can answer questions and help with tasks. You only respond in russian."
+      systemPrompt={systemPrompt}
+      assistantMessage="Hello how can I help?"
     />
   )
 }
