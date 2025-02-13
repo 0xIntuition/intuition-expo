@@ -2,7 +2,7 @@
   "expo": {
     "name": "intuition-expo",
     "slug": "intuition",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "i7n",
@@ -16,6 +16,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "associatedDomains": [
+        "applinks:app.i7n.xyz",
         "applinks:app.i7n.xyz"
       ],
       "bundleIdentifier": "systems.intuition.mobile",
@@ -27,8 +28,13 @@
           "metamask",
           "trust",
           "rainbow",
+          "uniswap",
+          "metamask",
+          "trust",
+          "rainbow",
           "uniswap"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
