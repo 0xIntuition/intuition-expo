@@ -85,14 +85,14 @@ export default function Signals() {
         {!loading && data && <FlashList
           data={data.signals}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => ((BigInt(item.delta) / BigInt(upvote)) > 0 ? <ListItem
+          renderItem={({ item }) => (<ListItem
             image={item.account?.image}
             id={item.account?.id.toString()! as Address}
             label={`${item.atom?.label || getTripleLabel(item.triple) || ''} `}
             subLabel={`${item.account?.label}  ∙ ${formatRelative(new Date(parseInt(item.block_timestamp.toString()) * 1000), new Date())} `}
             value={`${item.delta > 0 ? '⬆' : '⬇'}${(BigInt(item.delta) / BigInt(upvote))}`}
             href={item.atom?.id ? `/a/${item.atom.id}` : `/t/${item.triple?.id}`}
-          /> : null)
+          />)
           }
           estimatedItemSize={150}
           onEndReached={() => {
