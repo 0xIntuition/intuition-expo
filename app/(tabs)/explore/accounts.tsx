@@ -20,7 +20,7 @@ query GetAccounts($offset: Int) {
           total_shares: desc
        }
     } }
-    limit: 10
+    limit: 100
     offset: $offset
     where: { type: { _eq: Default } }
   ) {
