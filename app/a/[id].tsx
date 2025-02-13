@@ -1,19 +1,19 @@
 import { Button, View, TouchableOpacity } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { shareAsync } from 'expo-sharing';
 import { useState } from 'react';
-import { formatEther, parseEther } from 'viem';
+import { Address, formatEther, parseEther } from 'viem';
 import { useMultiVault } from '@/hooks/useMultiVault';
 import { Section } from '@/components/section';
 import { ListItem } from '@/components/list-item';
-import { useWalletConnectModal } from '@walletconnect/modal-react-native';
+import { gql } from '@/lib/generated';
 
-const GET_ATOM = gql`
-query Atom($id: BigInt!, $address: String) {
+const GetAtomQuery = gql(`
+query GetAtom($id: numeric!, $address: String) {
   atom(id: $id) {
     id
     label
@@ -21,17 +21,15 @@ query Atom($id: BigInt!, $address: String) {
     emoji
     type
     vault {
-      totalShares
-      positionCount
-      currentSharePrice
-      positions(orderBy: "shares", orderDirection: "desc") {
-        items {
-          shares
-          account {
-            id
-            image
-            label
-          }
+      total_shares
+      position_count
+      current_share_price
+      positions(order_by: { shares: desc }) {
+        shares
+        account {
+          id
+          image
+          label
         }
       }
     }
@@ -56,23 +54,18 @@ query Atom($id: BigInt!, $address: String) {
       }
     }
   }
-  chainlinkPrices(limit: 1, orderBy: "id", orderDirection: "desc") {
-    items {
-      usd
-    }
+
+  positions(where: { account_id: {_eq: $address}, vault_id: { _eq: $id} }, limit: 1) {
+    shares
   }
-  positions(where: { accountId: $address, vaultId: $id }, limit: 1) {
-    items {
-      shares
-    }
-  }
-}`;
+}`);
+
 export default function Atom() {
   const { id } = useLocalSearchParams();
-  const { address } = useWalletConnectModal();
-  const { loading, error, data, refetch } = useQuery(GET_ATOM, {
+  const { address } = { address: '0x0000000000000000000000000000000000000000' }; //useWalletConnectModal();
+  const { loading, error, data, refetch } = useQuery(GetAtomQuery, {
     fetchPolicy: 'network-only',
-    variables: { id, address: address }
+    variables: { id: Number(id), address: (address !== undefined ? address : '') }
   });
   const [signalInProgress, setSignalInProgress] = useState(false);
   const multivault = useMultiVault();
@@ -81,10 +74,9 @@ export default function Atom() {
   if (loading) return <ThemedText>Loading...</ThemedText>;
   if (error) return <ThemedText>{error.message}</ThemedText>;
 
-  if (!data.atom) {
+  if (!loading && !data?.atom) {
     return <ThemedText>Atom not found</ThemedText>;
   }
-  const { atom } = data;
 
   const handleDeposit = async () => {
 
@@ -93,9 +85,14 @@ export default function Atom() {
       return;
     }
 
+    if (!data?.atom) {
+      setErrorMesage('Atom not found');
+      return;
+    }
+
     setSignalInProgress(true);
 
-    multivault?.depositAtom(BigInt(atom.id), parseEther('0.00042'))
+    multivault?.depositAtom(BigInt(data.atom.id), parseEther('0.00042'))
       .then(() => {
         refetch();
       })
@@ -114,7 +111,12 @@ export default function Atom() {
       return;
     }
 
-    multivault?.redeemAtom(BigInt(atom.id), parseEther('0.00042'))
+    if (!data?.atom) {
+      setErrorMesage('Atom not found');
+      return;
+    }
+
+    multivault?.redeemAtom(BigInt(data.atom.id), parseEther('0.00042'))
       .then(() => {
         refetch();
       })
@@ -126,38 +128,38 @@ export default function Atom() {
       });
   };
 
-  const description = atom.value?.thing?.description || atom.value?.person?.description || atom.value?.organization?.description || '';
-  const totalStaked = parseFloat(formatEther(atom.vault.totalShares))
-    * parseFloat(formatEther(atom.vault.currentSharePrice));
-  const usd = data.chainlinkPrices.items[0].usd;
+  const description = data?.atom?.value?.thing?.description || data?.atom?.value?.person?.description || data?.atom?.value?.organization?.description || '';
+  const totalStaked = parseFloat(formatEther(data?.atom?.vault?.total_shares))
+    * parseFloat(formatEther(data?.atom?.vault?.current_share_price));
+  const usd = 1;
 
   return (
     <ThemedView style={styles.container}>
       <Stack.Screen
         options={{
           headerTitle: () => <View style={styles.header} >
-            {atom.image !== null && <Image style={styles.image} source={{ uri: atom.image }} />}
-            <ThemedText>{atom.label}</ThemedText>
+            {data?.atom?.image !== null && <Image style={styles.image} source={{ uri: data?.atom?.image }} />}
+            <ThemedText>{data?.atom?.label}</ThemedText>
           </View>,
         }}
       />
       <Section >
         <ListItem
           label={description}
-          subLabel={`${atom.type} ∙ ID: ${atom.id}`}
+          subLabel={`${data?.atom?.type} ∙ ID: ${data?.atom?.id}`}
         />
-        {data.positions.items.length > 0 && (
+        {data && data.positions && data.positions.length > 0 && (
           <ListItem
             label="My stake"
             value={`${(
-              parseFloat(formatEther(atom.vault.currentSharePrice))
-              * parseFloat(formatEther(data.positions.items[0].shares))
+              parseFloat(formatEther(data?.atom?.vault?.current_share_price))
+              * parseFloat(formatEther(data?.positions[0]?.shares))
               * usd).toFixed(2)} USD`}
           />
         )}
         <ListItem
           label="Total staked"
-          subLabel={`Holders: ${atom.vault.positionCount}`}
+          subLabel={`Holders: ${data?.atom?.vault?.position_count}`}
           value={`${(totalStaked * usd).toFixed(2)} USD`}
           last
         />
@@ -167,24 +169,24 @@ export default function Atom() {
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: 8, paddingLeft: 8 }}>
         {signalInProgress && <ThemedText>Signal in progress...</ThemedText>}
         {!signalInProgress && <Button title="Deposit" onPress={handleDeposit} />}
-        {!signalInProgress && data.positions.items.length > 0 && <Button title="Withdraw" onPress={handleWithdraw} />}
+        {!signalInProgress && data?.positions && data?.positions.length > 0 && <Button title="Withdraw" onPress={handleWithdraw} />}
         <Button title="Share" onPress={async () => {
-          await shareAsync('https://i7n.app/a/' + id);
+          await shareAsync('https://app.i7n.xyz/a/' + id);
         }} />
       </View>
 
       <ThemedText>{errorMesage}</ThemedText>
-      {errorMesage && <Link href={{ pathname: '(tabs)/me' }}><ThemedText>Go to me</ThemedText></Link>}
+      {errorMesage && <Link href={{ pathname: '/(tabs)/me' }}><ThemedText>Go to me</ThemedText></Link>}
       <Section title="Top Holders">
-        {atom.vault.positions.items.map(({ shares, account }: any) => (
+        {data?.atom?.vault?.positions.map(({ shares, account }) => (
           <ListItem
-            key={account.id}
-            id={account.id}
-            image={account.image}
-            label={account.label}
-            href={{ pathname: '/acc/[id]', params: { id: account.id } }}
+            key={account?.id || ''}
+            id={account?.id as Address}
+            image={account?.image || ''}
+            label={account?.label || ''}
+            href={{ pathname: '/acc/[id]', params: { id: account?.id || '' } }}
             value={`${(
-              parseFloat(formatEther(atom.vault.currentSharePrice))
+              parseFloat(formatEther(data?.atom?.vault?.current_share_price))
               * parseFloat(formatEther(shares))
               * usd).toFixed(2)} USD`}
           />

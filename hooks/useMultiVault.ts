@@ -1,10 +1,9 @@
 import { Multivault } from '@/lib/protocol';
-import { useWalletConnectModal } from '@walletconnect/modal-react-native';
 import { Address, createPublicClient, createWalletClient, custom, http } from 'viem';
 import { base } from 'viem/chains';
 
 export function useMultiVault() {
-  const { isConnected, address, provider } = useWalletConnectModal();
+  const { isConnected, address, provider } = { isConnected: false, address: undefined, provider: undefined };
   if (!isConnected || !address || !provider) {
     return null;
   }
@@ -19,7 +18,7 @@ export function useMultiVault() {
     account: address as Address,
     transport: custom({
       async request({ method, params }) {
-        return await provider?.request({ method, params });
+        // return await provider?.request({ method, params });
       },
     }),
   })
@@ -29,6 +28,20 @@ export function useMultiVault() {
     publicClient,
     // @ts-ignore
     walletClient,
+  });
+  return multivault;
+}
+
+export function usePublicMultivault() {
+  const publicClient = createPublicClient({
+    chain: base,
+    transport: http(),
+  })
+  const multivault = new Multivault({
+    // @ts-ignore
+    publicClient,
+    // @ts-ignore
+    walletClient: publicClient,
   });
   return multivault;
 }

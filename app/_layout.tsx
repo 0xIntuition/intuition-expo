@@ -1,16 +1,20 @@
-import '@walletconnect/react-native-compat';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import 'react-native-reanimated';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
 import { relayStylePagination } from '@apollo/client/utilities';
-import { WalletConnectModal } from '@walletconnect/modal-react-native';
+import { PrivyProvider, PrivyElements } from '@privy-io/expo';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
+import { Platform } from 'react-native';
+if (typeof window !== 'undefined') { window.React = React; }
+
+const isWeb = Platform.OS === 'web';
+
 SplashScreen.preventAutoHideAsync();
 
 if (__DEV__) {
@@ -18,29 +22,10 @@ if (__DEV__) {
   loadErrorMessages();
 }
 
-const projectId = '5e71a895f4587af8d1ac0df79b81f86e';
 
-const providerMetadata = {
-  name: 'Intuition',
-  description: 'Disruptive Trustformation',
-  url: 'https://i7n.app/',
-  icons: ['https://avatars.githubusercontent.com/u/94311139?s=200&v=4'],
-  redirect: {
-    native: 'i7n://',
-  }
-};
-const sessionParams = {
-  namespaces: {
-    eip155: {
-      methods: ['eth_sendTransaction'],
-      chains: ['eip155:8453'],
-      events: ['chainChanged', 'accountsChanged'],
-      rpcMap: {}
-    }
-  }
-}
+
 const client = new ApolloClient({
-  uri: 'https://i7n.app/graphql',
+  uri: process.env.EXPO_PUBLIC_API_URL,
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -66,38 +51,57 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
+  if (!process.env.EXPO_PUBLIC_PRIVY_APP_ID || !process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID) {
+    throw new Error('Privy app ID and client ID are not set');
+  }
+  const App = <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+    <ApolloProvider client={client}>
 
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen
+          name="a"
+          options={{
+            presentation: 'modal',
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="t"
+          options={{
+            presentation: 'modal',
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen
+          name="acc"
+          options={{
+            presentation: 'modal',
+            headerShown: false,
+          }}
+        />
+        <Stack.Screen name="+not-found" />
+      </Stack>
+    </ApolloProvider>
+  </ThemeProvider>;
+  if (isWeb) {
+    return App;
+  }
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <ApolloProvider client={client}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen
-            name="a"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="t"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="acc"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-        <WalletConnectModal projectId={projectId} providerMetadata={providerMetadata} sessionParams={sessionParams} />
+    <PrivyProvider
+      appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID}
+      clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID}
+      config={{
+        embedded: {
+          ethereum: {
+            createOnLogin: 'users-without-wallets', // defaults to 'off'
+          },
+        },
+      }}
+    >
+      {App}
+      <PrivyElements config={{ appearance: { colorScheme: colorScheme === 'dark' ? 'dark' : 'light' } }} />
+    </PrivyProvider>
 
-      </ApolloProvider>
-    </ThemeProvider>
   );
 }

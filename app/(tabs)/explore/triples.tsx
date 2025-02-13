@@ -1,6 +1,6 @@
 import { View, StyleSheet, RefreshControl, ActivityIndicator, Image } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useQuery, gql } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import React, { useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
@@ -8,54 +8,55 @@ import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
+import { gql } from '@/lib/generated';
+import Atom from '@/components/Atom';
+import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 
-const GET_TRIPLES = gql`
-query Triples($after: String) {
-  triples(
-    orderBy: "blockTimestamp"
-    limit: 10
-    after: $after
-    orderDirection: "desc"
-  ) {
-    items {
-      id
-      subject {
-        emoji
-        label
-      }
-      predicate {
-        emoji
-        label
-      }
-      object {
-        emoji
-        label
-      }
-      creator {
-        id
-        label
-        image
-      }
-      blockTimestamp
-      vault {
-        totalShares
-        positionCount
-      }
-      counterVault {
-        totalShares
-        positionCount
-      }
-    }
-    pageInfo {
-      endCursor
-      hasNextPage
+const GetTriplesQuery = gql(`
+query GetTriples($offset: Int) {
+  triples_aggregate {
+    aggregate {
+      count
     }
   }
-}`;
+  triples(order_by: { vault:  {
+     total_shares: desc
+  } }, limit: 10, offset: $offset) {
+    id
+    subject {
+      emoji
+      label
+    }
+    predicate {
+      emoji
+      label
+    }
+    object {
+      emoji
+      label
+    }
+    creator {
+      id
+      label
+      image
+    }
+    block_timestamp
+    vault {
+      total_shares
+      position_count
+    }
+    counter_vault {
+      total_shares
+      position_count
+    }
+  }
+}
+`);
 
 export default function Triple() {
-
-  const { loading, error, data, refetch, fetchMore } = useQuery(GET_TRIPLES);
+  const generalConfig = useGeneralConfig();
+  const upvote = BigInt(generalConfig.minDeposit);
+  const { loading, error, data, refetch, fetchMore } = useQuery(GetTriplesQuery);
 
   if (loading && !data) return <ActivityIndicator size="large" />;
 
@@ -63,24 +64,22 @@ export default function Triple() {
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.triples.items}
+        data={data.triples}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }: { item: any }) => <TripleListItem triple={item} />}
-        estimatedItemSize={300}
+        renderItem={({ item }) => <TripleListItem triple={item} />}
+        estimatedItemSize={150}
         onEndReached={() => {
-          if (data.triples.pageInfo.hasNextPage) {
+          if (data.triples_aggregate.aggregate?.count && data.triples_aggregate.aggregate.count > data.triples.length) {
             fetchMore({
               variables: {
-                after: data.triples.pageInfo.endCursor,
+                offset: data.triples.length,
               },
               updateQuery: (previousResult, { fetchMoreResult }) => {
                 if (!fetchMoreResult) return previousResult;
                 return {
-                  triples: {
-                    __typename: previousResult.__typename,
-                    items: [...previousResult.triples.items, ...fetchMoreResult.triples.items],
-                    pageInfo: fetchMoreResult.triples.pageInfo,
-                  }
+                  ...previousResult,
+                  triples_aggregate: fetchMoreResult.triples_aggregate,
+                  triples: [...previousResult.triples, ...fetchMoreResult.triples],
                 };
               },
             });
@@ -91,7 +90,7 @@ export default function Triple() {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={() => refetch({ after: null })}
+            onRefresh={() => refetch({ offset: 0 })}
           />
         }
       />}
@@ -99,6 +98,8 @@ export default function Triple() {
   );
 }
 export function TripleListItem({ triple }: { triple: any }) {
+  const generalConfig = useGeneralConfig();
+  const upvote = BigInt(generalConfig.minDeposit);
   return (
     <ThemedView style={styles.listContainer}>
       <View style={styles.topRow}>
@@ -111,7 +112,7 @@ export function TripleListItem({ triple }: { triple: any }) {
           <ThemedText style={styles.secondary}>{triple.creator.label}</ThemedText>
         </Link>
 
-        <ThemedText style={styles.date}>{formatRelative(triple.blockTimestamp * 1000, new Date())}</ThemedText>
+        <ThemedText style={styles.date}>{formatRelative(new Date(parseInt(triple.block_timestamp.toString()) * 1000), new Date())}</ThemedText>
       </View>
 
       <Link
@@ -121,15 +122,15 @@ export function TripleListItem({ triple }: { triple: any }) {
           params: { id: triple.id }
         }}>
         <View style={styles.vaultContent}>
-          <ThemedText numberOfLines={1}>{triple.subject.emoji} {triple.subject.label}</ThemedText>
-          <ThemedText >{triple.predicate.label}</ThemedText>
-          <ThemedText >{triple.object.emoji} {triple.object.label}</ThemedText>
+          <Atom atom={triple.subject} layout='text-avatar' />
+          <Atom atom={triple.predicate} layout='text-avatar' />
+          <Atom atom={triple.object} layout='text-avatar' />
         </View>
       </Link>
       <View style={styles.positionsRow}>
-        <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {triple.vault.positionsCount} ∙ {convertToCurrency(triple.vault.totalShares)} </ThemedText>
+        <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {triple.vault.position_count} ∙ ⬆{(BigInt(triple.vault.total_shares) / upvote).toString(10)} </ThemedText>
 
-        <ThemedText numberOfLines={1} style={styles.counterVault}><Ionicons size={13} name='person' /> {triple.counterVault.positionsCount} ∙ {convertToCurrency(triple.counterVault.totalShares)} </ThemedText>
+        {triple.counter_vault.position_count > 0 && <ThemedText numberOfLines={1} style={styles.counterVault}><Ionicons size={13} name='person' /> {triple.counter_vault.position_count} ∙ ⬇{(BigInt(triple.counter_vault.total_shares) / upvote).toString(10)} </ThemedText>}
       </View>
 
     </ThemedView>
@@ -147,6 +148,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    marginTop: 16,
   },
   topRow: {
     flexDirection: 'row',
@@ -169,6 +171,8 @@ const styles = StyleSheet.create({
   },
   vaultContent: {
     flex: 1,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
     padding: 8,
     marginTop: 8,
 
@@ -183,7 +187,7 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     paddingVertical: 16,
-    paddingRight: 16,
+    paddingRight: 36,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(100,100,100,0.5)',
   },

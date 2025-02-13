@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { shareAsync } from 'expo-sharing';
 
 const GET_TRIPLE = gql`
-query Triple ($id: BigInt!){
+query Triple ($id: numeric!){
   triple(id: $id) {
     id
       subject {
@@ -47,7 +47,7 @@ export default function Triple() {
         <ThemedText >{triple.object.emoji} {triple.object.label}</ThemedText>
       </View>
       <Button title="Share" onPress={async () => {
-        await shareAsync('https://i7n.app/t/' + id);
+        await shareAsync('https://app.i7n.xyz/t/' + id);
       }} />
     </ThemedView>
   );

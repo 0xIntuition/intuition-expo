@@ -1,39 +1,42 @@
 import { View, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useQuery, gql } from '@apollo/client';
-import React, { useState, useEffect, useCallback } from 'react';
+import { useQuery } from '@apollo/client';
 import Avatar from '@/components/Avatar';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
+import { gql } from '@/lib/generated';
 
-const GET_ACCOUNTS = gql`
-query Accounts($after: String) {
-  accounts(
-    orderBy: "label"
-    limit: 10
-    after: $after
-    orderDirection: "asc"
-    where: { type: Default }
-  ) {
-    items {
-      image
-      label
-      id
-    }
-    pageInfo {
-      endCursor
-      hasNextPage
+const GetAccountsQuery = gql(`
+query GetAccounts($offset: Int) {
+  accounts_aggregate(where: { type: { _eq: Default } }) {
+    aggregate {
+      count
     }
   }
-}`;
+  accounts(
+    order_by: { atom:  {
+       vault:  {
+          total_shares: desc
+       }
+    } }
+    limit: 10
+    offset: $offset
+    where: { type: { _eq: Default } }
+  ) {
+    image
+    label
+    id
+  }
+}`);
+
 function shortId(id: string): string {
   return id.substring(0, 6) + "..." + id.substring(id.length - 4)
 }
 
 export default function Accounts() {
 
-  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ACCOUNTS);
+  const { loading, error, data, refetch, fetchMore } = useQuery(GetAccountsQuery);
 
 
   if (loading && !data) return <ActivityIndicator size="large" />;
@@ -41,24 +44,22 @@ export default function Accounts() {
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.accounts.items}
+        data={data.accounts}
         keyExtractor={(item: any) => `${item.id}`}
         renderItem={({ item }: { item: any }) => <AccountListItem account={item} />}
-        estimatedItemSize={300}
+        estimatedItemSize={100}
         onEndReached={() => {
-          if (data.accounts.pageInfo.hasNextPage) {
+          if (data.accounts_aggregate.aggregate?.count && data.accounts_aggregate.aggregate.count > data.accounts.length) {
             fetchMore({
               variables: {
-                after: data.accounts.pageInfo.endCursor,
+                offset: data.accounts.length,
               },
               updateQuery: (previousResult, { fetchMoreResult }) => {
                 if (!fetchMoreResult) return previousResult;
                 return {
-                  accounts: {
-                    __typename: previousResult.accounts.__typename,
-                    items: [...previousResult.accounts.items, ...fetchMoreResult.accounts.items],
-                    pageInfo: fetchMoreResult.accounts.pageInfo,
-                  }
+                  ...previousResult,
+                  accounts: [...previousResult.accounts, ...fetchMoreResult.accounts],
+                  accounts_aggregate: fetchMoreResult.accounts_aggregate,
                 };
               },
             });
@@ -69,7 +70,7 @@ export default function Accounts() {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={() => refetch({ after: null })}
+            onRefresh={() => refetch({ offset: 0 })}
           />
         }
       />}
@@ -104,7 +105,7 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     paddingVertical: 16,
-    paddingRight: 16,
+    paddingRight: 36,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(100,100,100,0.5)',
   },

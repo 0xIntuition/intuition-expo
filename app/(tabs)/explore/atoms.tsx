@@ -1,48 +1,47 @@
 import { View, StyleSheet, RefreshControl, ActivityIndicator, Image } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
-import { useQuery, gql } from '@apollo/client';
-import React, { useState } from 'react';
+import { useQuery } from '@apollo/client';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
-
-const GET_ATOMS = gql`
-query Atoms($after: String) {
-  atoms(
-    orderBy: "blockTimestamp"
-    limit: 10
-    after: $after
-    orderDirection: "desc"
-  ) {
-    items {
-      id
-      image
-      emoji
-      label
-      creator {
-        id
-        label
-        image
-      }
-      blockTimestamp
-      vault {
-        totalShares
-        currentSharePrice
-        positionCount
-      }
-    }
-    pageInfo {
-      endCursor
-      hasNextPage
+import { gql } from '@/lib/generated';
+import Atom from '@/components/Atom';
+import { useGeneralConfig } from '@/hooks/useGeneralConfig';
+const GetAtomsQuery = gql(`
+query GetAtoms($offset: Int) {
+  atoms_aggregate {
+    aggregate {
+      count
     }
   }
-}`;
+  atoms(
+    order_by: { vault: { total_shares: desc } }
+    limit: 10
+    offset: $offset
+  ) {
+    id
+    image
+    emoji
+    label
+    creator {
+      id
+      label
+      image
+    }
+    block_timestamp
+    vault {
+      total_shares
+      current_share_price
+      position_count
+    }
+  }
+}`);
 
 export default function Atoms() {
-  const { loading, error, data, refetch, fetchMore } = useQuery(GET_ATOMS);
+  const { loading, error, data, refetch, fetchMore } = useQuery(GetAtomsQuery);
 
   if (loading && !data) return <ActivityIndicator size="large" />;
 
@@ -50,24 +49,22 @@ export default function Atoms() {
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
-        data={data.atoms.items}
+        data={data.atoms}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }: { item: any }) => <AtomListItem atom={item} />}
-        estimatedItemSize={300}
+        renderItem={({ item }) => <AtomListItem atom={item} />}
+        estimatedItemSize={150}
         onEndReached={() => {
-          if (data.atoms.pageInfo.hasNextPage) {
+          if (data.atoms_aggregate.aggregate?.count && data.atoms_aggregate.aggregate.count > data.atoms.length) {
             fetchMore({
               variables: {
-                after: data.atoms.pageInfo.endCursor,
+                offset: data.atoms.length,
               },
               updateQuery: (previousResult, { fetchMoreResult }) => {
                 if (!fetchMoreResult) return previousResult;
                 return {
-                  atoms: {
-                    __typename: previousResult.__typename,
-                    items: [...previousResult.atoms.items, ...fetchMoreResult.atoms.items],
-                    pageInfo: fetchMoreResult.atoms.pageInfo,
-                  }
+                  ...previousResult,
+                  atoms: [...previousResult.atoms, ...fetchMoreResult.atoms],
+                  atoms_aggregate: fetchMoreResult.atoms_aggregate,
                 };
               },
             });
@@ -78,7 +75,7 @@ export default function Atoms() {
         refreshControl={
           <RefreshControl
             refreshing={loading}
-            onRefresh={() => refetch({ after: null })}
+            onRefresh={() => refetch({ offset: 0 })}
           />
         }
       />}
@@ -86,6 +83,8 @@ export default function Atoms() {
   );
 }
 export function AtomListItem({ atom }: { atom: any }) {
+  const generalConfig = useGeneralConfig();
+  const upvote = BigInt(generalConfig.minDeposit);
   return (
     <ThemedView style={styles.listContainer}>
       <View style={styles.topRow}>
@@ -98,7 +97,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           <ThemedText style={styles.secondary}>{atom.creator.label}</ThemedText>
         </Link>
 
-        <ThemedText style={styles.date}>{formatRelative(atom.blockTimestamp * 1000, new Date())}</ThemedText>
+        <ThemedText style={styles.date}>{formatRelative(new Date(parseInt(atom.block_timestamp.toString()) * 1000), new Date())}</ThemedText>
       </View>
 
       <Link
@@ -108,10 +107,10 @@ export function AtomListItem({ atom }: { atom: any }) {
           params: { id: atom.id }
         }}>
         <View style={styles.vaultContent}>
-          <ThemedText numberOfLines={1}>{atom.emoji} {atom.label}</ThemedText>
+          <Atom atom={atom} layout='text-avatar' />
         </View>
       </Link>
-      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.positionCount} ∙ {convertToCurrency(atom.vault.totalShares)} </ThemedText>
+      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.position_count} ∙ ⬆{(BigInt(atom.vault.total_shares) / upvote).toString(10)} </ThemedText>
 
 
     </ThemedView>
@@ -157,7 +156,7 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     paddingVertical: 16,
-    paddingRight: 16,
+    paddingRight: 36,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(100,100,100,0.5)',
   },

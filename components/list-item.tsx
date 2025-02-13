@@ -2,13 +2,12 @@ import React, { FC } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Address } from 'viem';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { ExpoRouter } from 'expo-router/types/expo-router';
-import { Link } from 'expo-router';
+import { Link, Href } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons'
 
 interface ListItemProps {
   id?: Address;
-  href?: ExpoRouter.Href;
+  href?: Href;
   emoji?: string | null;
   image?: string | null;
   label: string;
@@ -46,15 +45,10 @@ export const ListItem: FC<ListItemProps> = ({
     <View style={[styles.contentContainer, { borderBottomWidth: last ? 0 : 1 }]}>
       <View style={styles.leftContent}>
         {icon && <View style={styles.iconContainer}>{icon}</View>}
-        {!icon && id !== undefined && (
-          <Image
-            style={styles.idIcon}
-            source={{ uri: `https://i7n.app/blo/${id}` }}
-          />
-        )}
+
         <View style={styles.labelContainer}>
-          <Text style={[styles.label, { color: textColor }]}>{label}</Text>
           {subLabel && <Text style={[styles.subLabel, { color: subTextColor }]}>{subLabel}</Text>}
+          <Text style={[styles.label, { color: textColor }]}>{label}</Text>
         </View>
       </View>
       <View style={styles.centerContent}>{children}</View>
@@ -87,7 +81,6 @@ const styles = StyleSheet.create({
     // shadowOpacity: 0.1,
     // shadowRadius: 1,
     elevation: 1,
-    marginTop: 4,
 
   },
   contentContainer: {
@@ -129,6 +122,7 @@ const styles = StyleSheet.create({
   },
   subLabel: {
     fontSize: 12,
+    marginBottom: 4,
   },
   centerContent: {
     flex: 1,

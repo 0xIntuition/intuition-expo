@@ -2,7 +2,7 @@
   "expo": {
     "name": "intuition-expo",
     "slug": "intuition",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "i7n",
@@ -13,18 +13,28 @@
       "backgroundColor": "#000000"
     },
     "ios": {
+      "usesAppleSignIn": true,
       "supportsTablet": true,
       "associatedDomains": [
-        "applinks:i7n.app"
+        "applinks:app.i7n.xyz",
+        "applinks:app.i7n.xyz"
       ],
-      "bundleIdentifier": "systems.intuition.expo",
+      "bundleIdentifier": "systems.intuition.mobile",
       "infoPlist": {
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": true
+        },
         "LSApplicationQueriesSchemes": [
           "metamask",
           "trust",
           "rainbow",
+          "uniswap",
+          "metamask",
+          "trust",
+          "rainbow",
           "uniswap"
-        ]
+        ],
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -35,7 +45,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "i7n.app",
+              "host": "app.i7n.xyz",
               "pathPrefix": "/"
             }
           ],
@@ -49,7 +59,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "systems.intuition.expo"
+      "package": "systems.intuition.mobile"
     },
     "web": {
       "bundler": "metro",
@@ -58,7 +68,21 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font"
+      "expo-font",
+      "expo-asset",
+      "expo-secure-store",
+      "expo-apple-authentication",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "17.5"
+          },
+          "android": {
+            "compileSdkVersion": 34
+          }
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
