@@ -100,7 +100,7 @@ export default function RootLayout() {
       }}
     >
       {App}
-      <PrivyElements />
+      <PrivyElements config={{ appearance: { colorScheme: colorScheme === 'dark' ? 'dark' : 'light' } }} />
     </PrivyProvider>
 
   );
