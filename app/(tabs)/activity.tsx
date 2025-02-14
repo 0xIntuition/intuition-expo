@@ -11,13 +11,18 @@ import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 import { useQuery } from '@apollo/client';
 import React, { useMemo } from 'react';
 const GET_SIGNALS = gql(`
-query GetSignals($offset: Int, $limit: Int) {
-  signals_aggregate {
+query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
+  signals_aggregate(where: { delta: { _gt: $minDelta } }) {
     aggregate {
       count
     }
   }
-  signals(order_by: { block_timestamp: desc }, limit: $limit, offset: $offset) {
+  signals(
+    where: { delta: { _gt: $minDelta } },
+    order_by: { block_timestamp: desc },
+    limit: $limit,
+    offset: $offset
+  ) {
     id
     delta
     block_timestamp
@@ -68,9 +73,14 @@ export default function Signals() {
 
   const generalConfig = useGeneralConfig();
   const upvote = BigInt(generalConfig.minDeposit);
+
+  // min delta is 80% of the upvote
+  const minDelta = BigInt(upvote) * BigInt(80) / BigInt(100);
+
   const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS, {
     variables: {
       limit: 100,
+      minDelta: parseInt(minDelta.toString())
     },
   });
   const { width } = useWindowDimensions();
@@ -90,7 +100,7 @@ export default function Signals() {
             id={item.account?.id.toString()! as Address}
             label={`${item.atom?.label || getTripleLabel(item.triple) || ''} `}
             subLabel={`${item.account?.label}  ∙ ${formatRelative(new Date(parseInt(item.block_timestamp.toString()) * 1000), new Date())} `}
-            value={`${item.delta > 0 ? '⬆' : '⬇'}${(BigInt(item.delta) / BigInt(upvote))}`}
+            value={`${item.delta > 0 ? '↑' : '↓'}${(BigInt(item.delta) / BigInt(upvote) + BigInt(1))}`}
             href={item.atom?.id ? `/a/${item.atom.id}` : `/t/${item.triple?.id}`}
           />)
           }

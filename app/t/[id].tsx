@@ -5,22 +5,29 @@ import { useQuery, gql } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { shareAsync } from 'expo-sharing';
+import Atom from '@/components/Atom';
 
 const GET_TRIPLE = gql`
 query Triple ($id: numeric!){
   triple(id: $id) {
     id
       subject {
+        id
         emoji
         label 
+        image
       }
       predicate {
+        id
         emoji
         label
+        image
       }
       object {
+        id
         emoji
         label
+        image
       }
   }
 }`;
@@ -40,15 +47,34 @@ export default function Triple() {
 
   return (
     <ThemedView style={styles.container}>
-
+      <Stack.Screen
+        options={{
+          headerRight: () => <Button title="Share" onPress={async () => {
+            await shareAsync('https://app.i7n.xyz/t/' + id);
+          }} />,
+        }}
+      />
       <View style={styles.vaultContent}>
-        <ThemedText numberOfLines={1}>{triple.subject.emoji} {triple.subject.label}</ThemedText>
-        <ThemedText >{triple.predicate.label}</ThemedText>
-        <ThemedText >{triple.object.emoji} {triple.object.label}</ThemedText>
+        <Link href={{
+          pathname: '/a/[id]',
+          params: { id: triple.subject.id }
+        }}>
+          <Atom atom={triple.subject} layout='text-avatar' />
+        </Link>
+        <Link href={{
+          pathname: '/a/[id]',
+          params: { id: triple.predicate.id }
+        }}>
+          <Atom atom={triple.predicate} layout='text-avatar' />
+        </Link>
+        <Link href={{
+          pathname: '/a/[id]',
+          params: { id: triple.object.id }
+        }}>
+          <Atom atom={triple.object} layout='text-avatar' />
+        </Link>
       </View>
-      <Button title="Share" onPress={async () => {
-        await shareAsync('https://app.i7n.xyz/t/' + id);
-      }} />
+
     </ThemedView>
   );
 }
@@ -72,7 +98,9 @@ const styles = StyleSheet.create({
   vaultContent: {
     padding: 8,
     margin: 8,
-
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: 'rgba(100,100,100,0.5)',
     borderRadius: 8,
