@@ -135,8 +135,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   wideContainer: {
-    paddingLeft: '20%',
-    paddingRight: '20%',
   },
   wideInner: {
     flex: 1,
@@ -150,7 +148,6 @@ const styles = StyleSheet.create({
     borderLeftColor: 'rgba(100,100,100,0.5)',
   },
   rightColumn: {
-    width: '20%',
     borderLeftWidth: 1,
     borderLeftColor: 'rgba(100,100,100,0.5)',
   },

@@ -98,7 +98,7 @@ const styles = StyleSheet.create({
   vaultContent: {
     padding: 8,
     margin: 8,
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,

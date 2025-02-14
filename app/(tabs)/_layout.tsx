@@ -17,6 +17,9 @@ export default function TabLayout() {
         headerShown: true,
         tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconSelected,
         tabBarShowLabel: false,
+        tabBarInactiveBackgroundColor: 'transparent',
+        tabBarActiveBackgroundColor: 'transparent',
+        headerBackground: () => null,
       }}>
       <Tabs.Screen
         name="index"

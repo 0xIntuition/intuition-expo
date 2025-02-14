@@ -40,7 +40,7 @@ export default function Account() {
 
   const account = data.account;
   return (
-    <ThemedView style={styles.container}>
+    <View style={styles.container}>
       <Stack.Screen
         options={{
           headerRight: () => <Button title="Share" onPress={async () => {
@@ -58,7 +58,7 @@ export default function Account() {
           systemPrompt={`${systemPrompt} You that can answer questions about ${account.label} ${account.id}.`}
         />
       </SafeAreaView>
-    </ThemedView>
+    </View>
   );
 }
 
