@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useEffect } from 'react'
-import { GiftedChat, IMessage, Bubble, InputToolbar, Composer } from 'react-native-gifted-chat'
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { GiftedChat, IMessage, Bubble, InputToolbar, Composer, Send } from 'react-native-gifted-chat'
 import OpenAI from 'openai';
 import { ChatCompletionMessageParam } from 'openai/resources/chat/completions';
 import { useApolloClient } from '@apollo/client';
@@ -8,6 +9,9 @@ import Markdown from 'react-native-markdown-display';
 import { styles } from '@/lib/chat-styles';
 import { Link } from 'expo-router';
 import { Image } from 'expo-image';
+import { ThemedView } from './ThemedView';
+import { Button } from 'react-native';
+import { ThemedText } from './ThemedText';
 
 export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?: string, assistantMessage?: string }) {
   const [messages, setMessages] = useState<IMessage[]>([])
@@ -107,6 +111,7 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
       user={{
         _id: 1,
       }}
+      renderDay={() => null}
       renderBubble={props => (
         <Bubble
           {...props}
@@ -145,12 +150,30 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
           )}
         />
       )}
+      renderSend={props => (
+        <Send
+          {...props}
+          disabled={!props.text}
+          containerStyle={{
+            width: 44,
+            height: 44,
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginHorizontal: 4,
+          }}
+        >
+          <Ionicons name="send" size={24} color="white" />
+        </Send>)}
       renderInputToolbar={props => (
         <InputToolbar
           {...props}
+
           containerStyle={{
             backgroundColor: '#151718',
-            borderTopColor: '#282c2e'
+            borderTopWidth: 0,
+            borderRadius: 20,
+            margin: 10,
+            marginBottom: 16,
           }}
         />
       )}
@@ -159,7 +182,9 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
           {...props}
           textInputStyle={{
             color: '#ECEDEE',
-            backgroundColor: 'transparent'
+            backgroundColor: 'transparent',
+
+
           }}
         />
       )}
@@ -175,9 +200,8 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
         <Image source={require('@/assets/images/logo-small.png')} style={{ width: 32, height: 32, borderRadius: 16 }} />
       )}
 
-      renderSystemMessage={props => (
-        null
-      )}
+      renderTime={props => null}
+      renderSystemMessage={props => null}
     />
   )
 }
