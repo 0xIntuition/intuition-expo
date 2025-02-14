@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "intuition-expo",
+    "name": "Intuition",
     "slug": "intuition",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "i7n",
@@ -16,7 +16,6 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "associatedDomains": [
-        "applinks:app.i7n.xyz",
         "applinks:app.i7n.xyz"
       ],
       "bundleIdentifier": "systems.intuition.mobile",

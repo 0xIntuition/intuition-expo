@@ -8,8 +8,11 @@ import Markdown from 'react-native-markdown-display';
 import { styles } from '@/lib/chat-styles';
 import { Link } from 'expo-router';
 
+const icon = require('../assets/images/icon.png')
+
 export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?: string, assistantMessage?: string }) {
   const [messages, setMessages] = useState<IMessage[]>([])
+  const [isTyping, setIsTyping] = useState(false)
   const client = useApolloClient();
   const openAI = React.useMemo(
     () =>
@@ -26,12 +29,9 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
         _id: 0,
         text: systemPrompt,
         createdAt: new Date(),
-
         system: true,
         user: {
           _id: 0,
-          name: 'Intuition',
-          avatar: 'https://avatars.githubusercontent.com/u/94311139?s=200&v=4'
         },
       })
     }
@@ -43,7 +43,7 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
         user: {
           _id: 2,
           name: 'Intuition',
-          avatar: 'https://avatars.githubusercontent.com/u/94311139?s=200&v=4'
+          avatar: icon.uri
         },
       })
     }
@@ -71,13 +71,19 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
       tools: tools,
       max_tokens: 2048
     })
-      .on("connect", () => console.log("Connecting..."))
+      .on("connect", () => {
+        console.log("Connecting...")
+        setIsTyping(true)
+      })
       .on("functionCall", (event: any) => {
         console.log("functionCall", event)
         // setProgressMessage(`Calling function ${event.name}...`)
       })
       .on("message", () => console.log("Processing..."))
-      .on("finalContent", () => console.log("Finalizing..."))
+      .on("finalContent", () => {
+        console.log("Finalizing...")
+        setIsTyping(false)
+      })
       .on("error", (error: any) => console.error(error));
 
     const finalContent = await runner.finalContent();
@@ -86,7 +92,7 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
     const aiResponse: IMessage = {
       _id: Math.random().toString(),
       createdAt: new Date(),
-      user: { _id: 2, name: 'Intuition', avatar: 'https://avatars.githubusercontent.com/u/94311139?s=200&v=4' },
+      user: { _id: 2, name: 'Intuition', avatar: icon.uri },
       text: finalContent || ''
     };
 
@@ -98,6 +104,7 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
 
   return (
     <GiftedChat
+      isTyping={isTyping}
       messages={messages}
       onSend={messages => onSend(messages)}
       user={{
@@ -108,7 +115,7 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
           {...props}
           wrapperStyle={{
             right: {
-              backgroundColor: '#0a7ea4'
+              backgroundColor: '#3c4245'
             },
             left: {
               backgroundColor: '#282c2e',
@@ -161,12 +168,13 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
       )}
       timeTextStyle={{
         right: {
-          color: '#073b4d'
+          color: 'gray'
         },
         left: {
           color: 'gray'
         }
       }}
+
       renderSystemMessage={props => (
         null
       )}
