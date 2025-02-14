@@ -110,7 +110,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           <Atom atom={atom} layout='text-avatar' />
         </View>
       </Link>
-      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.position_count} ∙ ⬆{(BigInt(atom.vault.total_shares) / upvote).toString(10)} </ThemedText>
+      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.position_count} ∙ ↑ {(BigInt(atom.vault.total_shares) / upvote).toString(10)} </ThemedText>
 
 
     </ThemedView>

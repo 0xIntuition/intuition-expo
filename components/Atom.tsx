@@ -28,6 +28,7 @@ interface AtomProps {
 }
 
 const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
+  const imageUrl = atom.cached_image?.url || atom.image;
   switch (layout) {
     case 'text':
       return (
@@ -39,14 +40,14 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
     case 'text-avatar':
       return (
         <View style={styles.row}>
-          {(atom.cached_image?.url || atom.image) && (
+          {imageUrl && (
             <Image
-              source={{ uri: atom.cached_image?.url || atom.image }}
+              source={{ uri: imageUrl }}
               style={styles.avatar}
             />
           )}
-          <ThemedText style={[styles.text, { marginLeft: 8 }]}>
-            {atom.emoji ? `${atom.emoji} ` : ''}{atom.label}
+          <ThemedText style={[styles.text, { marginLeft: 8, marginRight: 8 }]}>
+            {!imageUrl ? `${atom.emoji} ` : ''}{atom.label}
           </ThemedText>
         </View>
       );
@@ -54,7 +55,7 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
     case 'list-item':
       return (
         <ListItem
-          image={atom.image || atom.cached_image?.url}
+          image={imageUrl}
           label={atom.label || ''}
           subLabel={atom.type || ''}
           id={atom.id as Address}
@@ -69,7 +70,7 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
           </ThemedText>
           {atom.cached_image?.url && (
             <Image
-              source={{ uri: atom.cached_image.url }}
+              source={{ uri: imageUrl }}
               style={styles.cardImage}
             />
           )}
@@ -85,9 +86,9 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
             Label: {atom.emoji ? `${atom.emoji} ` : ''}{atom.label}
           </ThemedText>
           {atom.type && <ThemedText style={styles.detailText}>Type: {atom.type}</ThemedText>}
-          {(atom.image || atom.cached_image?.url) && (
+          {imageUrl && (
             <Image
-              source={{ uri: atom.cached_image?.url || atom.image }}
+              source={{ uri: imageUrl }}
               style={styles.detailImage}
             />
           )}

@@ -63,9 +63,12 @@ export async function getAccountInfo(client: ApolloClient<object>) {
       const result = {
         account_id: data.account.id,
         label: data.account.label,
-        positions: data.account.positions?.map((position) => {
+        upvotes: data.account.positions?.map((position) => {
           return {
-            vaultId: position.vault?.id,
+            vault: {
+              tripleId: position.vault?.triple?.id,
+              atomId: position.vault?.atom?.id,
+            },
             label: position.vault?.atom?.label || `${position.vault?.triple?.subject.label} ${position.vault?.triple?.predicate.label} ${position.vault?.triple?.object.label}`,
             upvotes: (BigInt(position.shares) / upvote + BigInt(1)).toString(10),
           }

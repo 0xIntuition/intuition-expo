@@ -17,7 +17,7 @@ query GetAccounts($offset: Int) {
   accounts(
     order_by: { atom:  {
        vault:  {
-          total_shares: desc
+          position_count: desc
        }
     } }
     limit: 100

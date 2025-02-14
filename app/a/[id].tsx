@@ -11,6 +11,7 @@ import { useMultiVault } from '@/hooks/useMultiVault';
 import { Section } from '@/components/section';
 import { ListItem } from '@/components/list-item';
 import { gql } from '@/lib/generated';
+import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 
 const GetAtomQuery = gql(`
 query GetAtom($id: numeric!, $address: String) {
@@ -24,7 +25,7 @@ query GetAtom($id: numeric!, $address: String) {
       total_shares
       position_count
       current_share_price
-      positions(order_by: { shares: desc }) {
+      positions(order_by: { shares: desc }, limit: 5) {
         shares
         account {
           id
@@ -70,6 +71,8 @@ export default function Atom() {
   const [signalInProgress, setSignalInProgress] = useState(false);
   const multivault = useMultiVault();
   const [errorMesage, setErrorMesage] = useState<string | null>(null);
+  const generalConfig = useGeneralConfig();
+  const upvote = BigInt(generalConfig.minDeposit);
 
   if (loading) return <ThemedText>Loading...</ThemedText>;
   if (error) return <ThemedText>{error.message}</ThemedText>;
@@ -129,9 +132,6 @@ export default function Atom() {
   };
 
   const description = data?.atom?.value?.thing?.description || data?.atom?.value?.person?.description || data?.atom?.value?.organization?.description || '';
-  const totalStaked = parseFloat(formatEther(data?.atom?.vault?.total_shares))
-    * parseFloat(formatEther(data?.atom?.vault?.current_share_price));
-  const usd = 1;
 
   return (
     <ThemedView style={styles.container}>
@@ -141,6 +141,9 @@ export default function Atom() {
             {data?.atom?.image !== null && <Image style={styles.image} source={{ uri: data?.atom?.image }} />}
             <ThemedText>{data?.atom?.label}</ThemedText>
           </View>,
+          headerRight: () => <Button title="Share" onPress={async () => {
+            await shareAsync('https://app.i7n.xyz/a/' + id);
+          }} />,
         }}
       />
       <Section >
@@ -150,17 +153,14 @@ export default function Atom() {
         />
         {data && data.positions && data.positions.length > 0 && (
           <ListItem
-            label="My stake"
-            value={`${(
-              parseFloat(formatEther(data?.atom?.vault?.current_share_price))
-              * parseFloat(formatEther(data?.positions[0]?.shares))
-              * usd).toFixed(2)} USD`}
+            label="My upvotes"
+            value={`↑ ${(BigInt(data?.positions[0]?.shares) / upvote).toString(10)}`}
           />
         )}
         <ListItem
-          label="Total staked"
-          subLabel={`Holders: ${data?.atom?.vault?.position_count}`}
-          value={`${(totalStaked * usd).toFixed(2)} USD`}
+          label="Total upvotes"
+          subLabel={`Voters: ${data?.atom?.vault?.position_count}`}
+          value={`↑ ${(BigInt(data?.atom?.vault?.total_shares) / upvote).toString(10)}`}
           last
         />
 
@@ -170,14 +170,12 @@ export default function Atom() {
         {signalInProgress && <ThemedText>Signal in progress...</ThemedText>}
         {!signalInProgress && <Button title="Deposit" onPress={handleDeposit} />}
         {!signalInProgress && data?.positions && data?.positions.length > 0 && <Button title="Withdraw" onPress={handleWithdraw} />}
-        <Button title="Share" onPress={async () => {
-          await shareAsync('https://app.i7n.xyz/a/' + id);
-        }} />
+
       </View>
 
       <ThemedText>{errorMesage}</ThemedText>
       {errorMesage && <Link href={{ pathname: '/(tabs)/me' }}><ThemedText>Go to me</ThemedText></Link>}
-      <Section title="Top Holders">
+      <Section title="Top Upvoters">
         {data?.atom?.vault?.positions.map(({ shares, account }) => (
           <ListItem
             key={account?.id || ''}
@@ -185,10 +183,7 @@ export default function Atom() {
             image={account?.image || ''}
             label={account?.label || ''}
             href={{ pathname: '/acc/[id]', params: { id: account?.id || '' } }}
-            value={`${(
-              parseFloat(formatEther(data?.atom?.vault?.current_share_price))
-              * parseFloat(formatEther(shares))
-              * usd).toFixed(2)} USD`}
+            value={`↑ ${(BigInt(shares) / upvote).toString(10)}`}
           />
         ))}
       </Section>

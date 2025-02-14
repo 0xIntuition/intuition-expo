@@ -6,7 +6,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { shareAsync } from 'expo-sharing';
 import Chat from '@/components/Chat';
-
+import { systemPrompt } from '@/lib/system-prompt';
 const GET_ACCOUNT = gql`
 query Account($id: String!) {
   account(id: $id) {
@@ -29,7 +29,7 @@ query Account($id: String!) {
 
 export default function Account() {
   const { id } = useLocalSearchParams();
-  const { loading, error, data, refetch } = useQuery(GET_ACCOUNT, { variables: { id } });
+  const { loading, error, data, refetch } = useQuery(GET_ACCOUNT, { variables: { id: id.toString().toLowerCase() } });
 
   if (loading) return <ThemedText>Loading...</ThemedText>;
   if (error) return <ThemedText>{error.message}</ThemedText>;
@@ -52,7 +52,10 @@ export default function Account() {
           </View>,
         }}
       />
-      <Chat systemPrompt={`You are a helpful assistant that can answer questions about the account ${account.id}`} />
+      <Chat
+        assistantMessage={`What do you want to know about ${account.label}?`}
+        systemPrompt={`${systemPrompt} You that can answer questions about ${account.label} ${account.id}.`}
+      />
     </ThemedView>
   );
 }

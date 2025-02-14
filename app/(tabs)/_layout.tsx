@@ -15,6 +15,7 @@ export default function TabLayout() {
       screenOptions={{
         headerTintColor: Colors[colorScheme ?? 'light'].text,
         headerShown: true,
+        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tabIconSelected,
       }}>
       <Tabs.Screen
         name="index"
@@ -30,7 +31,7 @@ export default function TabLayout() {
         options={{
           title: 'Activity',
           tabBarIcon: ({ color, focused }) => (
-            <TabBarIcon name={focused ? 'list' : 'list-outline'} color={color} />
+            <TabBarIcon name={focused ? 'notifications' : 'notifications-outline'} color={color} />
           ),
         }}
       />
