@@ -10,6 +10,7 @@ import { getTripleLabel } from '@/lib/utils';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 import { useQuery } from '@apollo/client';
 import React, { useMemo } from 'react';
+
 const GET_SIGNALS = gql(`
 query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
   signals_aggregate(where: { delta: { _gt: $minDelta } }) {

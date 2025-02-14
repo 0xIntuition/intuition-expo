@@ -1,4 +1,4 @@
-import { Button, View } from 'react-native';
+import { Button, SafeAreaView, View } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery, gql } from '@apollo/client';
@@ -52,10 +52,12 @@ export default function Account() {
           </View>,
         }}
       />
-      <Chat
-        assistantMessage={`What do you want to know about ${account.label}?`}
-        systemPrompt={`${systemPrompt} You that can answer questions about ${account.label} ${account.id}.`}
-      />
+      <SafeAreaView style={styles.container}>
+        <Chat
+          assistantMessage={`What do you want to know about ${account.label}?`}
+          systemPrompt={`${systemPrompt} You that can answer questions about ${account.label} ${account.id}.`}
+        />
+      </SafeAreaView>
     </ThemedView>
   );
 }

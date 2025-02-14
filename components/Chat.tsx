@@ -7,8 +7,7 @@ import { getTools } from '@/lib/openai/tools';
 import Markdown from 'react-native-markdown-display';
 import { styles } from '@/lib/chat-styles';
 import { Link } from 'expo-router';
-
-const icon = require('../assets/images/icon.png')
+import { Image } from 'expo-image';
 
 export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?: string, assistantMessage?: string }) {
   const [messages, setMessages] = useState<IMessage[]>([])
@@ -42,8 +41,6 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
         createdAt: new Date(),
         user: {
           _id: 2,
-          name: 'Intuition',
-          avatar: icon.uri
         },
       })
     }
@@ -92,7 +89,7 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
     const aiResponse: IMessage = {
       _id: Math.random().toString(),
       createdAt: new Date(),
-      user: { _id: 2, name: 'Intuition', avatar: icon.uri },
+      user: { _id: 2 },
       text: finalContent || ''
     };
 
@@ -174,6 +171,9 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
           color: 'gray'
         }
       }}
+      renderAvatar={props => (
+        <Image source={require('@/assets/images/logo-small.png')} style={{ width: 32, height: 32, borderRadius: 16 }} />
+      )}
 
       renderSystemMessage={props => (
         null
