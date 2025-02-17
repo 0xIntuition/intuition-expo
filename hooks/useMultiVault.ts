@@ -1,10 +1,10 @@
 import { Multivault } from '@/lib/protocol';
-import { Address, createPublicClient, createWalletClient, custom, http } from 'viem';
+import { gql, useApolloClient } from '@apollo/client';
+import { Address, createPublicClient, createWalletClient, custom, http, EIP1193Provider } from 'viem';
 import { base } from 'viem/chains';
 
-export function useMultiVault() {
-  const { isConnected, address, provider } = { isConnected: false, address: undefined, provider: undefined };
-  if (!isConnected || !address || !provider) {
+export function getMultiVault({ address, provider }: { address: Address, provider: EIP1193Provider }) {
+  if (!address || !provider) {
     return null;
   }
 
@@ -16,11 +16,7 @@ export function useMultiVault() {
   const walletClient = createWalletClient({
     chain: base,
     account: address as Address,
-    transport: custom({
-      async request({ method, params }) {
-        // return await provider?.request({ method, params });
-      },
-    }),
+    transport: custom(provider),
   })
 
   const multivault = new Multivault({
@@ -29,7 +25,7 @@ export function useMultiVault() {
     // @ts-ignore
     walletClient,
   });
-  return multivault;
+  return { multivault, publicClient, walletClient };
 }
 
 export function usePublicMultivault() {
@@ -44,4 +40,35 @@ export function usePublicMultivault() {
     walletClient: publicClient,
   });
   return multivault;
+}
+
+export const getTransactionEventsQuery = gql(/* GraphQL */ `
+  query GetTransactionEvents($hash: String!) {
+    events(where: { transaction_hash: { _eq: $hash } }) {
+      transaction_hash
+    }
+  }
+`);
+
+export function useWaitForTransactionEvents() {
+  const client = useApolloClient();
+  return async (hash: string) => {
+    const promise = new Promise(async (resolve, reject) => {
+      while (true) {
+        const { data, error } = await client.query({
+          query: getTransactionEventsQuery,
+          variables: { hash },
+          fetchPolicy: 'network-only',
+        });
+        if (data?.events.length > 0) {
+          return resolve(true);
+        }
+        if (error) {
+          return reject(error);
+        }
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    });
+    return promise;
+  };
 }

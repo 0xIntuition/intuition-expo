@@ -171,6 +171,7 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
           containerStyle={{
             backgroundColor: '#151718',
             borderTopWidth: 0,
+            padding: 5,
             borderRadius: 20,
             margin: 10,
             marginBottom: 16,

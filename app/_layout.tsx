@@ -11,6 +11,7 @@ import { relayStylePagination } from '@apollo/client/utilities';
 import { PrivyProvider, PrivyElements } from '@privy-io/expo';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 import { Platform } from 'react-native';
+import { base } from 'viem/chains';
 if (typeof window !== 'undefined') { window.React = React; }
 
 const isWeb = Platform.OS === 'web';
@@ -91,6 +92,7 @@ export default function RootLayout() {
     <PrivyProvider
       appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID}
       clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID}
+      supportedChains={[base]}
       config={{
         embedded: {
           ethereum: {
