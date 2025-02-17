@@ -142,7 +142,7 @@ export function SignalListItem({ item }: { item: any }) {
 
         <ThemedText style={styles.date}>{`${item.delta > 0 ? '↑' : '↓'}${(BigInt(item.delta) / BigInt(upvote) + BigInt(1))} ∙ ${item.account?.label} ∙ ${formatDistanceToNow(new Date(parseInt(item.block_timestamp.toString()) * 1000), { addSuffix: true })}`}</ThemedText>
       </View>
-      {item.atom?.id ? (
+      {item.atom !== null ? (
         <Link
           style={styles.vaultLink}
           href={{

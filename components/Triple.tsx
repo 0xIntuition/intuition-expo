@@ -61,7 +61,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, upvote }) => {
               <Link href={{ pathname: '/acc/[id]', params: { id: triple.creator.id } }}>
                 <ThemedText style={styles.secondary}>{triple.creator.label}</ThemedText>
               </Link>
-              {triple.block_timestamp && (
+              {triple.block_timestamp !== null && (
                 <ThemedText style={styles.date}>
                   {formatRelative(new Date(parseInt(triple.block_timestamp) * 1000), new Date())}
                 </ThemedText>
@@ -84,7 +84,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, upvote }) => {
                 {(BigInt(triple.vault.total_shares) / upvote).toString(10)}
               </ThemedText>
 
-              {triple.counter_vault?.position_count && triple.counter_vault.position_count > 0 && (
+              {triple.counter_vault?.position_count !== null && triple.counter_vault.position_count > 0 && (
                 <ThemedText numberOfLines={1} style={styles.counterVault}>
                   <Ionicons size={13} name='person' /> {triple.counter_vault.position_count} ∙ ↓{' '}
                   {(BigInt(triple.counter_vault.total_shares) / upvote).toString(10)}
