@@ -9,7 +9,7 @@ import { Link } from 'expo-router';
 import { formatRelative } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 import { gql } from '@/lib/generated';
-import Atom from '@/components/Atom';
+import Triple from '@/components/Triple';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 
 const GetTriplesQuery = gql(`
@@ -24,16 +24,19 @@ query GetTriples($offset: Int) {
   } }, limit: 10, offset: $offset) {
     id
     subject {
+      id
       emoji
       label
       image
     }
     predicate {
+      id
       emoji
       label
       image
     }
     object {
+      id
       emoji
       label
       image
@@ -56,10 +59,11 @@ query GetTriples($offset: Int) {
 }
 `);
 
-export default function Triple() {
+export default function Triples() {
   const generalConfig = useGeneralConfig();
   const upvote = BigInt(generalConfig.minDeposit);
-  const { loading, error, data, refetch, fetchMore } = useQuery(GetTriplesQuery);
+  const { loading, error, data, refetch, fetchMore } = useQuery(GetTriplesQuery, {
+  });
 
   if (loading && !data) return <ActivityIndicator size="large" />;
 
@@ -69,7 +73,7 @@ export default function Triple() {
       {!loading && data && <FlashList
         data={data.triples}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <TripleListItem triple={item} />}
+        renderItem={({ item }) => <Triple triple={{ ...item, creator: item.creator! }} layout="list-item" upvote={upvote} />}
         estimatedItemSize={150}
         onEndReached={() => {
           if (data.triples_aggregate.aggregate?.count && data.triples_aggregate.aggregate.count > data.triples.length) {
@@ -100,45 +104,7 @@ export default function Triple() {
     </ThemedView>
   );
 }
-export function TripleListItem({ triple }: { triple: any }) {
-  const generalConfig = useGeneralConfig();
-  const upvote = BigInt(generalConfig.minDeposit);
-  return (
-    <ThemedView style={styles.listContainer}>
-      <View style={styles.topRow}>
-        <Link
-          href={{
-            pathname: '/acc/[id]',
-            params: { id: triple.creator.id }
-          }}>
-          {triple.creator.image !== null && <Image style={styles.image} source={{ uri: triple.creator.image }} />}
-          <ThemedText style={styles.secondary}>{triple.creator.label}</ThemedText>
-        </Link>
 
-        <ThemedText style={styles.date}>{formatRelative(new Date(parseInt(triple.block_timestamp.toString()) * 1000), new Date())}</ThemedText>
-      </View>
-
-      <Link
-        style={styles.vaultLink}
-        href={{
-          pathname: '/t/[id]',
-          params: { id: triple.id }
-        }}>
-        <View style={styles.vaultContent}>
-          <Atom atom={triple.subject} layout='text-avatar' />
-          <Atom atom={triple.predicate} layout='text-avatar' />
-          <Atom atom={triple.object} layout='text-avatar' />
-        </View>
-      </Link>
-      <View style={styles.positionsRow}>
-        <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {triple.vault.position_count} ∙ ↑ {(BigInt(triple.vault.total_shares) / upvote).toString(10)} </ThemedText>
-
-        {triple.counter_vault.position_count > 0 && <ThemedText numberOfLines={1} style={styles.counterVault}><Ionicons size={13} name='person' /> {triple.counter_vault.position_count} ∙ ↓ {(BigInt(triple.counter_vault.total_shares) / upvote).toString(10)} </ThemedText>}
-      </View>
-
-    </ThemedView>
-  );
-}
 
 const styles = StyleSheet.create({
   counterVault: {

@@ -10,7 +10,9 @@ import { getTripleLabel } from '@/lib/utils';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 import { useQuery } from '@apollo/client';
 import React, { useMemo } from 'react';
-
+import { Link } from 'expo-router';
+import Triple from '@/components/Triple';
+import Atom from '@/components/Atom';
 const GET_SIGNALS = gql(`
 query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
   signals_aggregate(where: { delta: { _gt: $minDelta } }) {
@@ -96,15 +98,7 @@ export default function Signals() {
         {!loading && data && <FlashList
           data={data.signals}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (<ListItem
-            image={item.account?.image}
-            id={item.account?.id.toString()! as Address}
-            label={`${item.atom?.label || getTripleLabel(item.triple) || ''} `}
-            subLabel={`${item.account?.label}  ∙ ${formatDistanceToNow(new Date(parseInt(item.block_timestamp.toString()) * 1000), { addSuffix: true })} ∙ ${item.delta > 0 ? '↑' : '↓'}${(BigInt(item.delta) / BigInt(upvote) + BigInt(1))}`}
-            value={``}
-            href={item.atom?.id ? `/a/${item.atom.id}` : `/t/${item.triple?.id}`}
-          />)
-          }
+          renderItem={({ item }) => (<SignalListItem item={item} />)}
           estimatedItemSize={150}
           onEndReached={() => {
             if (data.signals_aggregate.aggregate?.count && data.signals_aggregate.aggregate.count > data.signals.length) {
@@ -138,6 +132,35 @@ export default function Signals() {
   );
 }
 
+export function SignalListItem({ item }: { item: any }) {
+  const generalConfig = useGeneralConfig();
+  const upvote = BigInt(generalConfig.minDeposit);
+  return (
+    <ThemedView style={styles.listContainer}>
+      <View style={styles.topRow}>
+
+
+        <ThemedText style={styles.date}>{`${item.delta > 0 ? '↑' : '↓'}${(BigInt(item.delta) / BigInt(upvote) + BigInt(1))} ∙ ${item.account?.label} ∙ ${formatDistanceToNow(new Date(parseInt(item.block_timestamp.toString()) * 1000), { addSuffix: true })}`}</ThemedText>
+      </View>
+      {item.atom?.id ? (
+        <Link
+          style={styles.vaultLink}
+          href={{
+            pathname: '/a/[id]',
+            params: { id: item.atom.id }
+          }}>
+          <Atom atom={item.atom} layout="text-avatar" />
+        </Link>
+      ) : (
+
+        <Triple triple={item.triple} layout="compact" upvote={upvote} />
+
+      )}
+
+    </ThemedView>
+  );
+}
+
 const styles = StyleSheet.create({
   vaultLink: {
     marginTop: 10,
@@ -164,7 +187,6 @@ const styles = StyleSheet.create({
   vaultContent: {
     flex: 1,
     padding: 8,
-    marginTop: 8,
 
     borderWidth: 1,
     borderColor: 'rgba(100,100,100,0.5)',
@@ -184,8 +206,9 @@ const styles = StyleSheet.create({
   },
   listContainer: {
     flex: 1,
-    paddingVertical: 16,
     paddingRight: 16,
+    paddingTop: 8,
+    paddingBottom: 8,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(100,100,100,0.5)',
   },

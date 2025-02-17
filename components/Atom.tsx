@@ -46,7 +46,7 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
               style={styles.avatar}
             />
           )}
-          <ThemedText style={[styles.text, { marginLeft: 8, marginRight: 8 }]}>
+          <ThemedText style={[styles.text, { marginLeft: 8, marginRight: 8, textOverflow: 'ellipsis', overflow: 'hidden' }]}>
             {!imageUrl ? `${atom.emoji} ` : ''}{atom.label}
           </ThemedText>
         </View>
