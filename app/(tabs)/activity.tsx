@@ -2,7 +2,7 @@ import { StyleSheet, ActivityIndicator, RefreshControl, useWindowDimensions, Vie
 import { FlashList } from '@shopify/flash-list';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { formatRelative } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { ListItem } from '@/components/list-item';
 import { Address, formatEther } from 'viem';
 import { gql } from '@/lib/generated';
@@ -100,8 +100,8 @@ export default function Signals() {
             image={item.account?.image}
             id={item.account?.id.toString()! as Address}
             label={`${item.atom?.label || getTripleLabel(item.triple) || ''} `}
-            subLabel={`${item.account?.label}  ∙ ${formatRelative(new Date(parseInt(item.block_timestamp.toString()) * 1000), new Date())} `}
-            value={`${item.delta > 0 ? '↑' : '↓'}${(BigInt(item.delta) / BigInt(upvote) + BigInt(1))}`}
+            subLabel={`${item.account?.label}  ∙ ${formatDistanceToNow(new Date(parseInt(item.block_timestamp.toString()) * 1000), { addSuffix: true })} ∙ ${item.delta > 0 ? '↑' : '↓'}${(BigInt(item.delta) / BigInt(upvote) + BigInt(1))}`}
+            value={``}
             href={item.atom?.id ? `/a/${item.atom.id}` : `/t/${item.triple?.id}`}
           />)
           }
