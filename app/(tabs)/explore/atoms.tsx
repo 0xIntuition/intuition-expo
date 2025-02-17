@@ -110,7 +110,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           <Atom atom={atom} layout='text-avatar' />
         </View>
       </Link>
-      <ThemedText numberOfLines={1}><Ionicons size={13} name='person' /> {atom.vault.position_count} ∙ ↑ {(BigInt(atom.vault.total_shares) / upvote).toString(10)} </ThemedText>
+      <ThemedText numberOfLines={1}> ↑ {(BigInt(atom.vault.total_shares) / upvote).toString(10)} ∙ <Ionicons size={13} name='person' /> {atom.vault.position_count}</ThemedText>
 
 
     </ThemedView>
@@ -119,7 +119,7 @@ export function AtomListItem({ atom }: { atom: any }) {
 
 const styles = StyleSheet.create({
   vaultLink: {
-    marginTop: 10,
+    marginBottom: 10,
   },
   topRow: {
     flexDirection: 'row',

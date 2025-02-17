@@ -80,14 +80,14 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, upvote }) => {
           {triple.vault && (
             <View style={styles.positionsRow}>
               <ThemedText numberOfLines={1}>
-                <Ionicons size={13} name='person' /> {triple.vault.position_count} ∙ ↑{' '}
-                {(BigInt(triple.vault.total_shares) / upvote).toString(10)}
+                ↑{' '}
+                {(BigInt(triple.vault.total_shares) / upvote).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.vault.position_count}
               </ThemedText>
 
               {triple.counter_vault?.position_count !== null && triple.counter_vault.position_count > 0 && (
                 <ThemedText numberOfLines={1} style={styles.counterVault}>
-                  <Ionicons size={13} name='person' /> {triple.counter_vault.position_count} ∙ ↓{' '}
-                  {(BigInt(triple.counter_vault.total_shares) / upvote).toString(10)}
+                  ↓{' '}
+                  {(BigInt(triple.counter_vault.total_shares) / upvote).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.counter_vault.position_count}
                 </ThemedText>
               )}
             </View>
