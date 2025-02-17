@@ -2,12 +2,8 @@ import { View, StyleSheet, RefreshControl, ActivityIndicator, Image } from 'reac
 import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@apollo/client';
 import React, { useState } from 'react';
-import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Link } from 'expo-router';
-import { formatRelative } from 'date-fns';
-import { convertToCurrency } from '@/hooks/useCurrency';
 import { gql } from '@/lib/generated';
 import Triple from '@/components/Triple';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';

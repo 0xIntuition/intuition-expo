@@ -5,7 +5,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
-import { formatRelative } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import { convertToCurrency } from '@/hooks/useCurrency';
 import { gql } from '@/lib/generated';
 import Atom from '@/components/Atom';
@@ -97,7 +97,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           <ThemedText style={styles.secondary}>{atom.creator.label}</ThemedText>
         </Link>
 
-        <ThemedText style={styles.date}>{formatRelative(new Date(parseInt(atom.block_timestamp.toString()) * 1000), new Date())}</ThemedText>
+        <ThemedText style={styles.date}>{formatDistanceToNow(new Date(parseInt(atom.block_timestamp.toString()) * 1000), { addSuffix: true })}</ThemedText>
       </View>
 
       <Link
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     paddingVertical: 16,
-    paddingRight: 36,
+    paddingRight: 16,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(100,100,100,0.5)',
   },
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   name: {
-    fontSize: 15,
+    fontSize: 12,
     fontWeight: '500',
     marginBottom: 2,
   },

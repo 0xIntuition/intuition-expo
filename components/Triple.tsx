@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
-import { formatRelative } from 'date-fns';
+import { formatDistanceToNow } from 'date-fns';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -63,7 +63,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, upvote }) => {
               </Link>
               {triple.block_timestamp !== null && (
                 <ThemedText style={styles.date}>
-                  {formatRelative(new Date(parseInt(triple.block_timestamp) * 1000), new Date())}
+                  {formatDistanceToNow(new Date(parseInt(triple.block_timestamp) * 1000), { addSuffix: true })}
                 </ThemedText>
               )}
             </View>
@@ -128,7 +128,7 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     paddingVertical: 16,
-    paddingRight: 36,
+    paddingRight: 16,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(100,100,100,0.5)',
   },
