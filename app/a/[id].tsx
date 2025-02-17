@@ -193,7 +193,7 @@ export default function Atom() {
 
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: 8, paddingLeft: 8 }}>
         {signalInProgress && <ThemedText>Signal in progress...</ThemedText>}
-        {!signalInProgress && <Button title="Upvote +↑" onPress={handleDeposit} />}
+        {!signalInProgress && isReady && <Button title="Upvote +↑" onPress={handleDeposit} />}
         {!signalInProgress && data?.positions && data?.positions.length > 0 && <Button title="Withdraw all" onPress={() => handleWithdraw(BigInt(data?.positions[0]?.shares))} />}
 
       </View>
