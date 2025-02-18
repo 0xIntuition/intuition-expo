@@ -49,7 +49,7 @@ export default function RootLayout() {
   }
 
   if (isWeb) {
-    return App;
+    return <App />;
   }
   return (
     <ShareIntentProvider
