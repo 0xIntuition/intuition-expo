@@ -5,14 +5,15 @@ import {
   ShareIntent as ShareIntentType,
   useShareIntentContext,
 } from "expo-share-intent";
-
+import { ThemedView } from "@/components/ThemedView";
+import { ThemedText } from "@/components/ThemedText";
 const WebUrlComponent = ({ shareIntent }: { shareIntent: ShareIntentType }) => {
   return (
-    <View
+    <ThemedView
       style={[
         styles.gap,
         styles.row,
-        { borderWidth: 1, borderRadius: 5, height: 102 },
+        { borderWidth: 1, borderRadius: 5 },
       ]}
     >
       <Image
@@ -23,13 +24,14 @@ const WebUrlComponent = ({ shareIntent }: { shareIntent: ShareIntentType }) => {
         }
         style={[styles.icon, styles.gap, { borderRadius: 5 }]}
       />
-      <View style={{ flexShrink: 1, padding: 5 }}>
-        <Text style={[styles.gap]}>
+      <View style={{ padding: 5, flexShrink: 1 }}>
+        <ThemedText style={[styles.gap]}>
           {shareIntent.meta?.title || "<NO TITLE>"}
-        </Text>
-        <Text style={styles.gap}>{shareIntent.webUrl}</Text>
+        </ThemedText>
+        {!!shareIntent.meta?.description && <ThemedText style={styles.gap}>{shareIntent.meta?.description}</ThemedText>}
+        <ThemedText style={styles.gap}>{shareIntent.webUrl}</ThemedText>
       </View>
-    </View>
+    </ThemedView>
   );
 };
 
@@ -39,15 +41,11 @@ export default function ShareIntent() {
     useShareIntentContext();
 
   return (
-    <View style={styles.container}>
+    <ThemedView style={styles.container}>
 
       {!hasShareIntent && <Text>No Share intent detected</Text>}
-      {hasShareIntent && (
-        <Text style={[styles.gap, { fontSize: 20 }]}>
-          Congratz, a share intent value is available
-        </Text>
-      )}
-      {!!shareIntent.text && <Text style={styles.gap}>{shareIntent.text}</Text>}
+
+      {!!shareIntent.text && <ThemedText style={styles.gap}>{shareIntent.text}</ThemedText>}
       {shareIntent?.type === "weburl" && (
         <WebUrlComponent shareIntent={shareIntent} />
       )}
@@ -61,16 +59,15 @@ export default function ShareIntent() {
       {hasShareIntent && (
         <Button onPress={() => resetShareIntent()} title="Reset" />
       )}
-      <Text style={[styles.error]}>{error}</Text>
+      <ThemedText style={[styles.error]}>{error}</ThemedText>
       <Button onPress={() => router.replace("/")} title="Go home" />
-    </View>
+    </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 10,
@@ -89,7 +86,6 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     resizeMode: "contain",
-    backgroundColor: "lightgray",
   },
   row: {
     flexDirection: "row",

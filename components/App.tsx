@@ -43,6 +43,7 @@ export default function App() {
 
         <Stack>
           <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+          <Stack.Screen name="shareintent" options={{ headerShown: false, presentation: 'modal' }} />
           <Stack.Screen
             name="a"
             options={{
