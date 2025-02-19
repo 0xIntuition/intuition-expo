@@ -6,23 +6,32 @@ import { Link, Slot, usePathname, router } from 'expo-router';
 import { StyleSheet } from 'react-native';
 
 const GET_AGGREGATES = gql(`
-  query GetAggregates {
-    accounts_aggregate {
-      aggregate {
-        count
-      }
-    }
-    atoms_aggregate {
-      aggregate {
-        count
-      }
-    }
-    triples_aggregate {
-      aggregate {
-        count
-      }
+query GetAggregates {
+  accounts_aggregate(where: {type:  {
+     _eq: Default
+  }}) {
+    aggregate {
+      count
     }
   }
+  atoms_aggregate {
+    aggregate {
+      count
+    }
+  }
+  triples_aggregate {
+    aggregate {
+      count
+    }
+  }
+  predicate_objects_aggregate(
+    where: { predicate_id: { _eq: 4 } }
+  ) {
+    aggregate {
+      count
+    }
+  }
+}
 `);
 
 const WIDE_SCREEN_THRESHOLD = 768;
@@ -55,6 +64,14 @@ const NavigationMenu = memo(({ data, loading, pathname }: { data: any; loading: 
         </Text>
       </Pressable>
     </Link>
+    <Link href="/explore/lists" asChild>
+      <Pressable style={{ ...styles.item, ...(pathname === '/explore/lists' ? styles.activeItem : {}) }}>
+        <Text style={{ ...styles.title, ...(pathname === '/explore/lists' ? styles.activeText : {}) }}>Lists</Text>
+        <Text style={{ ...styles.count, ...(pathname === '/explore/lists' ? styles.activeText : {}) }}>
+          {loading ? '...' : data?.predicate_objects_aggregate.aggregate?.count ?? 0}
+        </Text>
+      </Pressable>
+    </Link>
   </View>
 ));
 
@@ -78,6 +95,7 @@ const LayoutContent = memo(({ isWideScreen, isExploreRoot, data, loading, pathna
     if (pathname.includes('atoms')) return 'Atoms';
     if (pathname.includes('triples')) return 'Triples';
     if (pathname.includes('accounts')) return 'Accounts';
+    if (pathname.includes('lists')) return 'Lists';
     return 'Explore';
   };
 
