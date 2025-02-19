@@ -27,16 +27,7 @@ const client = new ApolloClient({
 export default function App() {
   const router = useRouter();
   const colorScheme = useColorScheme();
-  const { hasShareIntent } = useShareIntentContext();
-  useEffect(() => {
-    if (hasShareIntent) {
-      // we want to handle share intent event in a specific page
-      console.debug("[expo-router-index] redirect to ShareIntent screen");
-      router.replace({
-        pathname: "/shareintent",
-      });
-    }
-  }, [hasShareIntent]);
+
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <ApolloProvider client={client}>
