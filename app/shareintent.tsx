@@ -31,9 +31,8 @@ export default function ShareIntent() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
     paddingHorizontal: 10,
+    paddingBottom: 40,
   },
   error: {
     color: "red",
