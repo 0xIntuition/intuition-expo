@@ -16,15 +16,35 @@ import { ThemedText } from './ThemedText';
 export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?: string, assistantMessage?: string }) {
   const [messages, setMessages] = useState<IMessage[]>([])
   const [isTyping, setIsTyping] = useState(false)
+  const [model, setModel] = useState('gpt-4o-mini')
+  const [availableModels, setAvailableModels] = useState<string[]>([])
   const client = useApolloClient();
   const openAI = React.useMemo(
     () =>
       new OpenAI({
         apiKey: process.env.EXPO_PUBLIC_OPENAI_API_KEY,
+        baseURL: process.env.EXPO_PUBLIC_OPENAI_BASE_URL,
         dangerouslyAllowBrowser: true,
+        defaultHeaders: {
+          // 'HTTP-Referer': 'https://app.i7n.xyz',
+          'X-Title': 'i7n',
+        },
       }),
     []
   );
+  useEffect(() => {
+    openAI.models.list().then((models) => {
+      console.log(models)
+      if (models.data.length > 0) {
+        setAvailableModels(models.data.map((model: any) => model.id))
+        if (!model) {
+          setModel(models.data[0].id)
+        }
+      }
+    })
+  }, [openAI])
+
+
   useEffect(() => {
     const initialMessages: IMessage[] = []
     if (systemPrompt) {
@@ -67,7 +87,7 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
     console.log(openaiMessages)
 
     const runner = openAI.beta.chat.completions.runTools({
-      model: "gpt-4o-mini",
+      model,
       messages: openaiMessages,
       tools: tools,
       max_tokens: 2048
