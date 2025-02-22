@@ -10,15 +10,18 @@ import { styles } from '@/lib/chat-styles';
 import { Link } from 'expo-router';
 import { Image } from 'expo-image';
 import { ThemedView } from './ThemedView';
-import { Button } from 'react-native';
+import { Button, View } from 'react-native';
 import { ThemedText } from './ThemedText';
-
+import { SelectList } from 'react-native-dropdown-select-list'
+import { useThemeColor } from '@/hooks/useThemeColor';
 export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?: string, assistantMessage?: string }) {
   const [messages, setMessages] = useState<IMessage[]>([])
   const [isTyping, setIsTyping] = useState(false)
-  const [model, setModel] = useState('gpt-4o-mini')
+  const [model, setModel] = useState('gpt-4o')
   const [availableModels, setAvailableModels] = useState<string[]>([])
   const client = useApolloClient();
+  const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
   const openAI = React.useMemo(
     () =>
       new OpenAI({
@@ -34,7 +37,6 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
   );
   useEffect(() => {
     openAI.models.list().then((models) => {
-      console.log(models)
       if (models.data.length > 0) {
         setAvailableModels(models.data.map((model: any) => model.id))
         if (!model) {
@@ -124,105 +126,134 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
   }, [messages, openAI]);
 
   return (
-    <GiftedChat
-      isTyping={isTyping}
-      messages={messages}
-      onSend={messages => onSend(messages)}
-      user={{
-        _id: 1,
-      }}
-      renderDay={() => null}
-      renderBubble={props => (
-        <Bubble
-          {...props}
-          wrapperStyle={{
-            right: {
-              backgroundColor: '#3c4245'
-            },
-            left: {
-              backgroundColor: '#282c2e',
-            }
-          }}
-          textStyle={{
-            left: {
-              color: 'white'
-            }
-          }}
-          renderMessageText={props => (
-            <Markdown
-              style={styles}
-              rules={{
-                link: (node, children, parent, styles) => {
-                  return (
-                    <Link
-                      key={node.key}
-                      href={node.attributes.href}
-                      style={[styles.link, { color: '#1e90ff' }]}
-                    >
-                      {children}
-                    </Link>
-                  );
-                }
-              }}
-            >
-              {props.currentMessage?.text}
-            </Markdown>
-          )}
-        />
-      )}
-      renderSend={props => (
-        <Send
-          {...props}
-          disabled={!props.text}
-          containerStyle={{
-            width: 44,
-            height: 44,
-            alignItems: 'center',
-            justifyContent: 'center',
-            marginHorizontal: 4,
-          }}
-        >
-          <Ionicons name="send" size={24} color="white" />
-        </Send>)}
-      renderInputToolbar={props => (
-        <InputToolbar
-          {...props}
+    <View style={{ flex: 1 }}>
+      <SelectList
+        boxStyles={{
+          backgroundColor: backgroundColor,
+          marginRight: 10,
+          marginLeft: 10,
+          borderColor: 'transparent',
+        }}
+        inputStyles={{
+          color: textColor,
+          borderColor: 'transparent',
+        }}
+        dropdownStyles={{
+          backgroundColor: backgroundColor,
+          borderRadius: 10,
+          borderColor: 'transparent',
+          margin: 10,
+        }}
+        dropdownTextStyles={{
+          color: textColor,
+        }}
 
-          containerStyle={{
-            backgroundColor: '#151718',
-            borderTopWidth: 0,
-            padding: 5,
-            borderRadius: 20,
-            margin: 10,
-            marginBottom: 16,
-          }}
-        />
-      )}
-      renderComposer={props => (
-        <Composer
-          {...props}
-          textInputStyle={{
-            color: '#ECEDEE',
-            backgroundColor: 'transparent',
+        defaultOption={{ key: model, value: model }}
+
+        setSelected={setModel}
+        data={availableModels.map((model) => ({ key: model, value: model }))}
+        save="key"
+      />
+      <GiftedChat
+        isTyping={isTyping}
+        messages={messages}
+        onSend={messages => onSend(messages)}
+        user={{
+          _id: 1,
+        }}
+        renderDay={() => null}
+        renderBubble={props => (
+          <Bubble
+            {...props}
+            wrapperStyle={{
+              right: {
+                backgroundColor: '#3c4245'
+              },
+              left: {
+                backgroundColor: '#282c2e',
+              }
+            }}
+            textStyle={{
+              left: {
+                color: 'white'
+              }
+            }}
+            renderMessageText={props => (
+              <Markdown
+                style={styles}
+                rules={{
+                  link: (node, children, parent, styles) => {
+                    return (
+                      <Link
+                        key={node.key}
+                        href={node.attributes.href}
+                        style={[styles.link, { color: '#1e90ff' }]}
+                      >
+                        {children}
+                      </Link>
+                    );
+                  }
+                }}
+              >
+                {props.currentMessage?.text}
+              </Markdown>
+            )}
+          />
+        )}
+        renderSend={props => (
+          <Send
+            {...props}
+            disabled={!props.text}
+            containerStyle={{
+              width: 44,
+              height: 44,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginHorizontal: 4,
+            }}
+          >
+            <Ionicons name="send" size={24} color="white" />
+          </Send>)}
+        renderInputToolbar={props => (
+          <InputToolbar
+            {...props}
+
+            containerStyle={{
+              backgroundColor: '#151718',
+              borderTopWidth: 0,
+              padding: 5,
+              borderRadius: 20,
+              margin: 10,
+              marginBottom: 16,
+            }}
+          />
+        )}
+        renderComposer={props => (
+          <Composer
+            {...props}
+            textInputStyle={{
+              color: '#ECEDEE',
+              backgroundColor: 'transparent',
 
 
-          }}
-        />
-      )}
-      timeTextStyle={{
-        right: {
-          color: 'gray'
-        },
-        left: {
-          color: 'gray'
-        }
-      }}
-      renderAvatar={props => (
-        <Image source={require('@/assets/images/logo-small.png')} style={{ width: 32, height: 32, borderRadius: 16 }} />
-      )}
+            }}
+          />
+        )}
+        timeTextStyle={{
+          right: {
+            color: 'gray'
+          },
+          left: {
+            color: 'gray'
+          }
+        }}
+        renderAvatar={props => (
+          <Image source={require('@/assets/images/logo-small.png')} style={{ width: 32, height: 32, borderRadius: 16 }} />
+        )}
 
-      renderTime={props => null}
-      renderSystemMessage={props => null}
-    />
+        renderTime={props => null}
+        renderSystemMessage={props => null}
+      />
+    </View>
   )
 }
