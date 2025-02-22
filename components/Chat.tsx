@@ -17,7 +17,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?: string, assistantMessage?: string }) {
   const [messages, setMessages] = useState<IMessage[]>([])
   const [isTyping, setIsTyping] = useState(false)
-  const [model, setModel] = useState('gpt-4o-mini')
+  const [model, setModel] = useState('gpt-4o')
   const [availableModels, setAvailableModels] = useState<string[]>([])
   const client = useApolloClient();
   const backgroundColor = useThemeColor({}, 'background');
@@ -42,7 +42,6 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
   );
   useEffect(() => {
     openAI.models.list().then((models) => {
-      console.log(models)
       if (models.data.length > 0) {
         setAvailableModels(models.data.map((model: any) => model.id))
         if (!model) {
