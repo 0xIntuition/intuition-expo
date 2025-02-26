@@ -27,12 +27,7 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
       new OpenAI({
         apiKey: process.env.EXPO_PUBLIC_OPENAI_API_KEY,
         baseURL: process.env.EXPO_PUBLIC_OPENAI_BASE_URL,
-        baseURL: process.env.EXPO_PUBLIC_OPENAI_BASE_URL,
         dangerouslyAllowBrowser: true,
-        defaultHeaders: {
-          // 'HTTP-Referer': 'https://app.i7n.xyz',
-          'X-Title': 'i7n',
-        },
         defaultHeaders: {
           // 'HTTP-Referer': 'https://app.i7n.xyz',
           'X-Title': 'i7n',
