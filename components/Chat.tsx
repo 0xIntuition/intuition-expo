@@ -15,6 +15,7 @@ import { ThemedText } from './ThemedText';
 import { SelectList } from 'react-native-dropdown-select-list'
 import { useThemeColor } from '@/hooks/useThemeColor';
 export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?: string, assistantMessage?: string }) {
+  const [showConfig, setShowConfig] = useState(false)
   const [messages, setMessages] = useState<IMessage[]>([])
   const [isTyping, setIsTyping] = useState(false)
   const [model, setModel] = useState('gpt-4o')
@@ -127,33 +128,37 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
 
   return (
     <View style={{ flex: 1 }}>
-      <SelectList
-        boxStyles={{
-          backgroundColor: backgroundColor,
-          marginRight: 10,
-          marginLeft: 10,
-          borderColor: 'transparent',
-        }}
-        inputStyles={{
-          color: textColor,
-          borderColor: 'transparent',
-        }}
-        dropdownStyles={{
-          backgroundColor: backgroundColor,
-          borderRadius: 10,
-          borderColor: 'transparent',
-          margin: 10,
-        }}
-        dropdownTextStyles={{
-          color: textColor,
-        }}
+      {showConfig && (
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', margin: 10 }}>
+          <SelectList
+            boxStyles={{
+              backgroundColor: backgroundColor,
+              marginRight: 10,
+              marginLeft: 10,
+              borderColor: 'transparent',
+            }}
+            inputStyles={{
+              color: textColor,
+              borderColor: 'transparent',
+            }}
+            dropdownStyles={{
+              backgroundColor: backgroundColor,
+              borderRadius: 10,
+              borderColor: 'transparent',
+              margin: 10,
+            }}
+            dropdownTextStyles={{
+              color: textColor,
+            }}
 
-        defaultOption={{ key: model, value: model }}
+            defaultOption={{ key: model, value: model }}
 
-        setSelected={setModel}
-        data={availableModels.map((model) => ({ key: model, value: model }))}
-        save="key"
-      />
+            setSelected={setModel}
+            data={availableModels.map((model) => ({ key: model, value: model }))}
+            save="key"
+          />
+        </View>
+      )}
       <GiftedChat
         isTyping={isTyping}
         messages={messages}
