@@ -6,13 +6,6 @@ export const getUpvotes = (shares: bigint, price: bigint) => {
   const decimalPrecision = useGeneralConfig().decimalPrecision;
   const upvotePrice = getUpvotePrice();
   const upvotes = shares * price / BigInt(decimalPrecision) / upvotePrice;
-  //console.log({ shares, price, upvotePrice, upvotes });
-  console.log(`
-${shares} - shares
-${price} - price
-${upvotePrice} - upvotePrice
-${upvotes} - upvotes
-    `)
   return upvotes;
 };
 
@@ -22,6 +15,5 @@ export const getUpvotePrice = () => {
   const entryFee = BigInt(generalConfig.entry_fee);
   const feeDenominator = BigInt(generalConfig.feeDenominator);
   const upvotePrice = minDeposit - (minDeposit * entryFee) / feeDenominator;
-  // console.log({ minDeposit, entryFee, feeDenominator, upvotePrice });
   return upvotePrice;
 };
