@@ -6,7 +6,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import Atom from '@/components/Atom';
-
+import { getUpvotes } from '@/hooks/useUpvotes';
 interface TripleData {
   id: string;
   subject: {
@@ -48,10 +48,9 @@ type LayoutType = 'list-item' | 'details' | 'compact';
 interface TripleProps {
   triple: any;
   layout: LayoutType;
-  upvote: bigint;
 }
 
-const Triple: React.FC<TripleProps> = ({ triple, layout, upvote }) => {
+const Triple: React.FC<TripleProps> = ({ triple, layout }) => {
   switch (layout) {
     case 'list-item':
       return (
@@ -81,13 +80,13 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, upvote }) => {
             <View style={styles.positionsRow}>
               <ThemedText numberOfLines={1}>
                 ↑{' '}
-                {(BigInt(triple.vault.total_shares) / upvote).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.vault.position_count}
+                {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.vault.position_count}
               </ThemedText>
 
               {triple.counter_vault?.position_count !== null && triple.counter_vault.position_count > 0 && (
                 <ThemedText numberOfLines={1} style={styles.counterVault}>
                   ↓{' '}
-                  {(BigInt(triple.counter_vault.total_shares) / upvote).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.counter_vault.position_count}
+                  {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.counter_vault.position_count}
                 </ThemedText>
               )}
             </View>

@@ -6,10 +6,9 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { formatDistanceToNow } from 'date-fns';
-import { convertToCurrency } from '@/hooks/useCurrency';
 import { gql } from '@/lib/generated';
 import Atom from '@/components/Atom';
-import { useGeneralConfig } from '@/hooks/useGeneralConfig';
+import { getUpvotes } from '@/hooks/useUpvotes';
 const GetAtomsQuery = gql(`
 query GetAtoms($offset: Int) {
   atoms_aggregate {
@@ -83,8 +82,7 @@ export default function Atoms() {
   );
 }
 export function AtomListItem({ atom }: { atom: any }) {
-  const generalConfig = useGeneralConfig();
-  const upvote = BigInt(generalConfig.minDeposit);
+  const upvotes = getUpvotes(BigInt(atom.vault.total_shares), BigInt(atom.vault.current_share_price)).toString(10);
   return (
     <ThemedView style={styles.listContainer}>
       <View style={styles.topRow}>
@@ -110,7 +108,7 @@ export function AtomListItem({ atom }: { atom: any }) {
           <Atom atom={atom} layout='text-avatar' />
         </View>
       </Link>
-      <ThemedText numberOfLines={1}> ↑ {(BigInt(atom.vault.total_shares) / upvote).toString(10)} ∙ <Ionicons size={13} name='person' /> {atom.vault.position_count}</ThemedText>
+      <ThemedText numberOfLines={1}> ↑ {upvotes} ∙ <Ionicons size={13} name='person' /> {atom.vault.position_count}</ThemedText>
 
 
     </ThemedView>

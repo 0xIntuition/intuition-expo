@@ -46,18 +46,18 @@ query GetTriples($offset: Int) {
     vault {
       total_shares
       position_count
+      current_share_price
     }
     counter_vault {
       total_shares
       position_count
+      current_share_price
     }
   }
 }
 `);
 
 export default function Triples() {
-  const generalConfig = useGeneralConfig();
-  const upvote = BigInt(generalConfig.minDeposit);
   const { loading, error, data, refetch, fetchMore } = useQuery(GetTriplesQuery, {
   });
 
@@ -69,7 +69,7 @@ export default function Triples() {
       {!loading && data && <FlashList
         data={data.triples}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <Triple triple={{ ...item, creator: item.creator! }} layout="list-item" upvote={upvote} />}
+        renderItem={({ item }) => <Triple triple={{ ...item, creator: item.creator! }} layout="list-item" />}
         estimatedItemSize={150}
         onEndReached={() => {
           if (data.triples_aggregate.aggregate?.count && data.triples_aggregate.aggregate.count > data.triples.length) {

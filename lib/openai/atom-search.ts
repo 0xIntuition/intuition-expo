@@ -1,7 +1,6 @@
 import { ApolloClient } from '@apollo/client';
 import { gql } from '@/lib/generated';
-import { useGeneralConfig } from '@/hooks/useGeneralConfig';
-
+import { getUpvotes } from '@/hooks/useUpvotes';
 export const SearchAtomsQuery = gql(/* GraphQL */ `
 query SearchAtoms($likeStr: String) {
   atoms(
@@ -49,6 +48,8 @@ query SearchAtoms($likeStr: String) {
     }
     vault {
       position_count
+      current_share_price
+      total_shares
     }
     as_subject_triples(
       limit: 15,
@@ -76,9 +77,13 @@ query SearchAtoms($likeStr: String) {
       }
       counter_vault {
         position_count
+        current_share_price
+        total_shares
       }
       vault {
         position_count
+        current_share_price
+        total_shares
       }
     }
   }
@@ -98,9 +103,17 @@ export async function searchAtoms(client: ApolloClient<object>) {
       if (!data.atoms) {
         return "No atoms found";
       }
+      const result = data.atoms.map((atom) => {
+        return {
+          id: atom.id,
+          label: atom.label,
+          value: atom.value,
+          upvotes: getUpvotes(BigInt(atom.vault?.total_shares ?? 0), BigInt(atom.vault?.current_share_price ?? 0)).toString(10)
+        }
+      })
 
-      console.log(data.atoms);
-      return data.atoms;
+      console.log(result);
+      return result;
     } catch (error) {
       console.error(error);
       return "No atoms found";

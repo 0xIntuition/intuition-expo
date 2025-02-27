@@ -13,6 +13,7 @@ import React, { useMemo } from 'react';
 import { Link } from 'expo-router';
 import Triple from '@/components/Triple';
 import Atom from '@/components/Atom';
+import { getUpvotes, getUpvotePrice } from '@/hooks/useUpvotes';
 const GET_SIGNALS = gql(`
 query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
   signals_aggregate(where: { delta: { _gt: $minDelta } }) {
@@ -39,13 +40,18 @@ query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
       id
       emoji
       image
-
       label
       type
+      vault {
+        current_share_price
+      }
     }
 
     triple {
       id
+      vault {
+        current_share_price
+      }
       subject {
         id
         image
@@ -74,11 +80,7 @@ query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
 
 export default function Signals() {
 
-  const generalConfig = useGeneralConfig();
-  const upvote = BigInt(generalConfig.minDeposit);
-
-  // min delta is 80% of the upvote
-  const minDelta = BigInt(upvote) * BigInt(80) / BigInt(100);
+  const minDelta = getUpvotePrice() * BigInt(80) / BigInt(100);
 
   const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS, {
     variables: {
@@ -133,14 +135,14 @@ export default function Signals() {
 }
 
 export function SignalListItem({ item }: { item: any }) {
-  const generalConfig = useGeneralConfig();
-  const upvote = BigInt(generalConfig.minDeposit);
+  const vault = item.atom?.vault ?? item.triple?.vault;
+  const upvotes = getUpvotes(BigInt(item.delta ?? 0), BigInt(vault?.current_share_price ?? 0));
   return (
     <ThemedView style={styles.listContainer}>
       <View style={styles.topRow}>
 
 
-        <ThemedText style={styles.date}>{`${item.delta > 0 ? '↑' : '↓'}${(BigInt(item.delta) / BigInt(upvote) + BigInt(1))} ∙ ${item.account?.label} ∙ ${formatDistanceToNow(new Date(parseInt(item.block_timestamp.toString()) * 1000), { addSuffix: true })}`}</ThemedText>
+        <ThemedText style={styles.date}>{`${item.delta > 0 ? '↑' : '↓'}${(upvotes)} ∙ ${item.account?.label} ∙ ${formatDistanceToNow(new Date(parseInt(item.block_timestamp.toString()) * 1000), { addSuffix: true })}`}</ThemedText>
       </View>
       {item.atom !== null ? (
         <Link
@@ -153,7 +155,7 @@ export function SignalListItem({ item }: { item: any }) {
         </Link>
       ) : (
 
-        <Triple triple={item.triple} layout="compact" upvote={upvote} />
+        <Triple triple={item.triple} layout="compact" />
 
       )}
 

@@ -12,7 +12,7 @@ import { Section } from '@/components/section';
 import { ListItem } from '@/components/list-item';
 import { gql } from '@/lib/generated';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';
-
+import { getUpvotes } from '@/hooks/useUpvotes';
 import { usePrivy, useLogin, useEmbeddedEthereumWallet, useFundWallet, usePrivyClient } from '@privy-io/expo';
 const GetAtomQuery = gql(`
 query GetAtom($id: numeric!, $address: String) {
@@ -75,7 +75,6 @@ export default function Atom() {
   const [signalInProgress, setSignalInProgress] = useState(false);
   const [errorMesage, setErrorMesage] = useState<string | null>(null);
   const generalConfig = useGeneralConfig();
-  const upvote = BigInt(generalConfig.minDeposit);
 
   if (loading) return <ThemedText>Loading...</ThemedText>;
   if (error) return <ThemedText>{error.message}</ThemedText>;
@@ -104,7 +103,7 @@ export default function Atom() {
 
     setSignalInProgress(true);
     try {
-      const res = await result?.multivault?.depositAtom(BigInt(data.atom.id), upvote);
+      const res = await result?.multivault?.depositAtom(BigInt(data.atom.id), BigInt(generalConfig.minDeposit));
       if (!res) {
         throw new Error('Deposit failed');
       }
@@ -179,13 +178,13 @@ export default function Atom() {
         {data && data.positions && data.positions.length > 0 && (
           <ListItem
             label="My upvotes"
-            value={`↑ ${(BigInt(data?.positions[0]?.shares) / upvote + 1n).toString(10)}`}
+            value={`↑ ${(getUpvotes(BigInt(data?.positions[0]?.shares), BigInt(data?.atom?.vault?.current_share_price))).toString(10)}`}
           />
         )}
         <ListItem
           label="Total upvotes"
           subLabel={`Voters: ${data?.atom?.vault?.position_count}`}
-          value={`↑ ${(BigInt(data?.atom?.vault?.total_shares) / upvote + 1n).toString(10)}`}
+          value={`↑ ${(getUpvotes(BigInt(data?.atom?.vault?.total_shares), BigInt(data?.atom?.vault?.current_share_price))).toString(10)}`}
           last
         />
 
@@ -208,7 +207,7 @@ export default function Atom() {
             image={account?.image || ''}
             label={account?.label || ''}
             href={{ pathname: '/acc/[id]', params: { id: account?.id || '' } }}
-            value={`↑ ${(BigInt(shares) / upvote).toString(10)}`}
+            value={`↑ ${(getUpvotes(BigInt(shares), BigInt(data?.atom?.vault?.current_share_price))).toString(10)}`}
           />
         ))}
       </Section>

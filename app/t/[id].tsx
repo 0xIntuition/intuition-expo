@@ -14,7 +14,7 @@ import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 import { Address } from 'viem';
 import { Section } from '@/components/section';
 import { ListItem } from '@/components/list-item';
-
+import { getUpvotes } from '@/hooks/useUpvotes';
 const GET_TRIPLE = gql`
 query Triple ($id: numeric!, $address: String){
   triple(id: $id) {
@@ -70,7 +70,6 @@ export default function Triple() {
   console.log(data);
   const wait = useWaitForTransactionEvents();
   const generalConfig = useGeneralConfig();
-  const upvote = BigInt(generalConfig.minDeposit);
   const [signalInProgress, setSignalInProgress] = useState(false);
   const [errorMesage, setErrorMesage] = useState<string | null>(null);
 
@@ -102,7 +101,7 @@ export default function Triple() {
 
     setSignalInProgress(true);
     try {
-      const res = await result?.multivault?.depositTriple(BigInt(triple.id), upvote);
+      const res = await result?.multivault?.depositTriple(BigInt(triple.id), BigInt(generalConfig.minDeposit));
       if (!res) {
         throw new Error('Deposit failed');
       }
@@ -188,13 +187,13 @@ export default function Triple() {
         {data && data.positions && data.positions.length > 0 && (
           <ListItem
             label="My upvotes"
-            value={`↑ ${(BigInt(data.positions[0].shares) / upvote + 1n).toString(10)}`}
+            value={`↑ ${(getUpvotes(BigInt(data.positions[0].shares), BigInt(data.triple.vault.current_share_price))).toString(10)}`}
           />
         )}
         <ListItem
           label="Total upvotes"
           subLabel={`Voters: ${triple.vault.position_count}`}
-          value={`↑ ${(BigInt(triple.vault.total_shares) / upvote + 1n).toString(10)}`}
+          value={`↑ ${(getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price))).toString(10)}`}
           last
         />
       </Section>
@@ -223,7 +222,7 @@ export default function Triple() {
               image={account.image || ''}
               label={account.label || ''}
               href={{ pathname: '/acc/[id]', params: { id: account.id } }}
-              value={`↑ ${(BigInt(shares) / upvote).toString(10)}`}
+              value={`↑ ${(getUpvotes(BigInt(shares), BigInt(triple.vault.current_share_price))).toString(10)}`}
             />
           );
         })}

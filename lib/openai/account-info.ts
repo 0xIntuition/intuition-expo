@@ -1,7 +1,6 @@
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client';
 import { gql } from '@/lib/generated';
-import { useGeneralConfig } from '@/hooks/useGeneralConfig';
-
+import { getUpvotes } from '@/hooks/useUpvotes';
 export const getAccountInfoQuery = gql(/* GraphQL */ `
 query GetAccountInfo($address: String!) {
   account(id: $address) {
@@ -46,8 +45,7 @@ query GetAccountInfo($address: String!) {
 `);
 
 export async function getAccountInfo(client: ApolloClient<object>) {
-  const generalConfig = useGeneralConfig();
-  const upvote = BigInt(generalConfig.minDeposit);
+
   return async function (account_id: string) {
     try {
       const { data } = await client.query({
@@ -70,7 +68,7 @@ export async function getAccountInfo(client: ApolloClient<object>) {
               atomId: position.vault?.atom?.id,
             },
             label: position.vault?.atom?.label || `${position.vault?.triple?.subject.label} ${position.vault?.triple?.predicate.label} ${position.vault?.triple?.object.label}`,
-            upvotes: (BigInt(position.shares) / upvote + BigInt(1)).toString(10),
+            upvotes: getUpvotes(BigInt(position.shares), BigInt(position.vault?.current_share_price)).toString(10),
           }
         }),
       };
