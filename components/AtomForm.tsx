@@ -49,7 +49,7 @@ const AtomForm: React.FC<AtomFormProps> = (props) => {
     setTimeout(() => {
       setIsSaving(false);
       props.onSuccess?.();
-    }, 4000);
+    }, 2000);
   };
 
   const fetchWebsiteContent = async (url: string) => {
@@ -71,7 +71,7 @@ const AtomForm: React.FC<AtomFormProps> = (props) => {
   const summarizeWebsiteContent = async (text: string) => {
     const response = await openAI.chat.completions.create({
       model: "gpt-4o-mini-2024-07-18",
-      messages: [{ role: "user", content: `Summarize in one short paragraph the following website: ${text}` }],
+      messages: [{ role: "user", content: `Summarize in one short (max 50 words) paragraph the following website: ${text}` }],
     });
     return response.choices[0].message.content;
   };
@@ -99,6 +99,23 @@ const AtomForm: React.FC<AtomFormProps> = (props) => {
       console.error(error);
       return { triples: [] };
     }
+  };
+  useEffect(() => {
+    if (url) {
+      generate();
+    }
+  }, [url]);
+
+  const regenerateSemanticTriples = async () => {
+    if (!url) {
+      return;
+    }
+    setIsGenerating(true);
+    const { text } = await fetchWebsiteContent(url);
+    const semanticTriples = await getSemanticTriples(text);
+    setSemanticTriples(semanticTriples);
+    setDebugString(semanticTriples.triples.map(triple => `${triple.subject} - ${triple.predicate} - ${triple.object}`).join("\n") || "");
+    setIsGenerating(false);
   };
 
 
@@ -171,13 +188,13 @@ const AtomForm: React.FC<AtomFormProps> = (props) => {
         {isGenerating ? (
           <ActivityIndicator size="small" color={color} />
         ) : (
-          <Button onPress={() => generate()} title="Fetch with AI" />
+          !isSaving && <Button onPress={() => regenerateSemanticTriples()} title="Regenerate" />
         )}
 
         {isSaving ? (
           <ActivityIndicator size="small" color={color} />
         ) : (
-          <Button onPress={() => save()} title="Save" disabled={isGenerating} />
+          !isGenerating && <Button onPress={() => save()} title="Save" disabled={isGenerating} />
         )}
       </ThemedView>
     </ScrollView>
@@ -188,6 +205,7 @@ export default AtomForm;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingBottom: 40,
   },
   text: {
     fontSize: 16,
