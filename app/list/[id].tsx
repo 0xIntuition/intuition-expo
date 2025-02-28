@@ -1,4 +1,4 @@
-import { View, StyleSheet, RefreshControl, ActivityIndicator, Image } from 'react-native';
+import { View, StyleSheet, RefreshControl, ActivityIndicator, Image, Button } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@apollo/client';
 import React, { useState } from 'react';
@@ -7,17 +7,25 @@ import { ThemedView } from '@/components/ThemedView';
 import { gql } from '@/lib/generated';
 import Triple from '@/components/Triple';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';
-import { Link, useLocalSearchParams } from 'expo-router';
+import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import Avatar from '@/components/Avatar';
 import { getUpvotes } from '@/hooks/useUpvotes';
+import { shareAsync } from 'expo-sharing';
 const GetListQuery = gql(`
-query GetList($listId: numeric, $offset: Int) {
+query GetList($listId: numeric!, $offset: Int) {
     triples_aggregate(
       where: { predicate_id: { _eq: 4 }, object_id: { _eq: $listId } }
     ) {
     aggregate {
       count
     }
+  }
+  atom(
+    id: $listId  
+  ) {
+    id
+    label
+    image
   }
   triples(
     limit: 10, offset: $offset
@@ -63,6 +71,17 @@ export default function List() {
 
   return (
     <ThemedView style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerTitle: () => <View style={styles.header} >
+            {data?.atom?.image !== null && <Image style={styles.titleImage} source={{ uri: data?.atom?.image }} />}
+            <ThemedText>{data?.atom?.label}</ThemedText>
+          </View>,
+          headerRight: () => <Button title="Share" onPress={async () => {
+            await shareAsync('https://app.i7n.xyz/list/' + id);
+          }} />,
+        }}
+      />
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <FlashList
         data={data.triples}
@@ -218,6 +237,12 @@ const styles = StyleSheet.create({
   },
   icon: {
     marginRight: 4,
+  },
+  titleImage: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    marginRight: 8,
   },
 });
 
