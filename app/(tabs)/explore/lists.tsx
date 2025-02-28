@@ -85,7 +85,7 @@ export function PredicateObjectListItem({ predicateObject }: { predicateObject: 
 
       <Link
         href={{
-          pathname: '/a/[id]',
+          pathname: '/list/[id]',
           params: { id: predicateObject.object.id }
         }}>
         <Avatar image={predicateObject.object.image} style={styles.avatar} />

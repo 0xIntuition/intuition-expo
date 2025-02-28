@@ -56,6 +56,13 @@ export default function App() {
               headerShown: false,
             }}
           />
+          <Stack.Screen
+            name="list"
+            options={{
+              presentation: 'modal',
+              headerShown: false,
+            }}
+          />
           <Stack.Screen name="+not-found" />
         </Stack>
       </ApolloProvider>
