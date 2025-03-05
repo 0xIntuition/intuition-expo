@@ -1,4 +1,4 @@
-import { View, StyleSheet, RefreshControl, ActivityIndicator, Image, Button } from 'react-native';
+import { View, StyleSheet, RefreshControl, ActivityIndicator, Image, Pressable } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@apollo/client';
 import React, { useState } from 'react';
@@ -11,6 +11,8 @@ import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import Avatar from '@/components/Avatar';
 import { getUpvotes } from '@/hooks/useUpvotes';
 import { shareAsync } from 'expo-sharing';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useThemeColor } from '@/hooks/useThemeColor';
 const GetListQuery = gql(`
 query GetList($listId: numeric!, $offset: Int) {
     triples_aggregate(
@@ -59,6 +61,7 @@ query GetList($listId: numeric!, $offset: Int) {
 `);
 
 export default function List() {
+  const textColor = useThemeColor({}, 'text');
   const { id } = useLocalSearchParams();
   const { loading, error, data, refetch, fetchMore } = useQuery(GetListQuery, {
     variables: {
@@ -77,9 +80,11 @@ export default function List() {
             {data?.atom?.image !== null && <Image style={styles.titleImage} source={{ uri: data?.atom?.image }} />}
             <ThemedText>{data?.atom?.label}</ThemedText>
           </View>,
-          headerRight: () => <Button title="Share" onPress={async () => {
+          headerRight: () => <Pressable onPress={async () => {
             await shareAsync('https://app.i7n.xyz/list/' + id);
-          }} />,
+          }} style={{ marginRight: 10 }}>
+            <Ionicons name="share-outline" size={24} color={textColor} />
+          </Pressable>,
         }}
       />
       {error && <ThemedText>{error.message}</ThemedText>}

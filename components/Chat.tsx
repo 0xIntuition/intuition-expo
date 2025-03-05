@@ -7,14 +7,16 @@ import { useApolloClient } from '@apollo/client';
 import { getTools } from '@/lib/openai/tools';
 import Markdown from 'react-native-markdown-display';
 import { styles } from '@/lib/chat-styles';
-import { Link } from 'expo-router';
+import { Link, Stack } from 'expo-router';
 import { Image } from 'expo-image';
 import { ThemedView } from './ThemedView';
-import { Button, View } from 'react-native';
+import { Button, Pressable, View } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { SelectList } from 'react-native-dropdown-select-list'
 import { useThemeColor } from '@/hooks/useThemeColor';
-export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?: string, assistantMessage?: string }) {
+
+
+export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }: { systemPrompt?: string, assistantMessage?: string, sampleQuestions?: string[] }) {
   const [showConfig, setShowConfig] = useState(false)
   const [messages, setMessages] = useState<IMessage[]>([])
   const [isTyping, setIsTyping] = useState(false)
@@ -48,7 +50,9 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
   }, [openAI])
 
 
-  useEffect(() => {
+
+
+  const reset = useCallback(() => {
     const initialMessages: IMessage[] = []
     if (systemPrompt) {
       initialMessages.push({
@@ -72,8 +76,11 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
       })
     }
     setMessages(initialMessages)
-  }, [])
+  }, [systemPrompt, assistantMessage])
 
+  useEffect(() => {
+    reset()
+  }, [reset])
 
   const onSend = useCallback(async (newMessages: IMessage[] = []) => {
     const tools = await getTools(client);
@@ -128,6 +135,13 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
 
   return (
     <View style={{ flex: 1 }}>
+      <Stack.Screen
+        options={{
+          headerRight: () => <Pressable onPress={() => reset()} style={{ marginRight: 10 }}>
+            <Ionicons name="refresh" size={24} color={textColor} />
+          </Pressable>,
+        }}
+      />
       {showConfig && (
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', margin: 10 }}>
           <SelectList
@@ -159,6 +173,18 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
           />
         </View>
       )}
+      {messages.length === 2 && (
+        <View style={{ flexDirection: 'column', margin: 10 }}>
+          {sampleQuestions?.map((question) => (
+            <Pressable
+              onPress={() => onSend([{ _id: Math.random().toString(), createdAt: new Date(), text: question, user: { _id: 1 } }])}
+              style={{ marginBottom: 10, backgroundColor: backgroundColor, padding: 10, borderRadius: 10 }}
+            >
+              <ThemedText>{question}</ThemedText>
+            </Pressable>
+          ))}
+        </View>
+      )}
       <GiftedChat
         isTyping={isTyping}
         messages={messages}
@@ -167,6 +193,7 @@ export default function Chat({ systemPrompt, assistantMessage }: { systemPrompt?
           _id: 1,
         }}
         renderDay={() => null}
+
         renderBubble={props => (
           <Bubble
             {...props}

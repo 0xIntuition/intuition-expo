@@ -1,4 +1,4 @@
-import { Button, View } from 'react-native';
+import { Button, View, Pressable } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery, gql } from '@apollo/client';
@@ -15,6 +15,8 @@ import { Address } from 'viem';
 import { Section } from '@/components/section';
 import { ListItem } from '@/components/list-item';
 import { getUpvotes } from '@/hooks/useUpvotes';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useThemeColor } from '@/hooks/useThemeColor';
 const GET_TRIPLE = gql`
 query Triple ($id: numeric!, $address: String){
   triple(id: $id) {
@@ -59,6 +61,7 @@ query Triple ($id: numeric!, $address: String){
 }`;
 
 export default function Triple() {
+  const textColor = useThemeColor({}, 'text');
   const { id } = useLocalSearchParams();
   const { isReady } = usePrivy();
   const { wallets } = useEmbeddedEthereumWallet();
@@ -157,9 +160,11 @@ export default function Triple() {
     <ThemedView style={styles.container}>
       <Stack.Screen
         options={{
-          headerRight: () => <Button title="Share" onPress={async () => {
+          headerRight: () => <Pressable onPress={async () => {
             await shareAsync('https://app.i7n.xyz/t/' + id);
-          }} />,
+          }} style={{ marginRight: 10 }}>
+            <Ionicons name="share-outline" size={24} color={textColor} />
+          </Pressable>,
         }}
       />
       <View style={styles.vaultContent}>

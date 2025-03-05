@@ -6,6 +6,11 @@ export default function Ask() {
     <Chat
       systemPrompt={systemPrompt}
       assistantMessage="Hello how can I help?"
+      sampleQuestions={[
+        "Show me web3 collections",
+        "What is the favourite book of simonas.eth?",
+        "What are top Pro Crypto Politicians?",
+      ]}
     />
   )
 }

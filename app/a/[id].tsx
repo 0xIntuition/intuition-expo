@@ -1,4 +1,4 @@
-import { Button, View, TouchableOpacity } from 'react-native';
+import { Button, View, TouchableOpacity, Pressable } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@apollo/client';
@@ -14,6 +14,8 @@ import { gql } from '@/lib/generated';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 import { getUpvotes } from '@/hooks/useUpvotes';
 import { usePrivy, useLogin, useEmbeddedEthereumWallet, useFundWallet, usePrivyClient } from '@privy-io/expo';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useThemeColor } from '@/hooks/useThemeColor';
 const GetAtomQuery = gql(`
 query GetAtom($id: numeric!, $address: String) {
   atom(id: $id) {
@@ -63,6 +65,7 @@ query GetAtom($id: numeric!, $address: String) {
 }`);
 
 export default function Atom() {
+  const textColor = useThemeColor({}, 'text');
   const wait = useWaitForTransactionEvents();
   const { isReady } = usePrivy();
   const { wallets } = useEmbeddedEthereumWallet();
@@ -165,9 +168,11 @@ export default function Atom() {
             {data?.atom?.image !== null && <Image style={styles.image} source={{ uri: data?.atom?.image }} />}
             <ThemedText>{data?.atom?.label}</ThemedText>
           </View>,
-          headerRight: () => <Button title="Share" onPress={async () => {
+          headerRight: () => <Pressable onPress={async () => {
             await shareAsync('https://app.i7n.xyz/a/' + id);
-          }} />,
+          }} style={{ marginRight: 10 }}>
+            <Ionicons name="share-outline" size={24} color={textColor} />
+          </Pressable>,
         }}
       />
       <Section >
