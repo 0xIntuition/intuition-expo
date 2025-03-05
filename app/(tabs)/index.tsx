@@ -9,7 +9,7 @@ export default function Ask() {
       sampleQuestions={[
         "Show me web3 collections",
         "What is the favourite book of simonas.eth?",
-        "What are top Pro Crypto Politicians?",
+        "Show me top 10 Pro Crypto Politicians?",
       ]}
     />
   )
