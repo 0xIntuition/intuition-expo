@@ -10,7 +10,7 @@ import { styles } from '@/lib/chat-styles';
 import { Link, Stack } from 'expo-router';
 import { Image } from 'expo-image';
 import { ThemedView } from './ThemedView';
-import { Button, Pressable, View } from 'react-native';
+import { Pressable, View, ActivityIndicator } from 'react-native';
 import { ThemedText } from './ThemedText';
 import { SelectList } from 'react-native-dropdown-select-list'
 import { useThemeColor } from '@/hooks/useThemeColor';
@@ -22,6 +22,7 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
   const [isTyping, setIsTyping] = useState(false)
   const [model, setModel] = useState('gpt-4o')
   const [availableModels, setAvailableModels] = useState<string[]>([])
+  const [progressMessage, setProgressMessage] = useState<string>('')
   const client = useApolloClient();
   const backgroundColor = useThemeColor({}, 'background');
   const textColor = useThemeColor({}, 'text');
@@ -104,15 +105,17 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
     })
       .on("connect", () => {
         console.log("Connecting...")
+        setProgressMessage("")
         setIsTyping(true)
       })
       .on("functionCall", (event: any) => {
         console.log("functionCall", event)
-        // setProgressMessage(`Calling function ${event.name}...`)
+        setProgressMessage(`Using ${event.name}`)
       })
       .on("message", () => console.log("Processing..."))
       .on("finalContent", () => {
         console.log("Finalizing...")
+        setProgressMessage("")
         setIsTyping(false)
       })
       .on("error", (error: any) => console.error(error));
@@ -175,8 +178,9 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
       )}
       {messages.length === 2 && (
         <View style={{ flexDirection: 'column', margin: 10 }}>
-          {sampleQuestions?.map((question) => (
+          {sampleQuestions?.map((question, index) => (
             <Pressable
+              key={index}
               onPress={() => onSend([{ _id: Math.random().toString(), createdAt: new Date(), text: question, user: { _id: 1 } }])}
               style={{ marginBottom: 10, backgroundColor: backgroundColor, padding: 10, borderRadius: 10 }}
             >
@@ -194,6 +198,12 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
         }}
         renderDay={() => null}
 
+        renderTypingIndicator={() => (
+          isTyping ? <View style={{ margin: 10, flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <ActivityIndicator size="small" color={textColor} />
+            <ThemedText style={{ fontSize: 12 }}>{progressMessage}</ThemedText>
+          </View> : null
+        )}
         renderBubble={props => (
           <Bubble
             {...props}
