@@ -1,32 +1,43 @@
-import { View, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
+import { View, StyleSheet, RefreshControl, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { MasonryFlashList } from '@shopify/flash-list';
 import { useQuery } from '@apollo/client';
 import Avatar from '@/components/Avatar';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { gql } from '@/lib/generated';
-
+import { useThemeColor } from '@/hooks/useThemeColor';
+import Ionicons from '@expo/vector-icons/Ionicons';
 const GetAccountsQuery = gql(`
-query GetAccounts($offset: Int) {
+query GetAccounts($offset: Int, $orderBy: [accounts_order_by!]) {
   accounts_aggregate(where: { type: { _eq: Default } }) {
     aggregate {
       count
     }
   }
   accounts(
-    order_by: { atom:  {
-       vault:  {
-          position_count: desc
-       }
-    } }
-    limit: 100
+    limit: 50
     offset: $offset
     where: { type: { _eq: Default } }
+    order_by: $orderBy
   ) {
     image
     label
     id
+    claims_aggregate {
+      aggregate {
+        count
+      }
+    }
+    signals_aggregate {
+      aggregate {
+        count
+      }
+    }
+    cached_image {
+      safe
+      url
+    }
   }
 }`);
 
@@ -36,14 +47,27 @@ function shortId(id: string): string {
 
 export default function Accounts() {
 
-  const { loading, error, data, refetch, fetchMore } = useQuery(GetAccountsQuery);
-
+  const { loading, error, data, refetch, fetchMore } = useQuery(GetAccountsQuery, {
+    variables: {
+      "offset": 0,
+      "orderBy": [
+        {
+          "signals_aggregate": {
+            // @ts-ignore
+            count: "desc"
+          }
+        }
+      ]
+    }
+  });
+  const width = useWindowDimensions().width;
 
   if (loading && !data) return <ActivityIndicator size="large" />;
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
-      {!loading && data && <FlashList
+      {!loading && data && <MasonryFlashList
+        numColumns={Math.floor(width / 150)}
         data={data.accounts}
         keyExtractor={(item: any) => `${item.id}`}
         renderItem={({ item }: { item: any }) => <AccountListItem account={item} />}
@@ -77,20 +101,28 @@ export default function Accounts() {
     </ThemedView>
   );
 }
+function getImage(account: any) {
+  // replace ipfs:// with https://ipfs.io/ipfs/
+  return account.cached_image?.url?.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
+}
 export function AccountListItem({ account }: { account: any }) {
+  const backgroundColor = useThemeColor({}, 'backgroundSecondary');
   return (
-    <ThemedView style={styles.listContainer}>
+    <ThemedView style={[styles.masonryContainer, { backgroundColor }]}>
 
       <Link
         href={{
           pathname: '/acc/[id]',
           params: { id: account.id }
         }}>
-        <Avatar image={account.image} style={styles.avatar} />
+        <Avatar image={getImage(account)} style={styles.avatar} size={80} radius={10} />
 
         <View>
-          <ThemedText style={styles.name}>{account.label}</ThemedText>
-          <ThemedText style={styles.secondary}>{shortId(account.id)}</ThemedText>
+          {account.label.toLowerCase() !== shortId(account.id).toLowerCase() && <ThemedText style={styles.name}>{account.label}</ThemedText>}
+          <ThemedText style={styles.secondary}>{account.signals_aggregate.aggregate.count} <Ionicons size={13} name='volume-high-outline' style={{ marginLeft: 4 }} /></ThemedText>
+
+          <ThemedText style={styles.secondary}>{account.claims_aggregate.aggregate.count} <Ionicons size={13} name='color-filter-outline' style={{ marginLeft: 4 }} /></ThemedText>
+          <ThemedText style={styles.tertiary}>{shortId(account.id)}</ThemedText>
         </View>
       </Link>
     </ThemedView>
@@ -114,10 +146,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginRight: 10,
     padding: 10,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#ddd',
     borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatar: {
     marginRight: 10,
@@ -130,6 +161,10 @@ const styles = StyleSheet.create({
   secondary: {
     color: '#888',
     fontSize: 13,
+  },
+  tertiary: {
+    color: '#666',
+    fontSize: 11,
   },
   profileLayout: {
     flexDirection: 'row',

@@ -48,7 +48,8 @@ export default function Accounts() {
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
       {!loading && data && <MasonryFlashList
-        numColumns={Math.floor(width / 200)}
+        numColumns={Math.floor(width / 150)}
+
         data={data.predicate_objects}
         keyExtractor={(item: any) => `${item.object.id}`}
         renderItem={({ item }: { item: any }) => <PredicateObjectListItem predicateObject={item} />}
