@@ -98,7 +98,7 @@ export function PredicateObjectListItem({ predicateObject }: { predicateObject: 
           params: { id: predicateObject.object.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Avatar image={predicateObject.object.image} style={styles.avatar} size={80} radius={10} />
+          <Avatar image={predicateObject.object.image} style={styles.avatar} size={100} radius={10} />
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{predicateObject.object.label}</ThemedText>
@@ -114,7 +114,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingLeft: 8,
-    paddingRight: 8,
   },
   listContainer: {
     flex: 1,

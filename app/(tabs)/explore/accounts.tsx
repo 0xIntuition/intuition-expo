@@ -72,7 +72,7 @@ export default function Accounts() {
         data={data.accounts}
         keyExtractor={(item: any) => `${item.id}`}
         renderItem={({ item }: { item: any }) => <AccountListItem account={item} />}
-        estimatedItemSize={100}
+        estimatedItemSize={200}
         onEndReached={() => {
           if (data.accounts_aggregate.aggregate?.count && data.accounts_aggregate.aggregate.count > data.accounts.length) {
             fetchMore({
@@ -118,7 +118,7 @@ export function AccountListItem({ account }: { account: any }) {
           params: { id: account.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Avatar image={getImage(account)} style={styles.avatar} size={100} radius={10} id={account.id} />
+          <Avatar image={getImage(account)} style={styles.avatar} size={100} radius={50} id={account.id} />
 
           {account.label.toLowerCase() !== shortId(account.id).toLowerCase() && <ThemedText style={styles.name}>{account.label}</ThemedText>}
           <View style={{ flexDirection: 'row', alignItems: 'center', }}>
@@ -136,7 +136,7 @@ export function AccountListItem({ account }: { account: any }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingLeft: 16,
+    paddingLeft: 8,
   },
   listContainer: {
     flex: 1,
