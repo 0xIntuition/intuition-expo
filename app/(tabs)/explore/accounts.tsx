@@ -118,7 +118,7 @@ export function AccountListItem({ account }: { account: any }) {
           params: { id: account.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Avatar image={getImage(account)} style={styles.avatar} size={100} radius={10} />
+          <Avatar image={getImage(account)} style={styles.avatar} size={100} radius={10} id={account.id} />
 
           {account.label.toLowerCase() !== shortId(account.id).toLowerCase() && <ThemedText style={styles.name}>{account.label}</ThemedText>}
           <View style={{ flexDirection: 'row', alignItems: 'center', }}>

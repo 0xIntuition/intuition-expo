@@ -1,17 +1,26 @@
 import { View, StyleSheet } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image } from 'expo-image';
+import { createAvatar } from '@dicebear/core';
+import { bottts, botttsNeutral } from '@dicebear/collection';
 
 //@ts-ignore
-export default function Avatar({ image, style, size = 36, radius = 999 }) {
+export default function Avatar({ image, style, size = 36, radius = 999, id }: { image?: string, style: any, size: number, radius: number, id?: string }) {
   const SIZING = {
     height: size,
     width: size,
   };
+
+  const avatar = id ? createAvatar(botttsNeutral, {
+    seed: id,
+    size: size,
+    radius: radius,
+  }).toDataUri() : null;
+  const uri = image ? image : avatar;
   return (
     <View style={style}>
-      {image ? (
-        <Image source={image} style={[styles.avatar, SIZING, { borderRadius: radius }]} />
+      {uri ? (
+        <Image source={uri} style={[styles.avatar, SIZING, { borderRadius: radius }]} />
       ) : (
         <View
           style={[

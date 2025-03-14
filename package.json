@@ -20,6 +20,8 @@
     "@apollo/client": "^3.10.5",
     "@babel/plugin-proposal-export-namespace-from": "^7.18.9",
     "@babel/runtime": "^7.26.7",
+    "@dicebear/collection": "^9.2.2",
+    "@dicebear/core": "^9.2.2",
     "@ethersproject/shims": "^5.7.0",
     "@expo/metro-runtime": "~4.0.1",
     "@expo/vector-icons": "^14.0.0",
