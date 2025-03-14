@@ -11,12 +11,13 @@ import { TripleItem } from '@/app/(tabs)/explore/triples';
 interface TriplesListProps {
   triples: TripleItem[];
   onRefresh?: () => void;
+  onRefetch?: () => void;
   onEndReached?: () => void;
   onEndReachedThreshold?: number;
   loading?: boolean;
 }
 
-const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onEndReached, onEndReachedThreshold, loading }) => {
+const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onRefetch, onEndReached, onEndReachedThreshold, loading }) => {
   const { isReady } = usePrivy();
   const { wallets } = useEmbeddedEthereumWallet();
   const address = wallets[0]?.address.toLowerCase() || '0x0000000000000000000000000000000000000000';
@@ -25,7 +26,45 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onEndReac
   const [actionInProgress, setActionInProgress] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const handleTripleDeposit = async (tripleId: string) => {
+  // Redeem shares from a vault
+  const handleRedeem = async (vaultId: bigint, shares: bigint) => {
+    if (!isReady || !wallets[0]) {
+      setErrorMessage('Connect wallet first');
+      return false;
+    }
+
+    if (shares <= 0n) {
+      // No shares to redeem
+      return true;
+    }
+
+    const multivault = getMultiVault({
+      address: wallets[0].address as `0x${string}`,
+      // @ts-ignore
+      provider: await wallets[0].getProvider()
+    })?.multivault;
+
+    if (!multivault) {
+      setErrorMessage('Failed to initialize multivault');
+      return false;
+    }
+
+    try {
+      const res = await multivault.redeemTriple(vaultId, shares);
+      if (!res) {
+        throw new Error('Redeem failed');
+      }
+      await wait(res.hash);
+      return true;
+    } catch (error) {
+      console.error('Redeem error:', error);
+      setErrorMessage(error instanceof Error ? error.message : 'Unknown error during redemption');
+      return false;
+    }
+  };
+
+  // Handle upvote - deposit to vault, but first redeem any counter_vault shares
+  const handleUpvote = async (tripleId: string) => {
     if (!isReady || !wallets[0]) {
       setErrorMessage('Connect wallet first');
       return;
@@ -37,15 +76,38 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onEndReac
       provider: await wallets[0].getProvider()
     });
 
+    if (!result?.multivault) {
+      setErrorMessage('Failed to initialize multivault');
+      return;
+    }
+
     setActionInProgress(true);
     try {
-      const res = await result?.multivault?.depositTriple(BigInt(tripleId), BigInt(generalConfig.minDeposit));
+      // First, check if user has counter position and redeem if needed
+      const triple = triples.find(t => t.id === tripleId);
+      const counterPosition = triple?.counter_vault?.positions?.find((pos: any) =>
+        pos.account_id === address);
+
+      // If user has position in counter_vault, redeem it first
+      if (counterPosition && counterPosition.shares) {
+        // Get counter vault ID
+        const counterId = await result.multivault.getCounterIdFromTriple(BigInt(tripleId));
+
+        // Redeem all shares from counter vault
+        const redeemSuccess = await handleRedeem(counterId, BigInt(counterPosition.shares));
+        if (!redeemSuccess) {
+          throw new Error('Failed to redeem counter position');
+        }
+      }
+
+      // Now deposit to the vault
+      const res = await result.multivault.depositTriple(BigInt(tripleId), BigInt(generalConfig.minDeposit));
       if (!res) {
         throw new Error('Deposit failed');
       }
       await wait(res.hash);
-      if (onRefresh) {
-        onRefresh();
+      if (onRefetch) {
+        onRefetch();
       }
       return true;
     } catch (error) {
@@ -57,14 +119,10 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onEndReac
     }
   };
 
-  const handleWithdraw = async (tripleId: string, shares: bigint) => {
+  // Handle downvote - deposit to counter_vault, but first redeem any vault shares
+  const handleDownvote = async (tripleId: string) => {
     if (!isReady || !wallets[0]) {
       setErrorMessage('Connect wallet first');
-      return;
-    }
-
-    if (shares <= 0n) {
-      setErrorMessage('Shares must be greater than 0');
       return;
     }
 
@@ -74,15 +132,37 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onEndReac
       provider: await wallets[0].getProvider()
     });
 
+    if (!result?.multivault) {
+      setErrorMessage('Failed to initialize multivault');
+      return;
+    }
+
     setActionInProgress(true);
     try {
-      const res = await result?.multivault?.redeemTriple(BigInt(tripleId), shares);
+      // First, check if user has normal position and redeem if needed
+      const triple = triples.find(t => t.id === tripleId);
+      const vaultPosition = triple?.vault?.positions?.find((pos: any) =>
+        pos.account_id === address);
+
+      // If user has position in vault, redeem it first
+      if (vaultPosition && vaultPosition.shares) {
+        const redeemSuccess = await handleRedeem(BigInt(tripleId), BigInt(vaultPosition.shares));
+        if (!redeemSuccess) {
+          throw new Error('Failed to redeem vault position');
+        }
+      }
+
+      // Get counter vault ID
+      const counterId = await result.multivault.getCounterIdFromTriple(BigInt(tripleId));
+
+      // Deposit to counter vault
+      const res = await result.multivault.depositTriple(counterId, BigInt(generalConfig.minDeposit));
       if (!res) {
-        throw new Error('Redeem failed');
+        throw new Error('Counter deposit failed');
       }
       await wait(res.hash);
-      if (onRefresh) {
-        onRefresh();
+      if (onRefetch) {
+        onRefetch();
       }
       return true;
     } catch (error) {
@@ -139,27 +219,19 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onEndReac
             <Triple
               triple={tripleData as any}
               layout="swipeable"
-              inProgress={actionInProgress}
+              inProgress={actionInProgress || loading}
               onUpvote={async () => {
                 try {
-                  await handleTripleDeposit(item.id);
+                  await handleUpvote(item.id);
                 } catch (e) {
                   console.error(e);
                 }
               }}
               onDownvote={async () => {
-                // Check if user has any position (shares) before attempting withdrawal
-                const userPosition = item.vault?.positions?.find((pos: any) =>
-                  pos.account_id === address);
-
-                if (userPosition && userPosition.shares) {
-                  try {
-                    await handleWithdraw(item.id, BigInt(userPosition.shares));
-                  } catch (e) {
-                    console.error(e);
-                  }
-                } else {
-                  setErrorMessage('No position to withdraw');
+                try {
+                  await handleDownvote(item.id);
+                } catch (e) {
+                  console.error(e);
                 }
               }}
             />

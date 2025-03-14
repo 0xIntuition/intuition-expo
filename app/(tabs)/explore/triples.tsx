@@ -66,7 +66,7 @@ query GetTriples($offset: Int, $address: String) {
   }
   triples(order_by: { vault:  {
      total_shares: desc
-  } }, limit: 10, offset: $offset) {
+  } }, limit: 5, offset: $offset) {
     id
     subject {
       id
@@ -119,7 +119,7 @@ query GetTriples($offset: Int, $address: String) {
 export default function Triples() {
   const { wallets } = useEmbeddedEthereumWallet();
   const address = wallets[0]?.address?.toLowerCase() || '0x0000000000000000000000000000000000000000';
-  const { loading, error, data, refetch, fetchMore } = useQuery(GetTriplesQuery, {
+  const { loading, error, data, refetch, fetchMore, variables } = useQuery(GetTriplesQuery, {
     variables: { address }
   });
 
@@ -128,7 +128,7 @@ export default function Triples() {
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
-      {!loading && data && (
+      {data && (
         <TriplesList
           triples={data.triples.map((item: TripleItem) => ({
             ...item,
@@ -140,6 +140,7 @@ export default function Triples() {
 
           }))}
           onRefresh={() => refetch({ offset: 0, address })}
+          onRefetch={() => refetch({ offset: variables?.offset || 0, address })}
           onEndReached={() => {
             if (data.triples_aggregate.aggregate?.count && data.triples_aggregate.aggregate.count > data.triples.length) {
               fetchMore({
