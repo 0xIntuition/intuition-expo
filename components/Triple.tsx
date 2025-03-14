@@ -8,27 +8,21 @@ import { ThemedView } from '@/components/ThemedView';
 import Atom from '@/components/Atom';
 import { getUpvotes } from '@/hooks/useUpvotes';
 import SwipeableListItem from './SwipeableListItem';
+
+// Define an interface for the Atom data structure
+interface AtomData {
+  id: string;
+  emoji?: string;
+  label?: string;
+  image?: string;
+}
+
 interface TripleData {
   id: string;
-  subject: {
-    id: string;
-    emoji?: string | null;
-    label?: string | null;
-    image?: string | null;
-  };
-  predicate: {
-    id: string;
-    emoji?: string | null;
-    label?: string | null;
-    image?: string | null;
-  };
-  object: {
-    id: string;
-    emoji?: string | null;
-    label?: string | null;
-    image?: string | null;
-  };
-  creator: {
+  subject: AtomData;
+  predicate: AtomData;
+  object: AtomData;
+  creator?: {
     id: string;
     label: string;
     image?: string;
@@ -37,24 +31,46 @@ interface TripleData {
   vault?: {
     total_shares: string;
     position_count: number;
+    current_share_price: string;
+    positions?: Array<{
+      shares: string;
+      account: {
+        id: string;
+        image?: string;
+        label?: string;
+      }
+    }>;
   };
   counter_vault?: {
     total_shares: string;
     position_count: number;
+    current_share_price: string;
+    positions?: Array<{
+      shares: string;
+      account: {
+        id: string;
+        image?: string;
+        label?: string;
+      }
+    }>;
   };
 }
 
 type LayoutType = 'list-item' | 'details' | 'compact' | 'swipeable';
 
 interface TripleProps {
-  triple: any;
+  triple: TripleData;
   layout: LayoutType;
+  onUpvote?: () => Promise<void>;
+  onDownvote?: () => Promise<void>;
 }
 
-const Triple: React.FC<TripleProps> = ({ triple, layout }) => {
+const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote }) => {
   switch (layout) {
     case 'swipeable':
-      return <SwipeableListItem>
+      return <SwipeableListItem
+        onLeftSwipe={onUpvote}
+        onRightSwipe={onDownvote}>
         <Triple triple={triple} layout="list-item" />
       </SwipeableListItem>;
     case 'list-item':
@@ -65,7 +81,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout }) => {
               <Link href={{ pathname: '/acc/[id]', params: { id: triple.creator.id } }}>
                 <ThemedText style={styles.secondary}>{triple.creator.label}</ThemedText>
               </Link>
-              {triple.block_timestamp !== null && (
+              {triple.block_timestamp && (
                 <ThemedText style={styles.date}>
                   {formatDistanceToNow(new Date(parseInt(triple.block_timestamp) * 1000), { addSuffix: true })}
                 </ThemedText>
@@ -88,7 +104,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout }) => {
                 {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.vault.position_count}
               </ThemedText>
 
-              {triple.counter_vault?.position_count !== null && triple.counter_vault.position_count > 0 && (
+              {triple.counter_vault && triple.counter_vault.position_count > 0 && (
                 <ThemedText numberOfLines={1} style={styles.counterVault}>
                   ↓{' '}
                   {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.counter_vault.position_count}
