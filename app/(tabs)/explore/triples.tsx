@@ -69,7 +69,7 @@ export default function Triples() {
       {!loading && data && <FlashList
         data={data.triples}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <Triple triple={{ ...item, creator: item.creator! }} layout="list-item" />}
+        renderItem={({ item }) => <Triple triple={{ ...item, creator: item.creator! }} layout="swipeable" />}
         estimatedItemSize={150}
         onEndReached={() => {
           if (data.triples_aggregate.aggregate?.count && data.triples_aggregate.aggregate.count > data.triples.length) {

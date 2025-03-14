@@ -7,6 +7,7 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import Atom from '@/components/Atom';
 import { getUpvotes } from '@/hooks/useUpvotes';
+import SwipeableListItem from './SwipeableListItem';
 interface TripleData {
   id: string;
   subject: {
@@ -43,7 +44,7 @@ interface TripleData {
   };
 }
 
-type LayoutType = 'list-item' | 'details' | 'compact';
+type LayoutType = 'list-item' | 'details' | 'compact' | 'swipeable';
 
 interface TripleProps {
   triple: any;
@@ -52,6 +53,10 @@ interface TripleProps {
 
 const Triple: React.FC<TripleProps> = ({ triple, layout }) => {
   switch (layout) {
+    case 'swipeable':
+      return <SwipeableListItem>
+        <Triple triple={triple} layout="list-item" />
+      </SwipeableListItem>;
     case 'list-item':
       return (
         <ThemedView style={styles.listContainer}>

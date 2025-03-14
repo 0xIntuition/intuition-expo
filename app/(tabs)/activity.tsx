@@ -165,7 +165,7 @@ export function SignalListItem({ item }: { item: any }) {
         </Link>
       ) : (
 
-        <Triple triple={item.triple} layout="list-item" />
+        <Triple triple={item.triple} layout="swipeable" />
 
       )}
 
