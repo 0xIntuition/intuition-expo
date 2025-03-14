@@ -3,7 +3,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image } from 'expo-image';
 
 //@ts-ignore
-export default function Avatar({ image, style, size = 36 }) {
+export default function Avatar({ image, style, size = 36, radius = 999 }) {
   const SIZING = {
     height: size,
     width: size,
@@ -11,12 +11,13 @@ export default function Avatar({ image, style, size = 36 }) {
   return (
     <View style={style}>
       {image ? (
-        <Image source={image} style={[styles.avatar, SIZING]} />
+        <Image source={image} style={[styles.avatar, SIZING, { borderRadius: radius }]} />
       ) : (
         <View
           style={[
             styles.avatar,
             SIZING,
+            { borderRadius: radius }
           ]}>
           <Ionicons
             name="person-circle-outline"
@@ -33,7 +34,6 @@ const styles = StyleSheet.create({
   avatar: {
     height: 36,
     width: 36,
-    borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#ccc',

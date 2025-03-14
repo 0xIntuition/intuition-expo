@@ -63,9 +63,9 @@ export default function ExploreIndex() {
         </ThemedText>
       </Link>
       <Link href="/explore/lists" style={styles.item}>
-        <ThemedText style={styles.title}>Lists</ThemedText>
+        <ThemedText style={styles.title}>Collections</ThemedText>
         <ThemedText style={styles.count}>
-          - {loading ? '...' : data?.accounts_aggregate.aggregate?.count ?? 0}
+          - {loading ? '...' : data?.predicate_objects_aggregate.aggregate?.count ?? 0}
         </ThemedText>
       </Link>
     </ScrollView>

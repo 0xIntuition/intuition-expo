@@ -1,11 +1,12 @@
-import { View, StyleSheet, RefreshControl, ActivityIndicator } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
+import { View, StyleSheet, RefreshControl, ActivityIndicator, Pressable, useWindowDimensions } from 'react-native';
+import { MasonryFlashList } from '@shopify/flash-list';
 import { useQuery } from '@apollo/client';
 import Avatar from '@/components/Avatar';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { gql } from '@/lib/generated';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 const GetListsQuery = gql(`
 query GetLists($offset: Int) {
@@ -39,17 +40,19 @@ function shortId(id: string): string {
 export default function Accounts() {
 
   const { loading, error, data, refetch, fetchMore } = useQuery(GetListsQuery);
+  const width = useWindowDimensions().width;
 
 
   if (loading && !data) return <ActivityIndicator size="large" />;
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
-      {!loading && data && <FlashList
+      {!loading && data && <MasonryFlashList
+        numColumns={Math.floor(width / 200)}
         data={data.predicate_objects}
         keyExtractor={(item: any) => `${item.object.id}`}
         renderItem={({ item }: { item: any }) => <PredicateObjectListItem predicateObject={item} />}
-        estimatedItemSize={100}
+        estimatedItemSize={200}
         onEndReached={() => {
           if (data.predicate_objects_aggregate.aggregate?.count && data.predicate_objects_aggregate.aggregate.count > data.predicate_objects.length) {
             fetchMore({
@@ -80,20 +83,24 @@ export default function Accounts() {
   );
 }
 export function PredicateObjectListItem({ predicateObject }: { predicateObject: any }) {
+  const backgroundColor = useThemeColor({}, 'backgroundSecondary');
   return (
-    <ThemedView style={styles.listContainer}>
+    <ThemedView style={[styles.masonryContainer, { backgroundColor }]}>
 
       <Link
+        asChild
         href={{
           pathname: '/list/[id]',
           params: { id: predicateObject.object.id }
         }}>
-        <Avatar image={predicateObject.object.image} style={styles.avatar} />
+        <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Avatar image={predicateObject.object.image} style={styles.avatar} size={80} radius={10} />
 
-        <View>
-          <ThemedText style={styles.name}>{predicateObject.object.label}</ThemedText>
-          <ThemedText style={styles.secondary}>{predicateObject.triple_count} triples, {predicateObject.claim_count} claims </ThemedText>
-        </View>
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
+            <ThemedText style={styles.name}>{predicateObject.object.label}</ThemedText>
+            <ThemedText style={styles.secondary}>{predicateObject.triple_count} triples, {predicateObject.claim_count} claims </ThemedText>
+          </View>
+        </Pressable>
       </Link>
     </ThemedView>
   );
@@ -102,10 +109,12 @@ export function PredicateObjectListItem({ predicateObject }: { predicateObject: 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    paddingLeft: 16,
+    paddingLeft: 8,
+    paddingRight: 8,
   },
   listContainer: {
     flex: 1,
+    margin: 10,
     paddingVertical: 16,
     paddingRight: 36,
     borderBottomWidth: 1,
@@ -116,10 +125,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     marginRight: 10,
     padding: 10,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#ddd',
     borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatar: {
     marginRight: 10,
