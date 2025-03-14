@@ -10,7 +10,7 @@ import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
 import { relayStylePagination } from '@apollo/client/utilities';
 import { PrivyProvider, PrivyElements } from '@privy-io/expo';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useShareIntentContext } from "expo-share-intent";
 const client = new ApolloClient({
   uri: process.env.EXPO_PUBLIC_API_URL,
@@ -29,43 +29,45 @@ export default function App() {
   const colorScheme = useColorScheme();
 
   return (
-    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-      <ApolloProvider client={client}>
+    <GestureHandlerRootView>
+      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+        <ApolloProvider client={client}>
 
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="shareintent" options={{ headerShown: false, presentation: 'modal' }} />
-          <Stack.Screen
-            name="a"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="t"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="acc"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen
-            name="list"
-            options={{
-              presentation: 'modal',
-              headerShown: false,
-            }}
-          />
-          <Stack.Screen name="+not-found" />
-        </Stack>
-      </ApolloProvider>
-    </ThemeProvider>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="shareintent" options={{ headerShown: false, presentation: 'modal' }} />
+            <Stack.Screen
+              name="a"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="t"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="acc"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
+              name="list"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen name="+not-found" />
+          </Stack>
+        </ApolloProvider>
+      </ThemeProvider>
+    </GestureHandlerRootView>
   );
 }

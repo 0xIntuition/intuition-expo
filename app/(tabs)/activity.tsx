@@ -52,11 +52,13 @@ query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
     triple {
       id
       vault {
+        id
         current_share_price
         total_shares
         position_count
       }
       counter_vault {
+        id
         total_shares
         position_count
         current_share_price
@@ -165,7 +167,7 @@ export function SignalListItem({ item }: { item: any }) {
         </Link>
       ) : (
 
-        <Triple triple={item.triple} layout="list-item" />
+        <Triple triple={item.triple} layout="swipeable" />
 
       )}
 

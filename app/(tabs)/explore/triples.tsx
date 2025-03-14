@@ -1,15 +1,64 @@
 import { View, StyleSheet, RefreshControl, ActivityIndicator, Image } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@apollo/client';
 import React, { useState } from 'react';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { gql } from '@/lib/generated';
-import Triple from '@/components/Triple';
+import { gql } from '@apollo/client';
+import TriplesList from '@/components/TriplesList';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';
+import { usePrivy, useEmbeddedEthereumWallet } from '@privy-io/expo';
+
+// Define interfaces for our GraphQL query results
+export interface TripleItem {
+  id: string;
+  subject: {
+    id: string;
+    emoji?: string | null;
+    label?: string | null;
+    image?: string | null;
+  };
+  predicate: {
+    id: string;
+    emoji?: string | null;
+    label?: string | null;
+    image?: string | null;
+  };
+  object: {
+    id: string;
+    emoji?: string | null;
+    label?: string | null;
+    image?: string | null;
+  };
+  creator?: {
+    id: string;
+    label: string;
+    image?: string | null;
+  };
+  block_timestamp?: string;
+  vault?: {
+    id: string;
+    total_shares: string;
+    position_count: number;
+    current_share_price: string;
+    positions?: Array<{
+      shares: string;
+      account_id: string;
+    }>;
+  };
+  counter_vault?: {
+    id: string;
+    total_shares: string;
+    position_count: number;
+    current_share_price: string;
+    positions?: Array<{
+      shares: string;
+      account_id: string;
+    }>;
+  };
+}
 
 const GetTriplesQuery = gql(`
-query GetTriples($offset: Int) {
+query GetTriples($offset: Int, $address: String) {
   triples_aggregate {
     aggregate {
       count
@@ -17,7 +66,7 @@ query GetTriples($offset: Int) {
   }
   triples(order_by: { vault:  {
      total_shares: desc
-  } }, limit: 10, offset: $offset) {
+  } }, limit: 5, offset: $offset) {
     id
     subject {
       id
@@ -44,21 +93,34 @@ query GetTriples($offset: Int) {
     }
     block_timestamp
     vault {
+      id
       total_shares
       position_count
       current_share_price
+      positions(where: { account_id: {_eq: $address} }, limit: 1) {
+        shares
+        account_id
+      }
     }
     counter_vault {
+      id
       total_shares
       position_count
       current_share_price
+      positions(where: { account_id: {_eq: $address} }, limit: 1) {
+        shares
+        account_id
+      }
     }
   }
 }
 `);
 
 export default function Triples() {
-  const { loading, error, data, refetch, fetchMore } = useQuery(GetTriplesQuery, {
+  const { wallets } = useEmbeddedEthereumWallet();
+  const address = wallets[0]?.address?.toLowerCase() || '0x0000000000000000000000000000000000000000';
+  const { loading, error, data, refetch, fetchMore, variables } = useQuery(GetTriplesQuery, {
+    variables: { address }
   });
 
   if (loading && !data) return <ActivityIndicator size="large" />;
@@ -66,37 +128,41 @@ export default function Triples() {
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
-      {!loading && data && <FlashList
-        data={data.triples}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <Triple triple={{ ...item, creator: item.creator! }} layout="list-item" />}
-        estimatedItemSize={150}
-        onEndReached={() => {
-          if (data.triples_aggregate.aggregate?.count && data.triples_aggregate.aggregate.count > data.triples.length) {
-            fetchMore({
-              variables: {
-                offset: data.triples.length,
-              },
-              updateQuery: (previousResult, { fetchMoreResult }) => {
-                if (!fetchMoreResult) return previousResult;
-                return {
-                  ...previousResult,
-                  triples_aggregate: fetchMoreResult.triples_aggregate,
-                  triples: [...previousResult.triples, ...fetchMoreResult.triples],
-                };
-              },
-            });
-          }
-        }}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={loading ? <ActivityIndicator /> : null}
-        refreshControl={
-          <RefreshControl
-            refreshing={loading}
-            onRefresh={() => refetch({ offset: 0 })}
-          />
-        }
-      />}
+      {data && (
+        <TriplesList
+          triples={data.triples.map((item: TripleItem) => ({
+            ...item,
+            creator: item.creator ? {
+              id: item.creator.id,
+              label: item.creator.label,
+              image: item.creator.image || undefined
+            } : undefined,
+
+          }))}
+          onRefresh={() => refetch({ offset: 0, address })}
+          onRefetch={() => refetch({ offset: variables?.offset || 0, address })}
+          onEndReached={() => {
+            if (data.triples_aggregate.aggregate?.count && data.triples_aggregate.aggregate.count > data.triples.length) {
+              fetchMore({
+                variables: {
+                  offset: data.triples.length,
+                  address
+                },
+                updateQuery: (previousResult, { fetchMoreResult }) => {
+                  if (!fetchMoreResult) return previousResult;
+                  return {
+                    ...previousResult,
+                    triples_aggregate: fetchMoreResult.triples_aggregate,
+                    triples: [...previousResult.triples, ...fetchMoreResult.triples],
+                  };
+                },
+              });
+            }
+          }}
+          onEndReachedThreshold={0.5}
+          loading={loading}
+        />
+      )}
     </ThemedView>
   );
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { Link } from 'expo-router';
 import { formatDistanceToNow } from 'date-fns';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -7,27 +7,23 @@ import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import Atom from '@/components/Atom';
 import { getUpvotes } from '@/hooks/useUpvotes';
+import SwipeableListItem from './SwipeableListItem';
+import { useThemeColor } from '@/hooks/useThemeColor';
+
+// Define an interface for the Atom data structure
+interface AtomData {
+  id: string;
+  emoji?: string;
+  label?: string;
+  image?: string;
+}
+
 interface TripleData {
   id: string;
-  subject: {
-    id: string;
-    emoji?: string | null;
-    label?: string | null;
-    image?: string | null;
-  };
-  predicate: {
-    id: string;
-    emoji?: string | null;
-    label?: string | null;
-    image?: string | null;
-  };
-  object: {
-    id: string;
-    emoji?: string | null;
-    label?: string | null;
-    image?: string | null;
-  };
-  creator: {
+  subject: AtomData;
+  predicate: AtomData;
+  object: AtomData;
+  creator?: {
     id: string;
     label: string;
     image?: string;
@@ -36,22 +32,50 @@ interface TripleData {
   vault?: {
     total_shares: string;
     position_count: number;
+    current_share_price: string;
+    positions?: Array<{
+      shares: string;
+      account: {
+        id: string;
+        image?: string;
+        label?: string;
+      }
+    }>;
   };
   counter_vault?: {
     total_shares: string;
     position_count: number;
+    current_share_price: string;
+    positions?: Array<{
+      shares: string;
+      account: {
+        id: string;
+        image?: string;
+        label?: string;
+      }
+    }>;
   };
 }
 
-type LayoutType = 'list-item' | 'details' | 'compact';
+type LayoutType = 'list-item' | 'details' | 'compact' | 'swipeable';
 
 interface TripleProps {
-  triple: any;
+  triple: TripleData;
   layout: LayoutType;
+  onUpvote?: () => Promise<void>;
+  onDownvote?: () => Promise<void>;
+  inProgress?: boolean;
 }
 
-const Triple: React.FC<TripleProps> = ({ triple, layout }) => {
+const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, inProgress }) => {
+  const textColor = useThemeColor({}, 'text');
   switch (layout) {
+    case 'swipeable':
+      return <SwipeableListItem
+        onLeftSwipe={inProgress ? undefined : onUpvote}
+        onRightSwipe={inProgress ? undefined : onDownvote}>
+        <Triple triple={triple} layout="list-item" inProgress={inProgress} />
+      </SwipeableListItem>;
     case 'list-item':
       return (
         <ThemedView style={styles.listContainer}>
@@ -60,7 +84,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout }) => {
               <Link href={{ pathname: '/acc/[id]', params: { id: triple.creator.id } }}>
                 <ThemedText style={styles.secondary}>{triple.creator.label}</ThemedText>
               </Link>
-              {triple.block_timestamp !== null && (
+              {triple.block_timestamp && (
                 <ThemedText style={styles.date}>
                   {formatDistanceToNow(new Date(parseInt(triple.block_timestamp) * 1000), { addSuffix: true })}
                 </ThemedText>
@@ -76,21 +100,36 @@ const Triple: React.FC<TripleProps> = ({ triple, layout }) => {
             </View>
           </Link>
 
-          {triple.vault && (
-            <View style={styles.positionsRow}>
+          <View style={styles.positionsColumn}>
+            {inProgress && (
+
+              <ActivityIndicator size="small" color={textColor} style={{ position: 'absolute', top: 0, right: 0 }} />
+
+            )}
+            {triple.vault && (
               <ThemedText numberOfLines={1}>
                 ↑{' '}
-                {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.vault.position_count}
-              </ThemedText>
+                {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.vault.position_count}
 
-              {triple.counter_vault?.position_count !== null && triple.counter_vault.position_count > 0 && (
-                <ThemedText numberOfLines={1} style={styles.counterVault}>
-                  ↓{' '}
-                  {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.counter_vault.position_count}
-                </ThemedText>
-              )}
-            </View>
-          )}
+                {triple.vault.positions != null && triple.vault.positions.length > 0 && (" ∙ ")}
+                {triple.vault.positions != null && triple.vault.positions.length > 0 && (<Ionicons size={13} name='person-outline' style={{ marginLeft: 4 }} />)}
+                {triple.vault.positions != null && triple.vault.positions.length > 0 && getUpvotes(BigInt(triple.vault.positions[0].shares), BigInt(triple.vault.current_share_price)).toString(10)}
+              </ThemedText>
+            )}
+
+
+
+            {triple.counter_vault && triple.counter_vault.position_count > 0 && (
+              <ThemedText numberOfLines={1} style={styles.counterVault}>
+                ↓{' '}
+                {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.counter_vault.position_count}
+                {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (" ∙ ")}
+                {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (<Ionicons size={13} name='person-outline' style={{ marginLeft: 4 }} />)}
+                {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && getUpvotes(BigInt(triple.counter_vault.positions[0].shares), BigInt(triple.counter_vault.current_share_price)).toString(10)}
+              </ThemedText>
+            )}
+          </View>
+
         </ThemedView>
       );
 
@@ -143,9 +182,11 @@ const styles = StyleSheet.create({
   },
   secondary: {
     color: '#888',
+    fontSize: 12,
   },
   vaultLink: {
     marginTop: 10,
+    flex: 1,
   },
   vaultContent: {
     flex: 1,
@@ -158,8 +199,8 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(100,100,100,0.5)',
     borderRadius: 8,
   },
-  positionsRow: {
-    flexDirection: 'row',
+  positionsColumn: {
+    flexDirection: 'column',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginTop: 16,
@@ -180,6 +221,7 @@ const styles = StyleSheet.create({
     wordWrap: 'break-word',
     paddingBottom: 16,
   },
+
 });
 
 export default Triple; 
