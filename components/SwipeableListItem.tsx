@@ -4,13 +4,13 @@ import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
 
 const LeftSwipeActions = () => (
   <View style={styles.leftAction}>
-    <Text style={styles.actionText}>Upvote</Text>
+    <Text style={styles.actionText}>↑</Text>
   </View>
 );
 
 const RightSwipeActions = () => (
   <View style={styles.rightAction}>
-    <Text style={styles.actionText}>Downvote</Text>
+    <Text style={styles.actionText}>↓</Text>
   </View>
 );
 
@@ -62,9 +62,9 @@ const SwipeableListItem = ({
 };
 
 const styles = StyleSheet.create({
-  leftAction: { backgroundColor: 'green', justifyContent: 'center', padding: 20 },
-  rightAction: { backgroundColor: 'red', justifyContent: 'center', padding: 20 },
-  actionText: { color: '#fff', fontWeight: 'bold' },
+  leftAction: { backgroundColor: '#2E8B57', justifyContent: 'center', padding: 20 },
+  rightAction: { backgroundColor: '#CD5C5C', justifyContent: 'center', padding: 20 },
+  actionText: { color: '#fff', fontWeight: 'bold', fontSize: 40 },
 });
 
 export default SwipeableListItem;
