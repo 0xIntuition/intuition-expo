@@ -104,7 +104,11 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
             <View style={styles.positionsRow}>
               <ThemedText numberOfLines={1}>
                 ↑{' '}
-                {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.vault.position_count}
+                {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.vault.position_count}
+
+                {triple.vault.positions && triple.vault.positions.length > 0 && (" ∙ ")}
+                {triple.vault.positions && triple.vault.positions.length > 0 && (<Ionicons size={13} name='person-outline' style={{ marginLeft: 4 }} />)}
+                {triple.vault.positions && triple.vault.positions.length > 0 && getUpvotes(BigInt(triple.vault.positions[0].shares), BigInt(triple.vault.current_share_price)).toString(10)}
               </ThemedText>
 
               {inProgress && (
@@ -116,7 +120,10 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
               {triple.counter_vault && triple.counter_vault.position_count > 0 && (
                 <ThemedText numberOfLines={1} style={styles.counterVault}>
                   ↓{' '}
-                  {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.counter_vault.position_count}
+                  {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.counter_vault.position_count}
+                  {triple.counter_vault.positions && triple.counter_vault.positions.length > 0 && (" ∙ ")}
+                  {triple.counter_vault.positions && triple.counter_vault.positions.length > 0 && (<Ionicons size={13} name='person-outline' style={{ marginLeft: 4 }} />)}
+                  {triple.counter_vault.positions && triple.counter_vault.positions.length > 0 && getUpvotes(BigInt(triple.counter_vault.positions[0].shares), BigInt(triple.counter_vault.current_share_price)).toString(10)}
                 </ThemedText>
               )}
             </View>
@@ -190,7 +197,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   positionsRow: {
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
     marginTop: 16,

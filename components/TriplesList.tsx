@@ -16,7 +16,7 @@ interface TriplesListProps {
   loading?: boolean;
 }
 
-const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh }) => {
+const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onEndReached, onEndReachedThreshold, loading }) => {
   const { isReady } = usePrivy();
   const { wallets } = useEmbeddedEthereumWallet();
   const address = wallets[0]?.address.toLowerCase() || '0x0000000000000000000000000000000000000000';
@@ -102,6 +102,10 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh }) => {
 
       <FlatList
         data={triples}
+        onEndReached={onEndReached}
+        onRefresh={onRefresh}
+        refreshing={loading}
+        onEndReachedThreshold={onEndReachedThreshold}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => {
           // Convert null values to undefined to satisfy type requirements
