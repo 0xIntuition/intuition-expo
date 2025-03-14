@@ -1,4 +1,4 @@
-import { View, StyleSheet, RefreshControl, ActivityIndicator, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, RefreshControl, ActivityIndicator, useWindowDimensions, Pressable } from 'react-native';
 import { MasonryFlashList } from '@shopify/flash-list';
 import { useQuery } from '@apollo/client';
 import Avatar from '@/components/Avatar';
@@ -8,6 +8,7 @@ import { Link } from 'expo-router';
 import { gql } from '@/lib/generated';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { numberFormatter } from '@/lib/utils';
 const GetAccountsQuery = gql(`
 query GetAccounts($offset: Int, $orderBy: [accounts_order_by!]) {
   accounts_aggregate(where: { type: { _eq: Default } }) {
@@ -111,19 +112,22 @@ export function AccountListItem({ account }: { account: any }) {
     <ThemedView style={[styles.masonryContainer, { backgroundColor }]}>
 
       <Link
+        asChild
         href={{
           pathname: '/acc/[id]',
           params: { id: account.id }
         }}>
-        <Avatar image={getImage(account)} style={styles.avatar} size={80} radius={10} />
+        <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Avatar image={getImage(account)} style={styles.avatar} size={100} radius={10} />
 
-        <View>
           {account.label.toLowerCase() !== shortId(account.id).toLowerCase() && <ThemedText style={styles.name}>{account.label}</ThemedText>}
-          <ThemedText style={styles.secondary}>{account.signals_aggregate.aggregate.count} <Ionicons size={13} name='volume-high-outline' style={{ marginLeft: 4 }} /></ThemedText>
+          <View style={{ flexDirection: 'row', alignItems: 'center', }}>
+            <ThemedText style={styles.secondary}><Ionicons size={13} name='volume-high-outline' style={{ marginLeft: 4 }} /> {numberFormatter.format(account.signals_aggregate.aggregate.count)} </ThemedText>
 
-          <ThemedText style={styles.secondary}>{account.claims_aggregate.aggregate.count} <Ionicons size={13} name='color-filter-outline' style={{ marginLeft: 4 }} /></ThemedText>
+            <ThemedText style={styles.secondary}><Ionicons size={13} name='color-filter-outline' style={{ marginLeft: 4 }} /> {numberFormatter.format(account.claims_aggregate.aggregate.count)} </ThemedText>
+          </View>
           <ThemedText style={styles.tertiary}>{shortId(account.id)}</ThemedText>
-        </View>
+        </Pressable>
       </Link>
     </ThemedView>
   );
@@ -154,9 +158,9 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   name: {
-    fontSize: 15,
+    fontSize: 13,
     fontWeight: '500',
-    marginBottom: 2,
+
   },
   secondary: {
     color: '#888',

@@ -20,7 +20,7 @@ export default function Avatar({ image, style, size = 36, radius = 999 }) {
             { borderRadius: radius }
           ]}>
           <Ionicons
-            name="person-circle-outline"
+            name="image-outline"
             size={(size * 2) / 3}
             color="rgba(255,255,255,.8)"
           />
@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
     width: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#ccc',
   },
 });
 
