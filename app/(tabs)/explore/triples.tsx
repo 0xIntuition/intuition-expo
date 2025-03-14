@@ -9,7 +9,7 @@ import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 import { usePrivy, useEmbeddedEthereumWallet } from '@privy-io/expo';
 
 // Define interfaces for our GraphQL query results
-interface TripleItem {
+export interface TripleItem {
   id: string;
   subject: {
     id: string;
@@ -36,6 +36,7 @@ interface TripleItem {
   };
   block_timestamp?: string;
   vault?: {
+    id: string;
     total_shares: string;
     position_count: number;
     current_share_price: string;
@@ -45,9 +46,14 @@ interface TripleItem {
     }>;
   };
   counter_vault?: {
+    id: string;
     total_shares: string;
     position_count: number;
     current_share_price: string;
+    positions?: Array<{
+      shares: string;
+      account_id: string;
+    }>;
   };
 }
 
@@ -87,6 +93,7 @@ query GetTriples($offset: Int, $address: String) {
     }
     block_timestamp
     vault {
+      id
       total_shares
       position_count
       current_share_price
@@ -96,9 +103,14 @@ query GetTriples($offset: Int, $address: String) {
       }
     }
     counter_vault {
+      id
       total_shares
       position_count
       current_share_price
+      positions(where: { account_id: {_eq: $address} }, limit: 1) {
+        shares
+        account_id
+      }
     }
   }
 }
@@ -125,8 +137,7 @@ export default function Triples() {
               label: item.creator.label,
               image: item.creator.image || undefined
             } : undefined,
-            // Extract positions if they exist to make it easier to work with in TriplesList
-            positions: item.vault?.positions || []
+
           }))}
           onRefresh={() => refetch({ offset: 0, address })}
           onEndReached={() => {

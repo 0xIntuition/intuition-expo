@@ -6,9 +6,10 @@ import { ThemedView } from '@/components/ThemedView';
 import Triple from '@/components/Triple';
 import { getMultiVault, useWaitForTransactionEvents } from '@/hooks/useMultiVault';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';
+import { TripleItem } from '@/app/(tabs)/explore/triples';
 
 interface TriplesListProps {
-  triples: any[];
+  triples: TripleItem[];
   onRefresh?: () => void;
   onEndReached?: () => void;
   onEndReachedThreshold?: number;
@@ -102,34 +103,64 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh }) => {
       <FlatList
         data={triples}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Triple
-            triple={item}
-            layout="swipeable"
-            onUpvote={async () => {
-              try {
-                await handleTripleDeposit(item.id);
-              } catch (e) {
-                console.error(e);
-              }
-            }}
-            onDownvote={async () => {
-              // Check if user has any position (shares) before attempting withdrawal
-              const userPosition = item.positions?.find((pos: any) =>
-                pos.account_id === address);
+        renderItem={({ item }) => {
+          // Convert null values to undefined to satisfy type requirements
+          const tripleData = {
+            ...item,
+            subject: {
+              ...item.subject,
+              emoji: item.subject.emoji || undefined,
+              label: item.subject.label || undefined,
+              image: item.subject.image || undefined
+            },
+            predicate: {
+              ...item.predicate,
+              emoji: item.predicate.emoji || undefined,
+              label: item.predicate.label || undefined,
+              image: item.predicate.image || undefined
+            },
+            object: {
+              ...item.object,
+              emoji: item.object.emoji || undefined,
+              label: item.object.label || undefined,
+              image: item.object.image || undefined
+            },
+            creator: item.creator ? {
+              ...item.creator,
+              image: item.creator.image || undefined
+            } : undefined
+          };
 
-              if (userPosition && userPosition.shares) {
+          return (
+            <Triple
+              triple={tripleData as any}
+              layout="swipeable"
+              inProgress={actionInProgress}
+              onUpvote={async () => {
                 try {
-                  await handleWithdraw(item.id, BigInt(userPosition.shares));
+                  await handleTripleDeposit(item.id);
                 } catch (e) {
                   console.error(e);
                 }
-              } else {
-                setErrorMessage('No position to withdraw');
-              }
-            }}
-          />
-        )}
+              }}
+              onDownvote={async () => {
+                // Check if user has any position (shares) before attempting withdrawal
+                const userPosition = item.vault?.positions?.find((pos: any) =>
+                  pos.account_id === address);
+
+                if (userPosition && userPosition.shares) {
+                  try {
+                    await handleWithdraw(item.id, BigInt(userPosition.shares));
+                  } catch (e) {
+                    console.error(e);
+                  }
+                } else {
+                  setErrorMessage('No position to withdraw');
+                }
+              }}
+            />
+          );
+        }}
       />
     </ThemedView>
   );

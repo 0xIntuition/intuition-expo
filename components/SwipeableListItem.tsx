@@ -34,19 +34,17 @@ const SwipeableListItem = ({
 
   const handleSwipeableOpen = (direction: 'left' | 'right') => {
     if (direction === 'left' && onLeftSwipe) {
-      onLeftSwipe().then(() => {
-        if (swipeableRef.current) {
-          console.log('closing swipeable');
-          swipeableRef.current.close();
-        }
-      });
+      onLeftSwipe();
+      if (swipeableRef.current) {
+        console.log('closing swipeable');
+        swipeableRef.current.close();
+      }
     } else if (direction === 'right' && onRightSwipe) {
-      onRightSwipe().then(() => {
-        if (swipeableRef.current) {
-          console.log('closing swipeable');
-          swipeableRef.current.close();
-        }
-      });
+      onRightSwipe();
+      if (swipeableRef.current) {
+        console.log('closing swipeable');
+        swipeableRef.current.close();
+      }
     }
   };
 
@@ -55,6 +53,7 @@ const SwipeableListItem = ({
       ref={swipeableRef as any}
       renderLeftActions={LeftSwipeActions}
       renderRightActions={RightSwipeActions}
+      enabled={!!(onLeftSwipe || onRightSwipe)}
       onSwipeableOpen={(direction) => handleSwipeableOpen(direction as 'left' | 'right')}
     >
       {children}

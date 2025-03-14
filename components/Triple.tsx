@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, ActivityIndicator } from 'react-native';
 import { Link } from 'expo-router';
 import { formatDistanceToNow } from 'date-fns';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -8,6 +8,7 @@ import { ThemedView } from '@/components/ThemedView';
 import Atom from '@/components/Atom';
 import { getUpvotes } from '@/hooks/useUpvotes';
 import SwipeableListItem from './SwipeableListItem';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 // Define an interface for the Atom data structure
 interface AtomData {
@@ -63,15 +64,17 @@ interface TripleProps {
   layout: LayoutType;
   onUpvote?: () => Promise<void>;
   onDownvote?: () => Promise<void>;
+  inProgress?: boolean;
 }
 
-const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote }) => {
+const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, inProgress }) => {
+  const textColor = useThemeColor({}, 'text');
   switch (layout) {
     case 'swipeable':
       return <SwipeableListItem
-        onLeftSwipe={onUpvote}
-        onRightSwipe={onDownvote}>
-        <Triple triple={triple} layout="list-item" />
+        onLeftSwipe={inProgress ? undefined : onUpvote}
+        onRightSwipe={inProgress ? undefined : onDownvote}>
+        <Triple triple={triple} layout="list-item" inProgress={inProgress} />
       </SwipeableListItem>;
     case 'list-item':
       return (
@@ -104,6 +107,12 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote })
                 {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='person' /> {triple.vault.position_count}
               </ThemedText>
 
+              {inProgress && (
+
+                <ActivityIndicator size="small" color={textColor} />
+
+              )}
+
               {triple.counter_vault && triple.counter_vault.position_count > 0 && (
                 <ThemedText numberOfLines={1} style={styles.counterVault}>
                   ↓{' '}
@@ -112,6 +121,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote })
               )}
             </View>
           )}
+
         </ThemedView>
       );
 
@@ -201,6 +211,7 @@ const styles = StyleSheet.create({
     wordWrap: 'break-word',
     paddingBottom: 16,
   },
+
 });
 
 export default Triple; 
