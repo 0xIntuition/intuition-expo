@@ -126,8 +126,8 @@ const Triple: React.FC<TripleProps> = ({ triple, layout }) => {
 const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
-    paddingVertical: 16,
     paddingRight: 16,
+    paddingBottom: 16,
     borderBottomWidth: 1,
     borderBottomColor: 'rgba(100,100,100,0.5)',
   },
@@ -135,6 +135,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    paddingTop: 8,
   },
   date: {
     fontSize: 11,
@@ -153,7 +154,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     flexWrap: 'wrap',
     padding: 8,
-    marginTop: 8,
     borderWidth: 1,
     borderColor: 'rgba(100,100,100,0.5)',
     borderRadius: 8,

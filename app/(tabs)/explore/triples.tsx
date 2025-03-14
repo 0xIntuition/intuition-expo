@@ -101,105 +101,10 @@ export default function Triples() {
   );
 }
 
-
 const styles = StyleSheet.create({
-  counterVault: {
-    // color: 'red'
-  },
-  vaultLink: {
-    marginTop: 10,
-  },
-  positionsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginTop: 16,
-  },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  date: {
-    fontSize: 11,
-    color: '#888',
-
-  },
-  shortText: {
-    fontSize: 11,
-  },
-  image: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 5,
-  },
-  vaultContent: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
-    padding: 8,
-    marginTop: 8,
-
-    borderWidth: 1,
-    borderColor: 'rgba(100,100,100,0.5)',
-    borderRadius: 8,
-  },
   container: {
     flex: 1,
     paddingLeft: 16,
-  },
-  listContainer: {
-    flex: 1,
-    paddingVertical: 16,
-    paddingRight: 36,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(100,100,100,0.5)',
-  },
-  masonryContainer: {
-    flex: 1,
-    marginTop: 10,
-    marginRight: 10,
-    padding: 10,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#ddd',
-    borderRadius: 8,
-  },
-  avatar: {
-    marginRight: 10,
-  },
-  name: {
-    fontSize: 15,
-    fontWeight: '500',
-    marginBottom: 2,
-  },
-  secondary: {
-    color: '#888',
-
-  },
-  profileLayout: {
-    flexDirection: 'row',
-    marginBottom: 12,
-  },
-  interactionsLayout: {
-    flexDirection: 'row',
-  },
-  header: {
-    flexDirection: 'row',
-    alignContent: 'space-between',
-  },
-  interaction: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    color: '#aaa',
-    marginRight: 20,
-    marginTop: 12,
-  },
-  icon: {
-    marginRight: 4,
   },
 });
 

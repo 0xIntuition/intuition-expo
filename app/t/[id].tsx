@@ -1,4 +1,4 @@
-import { Button, View, Pressable } from 'react-native';
+import { Button, View, Pressable, ScrollView } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery, gql } from '@apollo/client';
@@ -17,16 +17,17 @@ import { ListItem } from '@/components/list-item';
 import { getUpvotes } from '@/hooks/useUpvotes';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import Triple from '@/components/Triple';
 const GET_TRIPLE = gql`
 query Triple ($id: numeric!, $address: String){
   triple(id: $id) {
     id
     vault_id
-      vault {
+    vault {
       total_shares
       position_count
       current_share_price
-      positions(order_by: { shares: desc }, limit: 5) {
+      positions(order_by: { shares: desc }, limit: 15) {
         shares
         account {
           id
@@ -35,7 +36,19 @@ query Triple ($id: numeric!, $address: String){
         }
       }
     }
-
+    counter_vault {
+      total_shares
+      position_count
+      current_share_price
+      positions(order_by: { shares: desc }, limit: 15) {
+        shares
+        account {
+          id
+          image
+          label
+        }
+      }
+    }
       subject {
         id
         emoji
@@ -60,7 +73,7 @@ query Triple ($id: numeric!, $address: String){
   }
 }`;
 
-export default function Triple() {
+export default function TriplePage() {
   const textColor = useThemeColor({}, 'text');
   const { id } = useLocalSearchParams();
   const { isReady } = usePrivy();
@@ -157,82 +170,69 @@ export default function Triple() {
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerRight: () => <Pressable onPress={async () => {
-            await shareAsync('https://app.i7n.xyz/t/' + id);
-          }} style={{ marginRight: 10 }}>
-            <Ionicons name="share-outline" size={24} color={textColor} />
-          </Pressable>,
-        }}
-      />
-      <View style={styles.vaultContent}>
-        <Link href={{
-          pathname: '/a/[id]',
-          params: { id: triple.subject.id }
-        }}>
-          <Atom atom={triple.subject} layout='text-avatar' />
-        </Link>
-        <Link href={{
-          pathname: '/a/[id]',
-          params: { id: triple.predicate.id }
-        }}>
-          <Atom atom={triple.predicate} layout='text-avatar' />
-        </Link>
-        <Link href={{
-          pathname: '/a/[id]',
-          params: { id: triple.object.id }
-        }}>
-          <Atom atom={triple.object} layout='text-avatar' />
-        </Link>
-      </View>
-
-      <Section>
-        {data && data.positions && data.positions.length > 0 && (
-          <ListItem
-            label="My upvotes"
-            value={`↑ ${(getUpvotes(BigInt(data.positions[0].shares), BigInt(data.triple.vault.current_share_price))).toString(10)}`}
-          />
-        )}
-        <ListItem
-          label="Total upvotes"
-          subLabel={`Voters: ${triple.vault.position_count}`}
-          value={`↑ ${(getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price))).toString(10)}`}
-          last
+    <ScrollView>
+      <ThemedView style={styles.container}>
+        <Stack.Screen
+          options={{
+            title: triple.object.label,
+            headerRight: () => <Pressable onPress={async () => {
+              await shareAsync('https://app.i7n.xyz/t/' + id);
+            }} style={{ marginRight: 10 }}>
+              <Ionicons name="share-outline" size={24} color={textColor} />
+            </Pressable>,
+          }}
         />
-      </Section>
+        <View style={{ padding: 8 }}>
+          <Triple triple={triple} layout="list-item" />
+        </View>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'center', padding: 8 }}>
-        {signalInProgress ? (
-          <ThemedText>Signal in progress...</ThemedText>
-        ) : (
-          <>
-            {isReady && <Button title="Triple Upvote +↑" onPress={handleTripleDeposit} />}
-            {data?.positions && data?.positions.length > 0 && (
-              <Button title="Withdraw all" onPress={() => handleWithdraw(BigInt(data?.positions[0]?.shares))} />
-            )}
-          </>
-        )}
-      </View>
-      {errorMesage && <ThemedText>{errorMesage}</ThemedText>}
 
-      <Section title="Top Upvoters">
-        {triple.vault.positions.map((pos: { shares: string; account: { id: string; image?: string; label?: string } }) => {
-          const { shares, account } = pos;
-          return (
+        <Section>
+          {data && data.positions && data.positions.length > 0 && (
             <ListItem
-              key={account.id}
-              id={account.id as `0x${string}`}
-              image={account.image || ''}
-              label={account.label || ''}
-              href={{ pathname: '/acc/[id]', params: { id: account.id } }}
-              value={`↑ ${(getUpvotes(BigInt(shares), BigInt(triple.vault.current_share_price))).toString(10)}`}
+              label="My upvotes"
+              value={`↑ ${(getUpvotes(BigInt(data.positions[0].shares), BigInt(data.triple.vault.current_share_price))).toString(10)}`}
             />
-          );
-        })}
-      </Section>
-    </ThemedView>
+          )}
+          <ListItem
+            label="Total upvotes"
+            subLabel={`Voters: ${triple.vault.position_count}`}
+            value={`↑ ${(getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price))).toString(10)}`}
+            last
+          />
+        </Section>
+
+        <View style={{ flexDirection: 'row', justifyContent: 'center', padding: 8 }}>
+          {signalInProgress ? (
+            <ThemedText>Signal in progress...</ThemedText>
+          ) : (
+            <>
+              {isReady && <Button title="Triple Upvote +↑" onPress={handleTripleDeposit} />}
+              {data?.positions && data?.positions.length > 0 && (
+                <Button title="Withdraw all" onPress={() => handleWithdraw(BigInt(data?.positions[0]?.shares))} />
+              )}
+            </>
+          )}
+        </View>
+        {errorMesage && <ThemedText>{errorMesage}</ThemedText>}
+
+        <Section title="Top Upvoters">
+          {triple.vault.positions.map((pos: { shares: string; account: { id: string; image?: string; label?: string } }) => {
+            const { shares, account } = pos;
+            return (
+              <ListItem
+                key={account.id}
+                id={account.id as `0x${string}`}
+                image={account.image || ''}
+                label={account.label || ''}
+                href={{ pathname: '/acc/[id]', params: { id: account.id } }}
+                value={`↑ ${(getUpvotes(BigInt(shares), BigInt(triple.vault.current_share_price))).toString(10)}`}
+              />
+            );
+          })}
+        </Section>
+      </ThemedView>
+    </ScrollView>
   );
 }
 

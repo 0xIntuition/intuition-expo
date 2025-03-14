@@ -44,6 +44,8 @@ query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
       type
       vault {
         current_share_price
+        total_shares
+        position_count
       }
     }
 
@@ -51,7 +53,15 @@ query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
       id
       vault {
         current_share_price
+        total_shares
+        position_count
       }
+      counter_vault {
+        total_shares
+        position_count
+        current_share_price
+      }
+
       subject {
         id
         image
@@ -155,7 +165,7 @@ export function SignalListItem({ item }: { item: any }) {
         </Link>
       ) : (
 
-        <Triple triple={item.triple} layout="compact" />
+        <Triple triple={item.triple} layout="list-item" />
 
       )}
 
@@ -165,12 +175,12 @@ export function SignalListItem({ item }: { item: any }) {
 
 const styles = StyleSheet.create({
   vaultLink: {
-    marginTop: 10,
   },
   topRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
+    paddingTop: 8,
   },
   date: {
     fontSize: 11,
@@ -209,10 +219,6 @@ const styles = StyleSheet.create({
   listContainer: {
     flex: 1,
     paddingRight: 16,
-    paddingTop: 8,
-    paddingBottom: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(100,100,100,0.5)',
   },
   masonryContainer: {
     flex: 1,
