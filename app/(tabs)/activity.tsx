@@ -1,5 +1,5 @@
 import { StyleSheet, ActivityIndicator, RefreshControl, useWindowDimensions, View } from 'react-native';
-import { FlashList } from '@shopify/flash-list';
+import { FlashList, MasonryFlashList } from '@shopify/flash-list';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { formatDistanceToNow } from 'date-fns';
@@ -106,10 +106,11 @@ export default function Signals() {
   if (loading && !data) return <ActivityIndicator size="large" />;
 
   return (
-    <ThemedView style={[styles.container, isWideScreen && styles.wideContainer]}>
+    <ThemedView style={[styles.container,]}>
       <View style={styles.wideInner}>
         {error && <ThemedText>{error.message}</ThemedText>}
-        {!loading && data && <FlashList
+        {!loading && data && <MasonryFlashList
+          numColumns={Math.floor(width / 250)}
           data={data.signals}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (<SignalListItem item={item} />)}
