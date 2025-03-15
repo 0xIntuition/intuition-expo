@@ -69,6 +69,7 @@ interface TripleProps {
 
 const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, inProgress }) => {
   const textColor = useThemeColor({}, 'text');
+  const backgroundColor = useThemeColor({}, 'backgroundSecondary');
   switch (layout) {
     case 'swipeable':
       return <SwipeableListItem
@@ -78,22 +79,11 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
       </SwipeableListItem>;
     case 'list-item':
       return (
-        <ThemedView style={styles.listContainer}>
-          {triple.creator && (
-            <View style={styles.topRow}>
-              <Link href={{ pathname: '/acc/[id]', params: { id: triple.creator.id } }}>
-                <ThemedText style={styles.secondary}>{triple.creator.label}</ThemedText>
-              </Link>
-              {triple.block_timestamp && (
-                <ThemedText style={styles.date}>
-                  {formatDistanceToNow(new Date(parseInt(triple.block_timestamp) * 1000), { addSuffix: true })}
-                </ThemedText>
-              )}
-            </View>
-          )}
+        <ThemedView style={[styles.listContainer]}>
+
 
           <Link style={styles.vaultLink} href={{ pathname: '/t/[id]', params: { id: triple.id } }}>
-            <View style={styles.vaultContent}>
+            <View style={[styles.vaultContent, { backgroundColor }]}>
               <Atom atom={triple.subject} layout='text-avatar' />
               <Atom atom={triple.predicate} layout='text-avatar' />
               <Atom atom={triple.object} layout='text-avatar' />
@@ -107,7 +97,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
 
             )}
             {triple.vault && (
-              <ThemedText numberOfLines={1}>
+              <ThemedText numberOfLines={1} style={styles.secondary}>
                 ↑{' '}
                 {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.vault.position_count}
 
@@ -120,7 +110,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
 
 
             {triple.counter_vault && triple.counter_vault.position_count > 0 && (
-              <ThemedText numberOfLines={1} style={styles.counterVault}>
+              <ThemedText numberOfLines={1} style={styles.secondary}>
                 ↓{' '}
                 {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.counter_vault.position_count}
                 {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (" ∙ ")}
@@ -167,8 +157,6 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingRight: 16,
     paddingBottom: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(100,100,100,0.5)',
   },
   topRow: {
     flexDirection: 'row',
@@ -181,7 +169,7 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   secondary: {
-    color: '#888',
+    opacity: 0.6,
     fontSize: 12,
   },
   vaultLink: {
@@ -190,24 +178,16 @@ const styles = StyleSheet.create({
   },
   vaultContent: {
     flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexWrap: 'wrap',
     padding: 8,
-    borderWidth: 1,
-    borderColor: 'rgba(100,100,100,0.5)',
     borderRadius: 8,
   },
   positionsColumn: {
     flexDirection: 'column',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginTop: 16,
+    marginTop: 6,
   },
-  counterVault: {
-    // color: 'red'
-  },
+
   detailsContainer: {
     padding: 16,
   },

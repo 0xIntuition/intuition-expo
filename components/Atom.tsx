@@ -46,8 +46,8 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
               style={styles.avatar}
             />
           )}
-          <ThemedText style={[styles.text, { marginLeft: 8, marginRight: 8, textOverflow: 'ellipsis', overflow: 'hidden' }]}>
-            {!imageUrl ? `${atom.emoji} ` : ''}{atom.label}
+          <ThemedText style={[styles.text, { textOverflow: 'ellipsis', overflow: 'hidden', wordWrap: 'break-word' }]}>
+            {!imageUrl ? ` ` : ''}{atom.label}
           </ThemedText>
         </View>
       );
@@ -110,10 +110,12 @@ const styles = StyleSheet.create({
   avatar: {
     width: 36,
     height: 36,
-    borderRadius: 18,
+    borderRadius: 3,
   },
   text: {
-    fontSize: 16,
+    fontSize: 14,
+    paddingLeft: 8,
+    paddingRight: 8,
   },
   card: {
     padding: 16,

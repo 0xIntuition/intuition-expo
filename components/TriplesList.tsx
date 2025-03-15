@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FlatList, StyleSheet, View } from 'react-native';
+import { StyleSheet, View, useWindowDimensions } from 'react-native';
 import { usePrivy, useEmbeddedEthereumWallet } from '@privy-io/expo';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -7,6 +7,7 @@ import Triple from '@/components/Triple';
 import { getMultiVault, useWaitForTransactionEvents } from '@/hooks/useMultiVault';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 import { TripleItem } from '@/app/(tabs)/explore/triples';
+import { MasonryFlashList } from '@shopify/flash-list';
 
 interface TriplesListProps {
   triples: TripleItem[];
@@ -25,6 +26,7 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onRefetch
   const generalConfig = useGeneralConfig();
   const [actionInProgress, setActionInProgress] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const width = useWindowDimensions().width;
 
   // Redeem shares from a vault
   const handleRedeem = async (vaultId: bigint, shares: bigint) => {
@@ -180,7 +182,8 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onRefetch
         <ThemedText style={styles.errorText}>{errorMessage}</ThemedText>
       )}
 
-      <FlatList
+      <MasonryFlashList
+        numColumns={Math.floor(width / 250)}
         data={triples}
         onEndReached={onEndReached}
         onRefresh={onRefresh}
@@ -209,10 +212,7 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onRefetch
               label: item.object.label || undefined,
               image: item.object.image || undefined
             },
-            creator: item.creator ? {
-              ...item.creator,
-              image: item.creator.image || undefined
-            } : undefined
+
           };
 
           return (

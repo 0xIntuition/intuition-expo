@@ -66,7 +66,7 @@ query GetTriples($offset: Int, $address: String) {
   }
   triples(order_by: { vault:  {
      total_shares: desc
-  } }, limit: 5, offset: $offset) {
+  } }, limit: 50, offset: $offset) {
     id
     subject {
       id
@@ -132,11 +132,7 @@ export default function Triples() {
         <TriplesList
           triples={data.triples.map((item: TripleItem) => ({
             ...item,
-            creator: item.creator ? {
-              id: item.creator.id,
-              label: item.creator.label,
-              image: item.creator.image || undefined
-            } : undefined,
+
 
           }))}
           onRefresh={() => refetch({ offset: 0, address })}
