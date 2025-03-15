@@ -9,6 +9,7 @@ import { gql } from '@/lib/generated';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { numberFormatter } from '@/lib/utils';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { Image } from 'expo-image';
 const GetListsQuery = gql(`
 query GetLists($offset: Int) {
   predicate_objects_aggregate(
@@ -54,7 +55,7 @@ export default function Accounts() {
         data={data.predicate_objects}
         keyExtractor={(item: any) => `${item.object.id}`}
         renderItem={({ item }: { item: any }) => <PredicateObjectListItem predicateObject={item} />}
-        estimatedItemSize={200}
+        estimatedItemSize={150}
         onEndReached={() => {
           if (data.predicate_objects_aggregate.aggregate?.count && data.predicate_objects_aggregate.aggregate.count > data.predicate_objects.length) {
             fetchMore({
@@ -98,7 +99,7 @@ export function PredicateObjectListItem({ predicateObject }: { predicateObject: 
           params: { id: predicateObject.object.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Avatar image={predicateObject.object.image} style={styles.avatar} size={100} radius={10} />
+          {predicateObject.object.image && <Image source={predicateObject.object.image} style={styles.image} />}
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{predicateObject.object.label}</ThemedText>
@@ -111,23 +112,23 @@ export function PredicateObjectListItem({ predicateObject }: { predicateObject: 
 }
 
 const styles = StyleSheet.create({
+  image: {
+    width: '100%',
+    aspectRatio: 4 / 3,
+    borderRadius: 10,
+    resizeMode: 'cover',
+  },
   container: {
     flex: 1,
     paddingLeft: 8,
   },
-  listContainer: {
-    flex: 1,
-    margin: 10,
-    paddingVertical: 16,
-    paddingRight: 36,
-    borderBottomWidth: 1,
-    borderBottomColor: 'rgba(100,100,100,0.5)',
-  },
+
   masonryContainer: {
     flex: 1,
-    marginTop: 10,
-    marginRight: 10,
     padding: 10,
+    marginTop: 10,
+    marginBottom: 10,
+    marginRight: 10,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
