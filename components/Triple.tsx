@@ -69,8 +69,8 @@ interface TripleProps {
 
 const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, inProgress }) => {
   const textColor = useThemeColor({}, 'text');
-  const backgroundColor = useThemeColor({}, 'backgroundSecondary');
-  const backgroundColor2 = useThemeColor({}, 'background');
+  const backgroundSecondary = useThemeColor({}, 'backgroundSecondary');
+  const background = useThemeColor({}, 'background');
   switch (layout) {
     case 'swipeable':
       return <SwipeableListItem
@@ -84,9 +84,9 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
 
 
           <Link style={styles.vaultLink} href={{ pathname: '/t/[id]', params: { id: triple.id } }}>
-            <View style={[styles.vaultContent, { backgroundColor }]}>
+            <View style={[styles.vaultContent, { backgroundColor: backgroundSecondary }]}>
               <Atom atom={triple.subject} layout='text-avatar' />
-              {triple.predicate.type === 'Keywords' && <ThemedView style={[styles.keywordContainer, { backgroundColor: backgroundColor2 }]} >
+              {triple.predicate.type === 'Keywords' && <ThemedView style={[styles.keywordContainer, { backgroundColor: background }]} >
                 <ThemedText style={styles.keyword}>{triple.object.label}</ThemedText>
               </ThemedView>}
               {triple.predicate.type !== 'Keywords' && <>
@@ -99,7 +99,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
           <View style={styles.positionsColumn}>
             {triple.counter_vault && triple.counter_vault.position_count > 0 && (
               <Pressable onPress={() => { onDownvote?.(); }}>
-                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundColor }]}>
+                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary }]}>
                   ↓{' '}
                   {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.counter_vault.position_count}
                   {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (" ∙ ")}
@@ -112,7 +112,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
 
             {triple.vault && (
               <Pressable onPress={() => { onUpvote?.(); }}>
-                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundColor }]}>
+                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary }]}>
                   ↑{' '}
                   {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.vault.position_count}
 
@@ -181,10 +181,9 @@ const styles = StyleSheet.create({
     color: '#888',
   },
   secondary: {
-    opacity: 0.6,
     fontSize: 12,
-    borderWidth: 2,
-
+    borderWidth: 1,
+    opacity: 0.7,
     borderRadius: 12,
     paddingHorizontal: 6,
     marginRight: 4,
@@ -213,7 +212,6 @@ const styles = StyleSheet.create({
   },
   keyword: {
     fontSize: 12,
-    opacity: 0.8,
   },
   detailsContainer: {
     padding: 16,
