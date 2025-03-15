@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ActivityIndicator } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
 import { Link } from 'expo-router';
 import { formatDistanceToNow } from 'date-fns';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -97,33 +97,39 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
           </Link>
 
           <View style={styles.positionsColumn}>
+            {triple.counter_vault && triple.counter_vault.position_count > 0 && (
+              <Pressable onPress={() => { onDownvote?.(); }}>
+                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundColor }]}>
+                  ↓{' '}
+                  {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.counter_vault.position_count}
+                  {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (" ∙ ")}
+                  {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (<Ionicons size={13} name='person-outline' style={{ marginLeft: 4 }} />)}
+                  {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && getUpvotes(BigInt(triple.counter_vault.positions[0].shares), BigInt(triple.counter_vault.current_share_price)).toString(10)}
+                </ThemedText>
+              </Pressable>
+            )}
+
+
+            {triple.vault && (
+              <Pressable onPress={() => { onUpvote?.(); }}>
+                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundColor }]}>
+                  ↑{' '}
+                  {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.vault.position_count}
+
+                  {triple.vault.positions != null && triple.vault.positions.length > 0 && (" ∙ ")}
+                  {triple.vault.positions != null && triple.vault.positions.length > 0 && (<Ionicons size={13} name='person-outline' style={{ marginLeft: 4 }} />)}
+                  {triple.vault.positions != null && triple.vault.positions.length > 0 && getUpvotes(BigInt(triple.vault.positions[0].shares), BigInt(triple.vault.current_share_price)).toString(10)}
+                </ThemedText>
+              </Pressable>
+            )}
+
+
             {inProgress && (
 
               <ActivityIndicator size="small" color={textColor} style={{ position: 'absolute', top: 0, right: 0 }} />
 
             )}
-            {triple.vault && (
-              <ThemedText numberOfLines={1} style={styles.secondary}>
-                ↑{' '}
-                {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.vault.position_count}
 
-                {triple.vault.positions != null && triple.vault.positions.length > 0 && (" ∙ ")}
-                {triple.vault.positions != null && triple.vault.positions.length > 0 && (<Ionicons size={13} name='person-outline' style={{ marginLeft: 4 }} />)}
-                {triple.vault.positions != null && triple.vault.positions.length > 0 && getUpvotes(BigInt(triple.vault.positions[0].shares), BigInt(triple.vault.current_share_price)).toString(10)}
-              </ThemedText>
-            )}
-
-
-
-            {triple.counter_vault && triple.counter_vault.position_count > 0 && (
-              <ThemedText numberOfLines={1} style={styles.secondary}>
-                ↓{' '}
-                {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.counter_vault.position_count}
-                {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (" ∙ ")}
-                {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (<Ionicons size={13} name='person-outline' style={{ marginLeft: 4 }} />)}
-                {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && getUpvotes(BigInt(triple.counter_vault.positions[0].shares), BigInt(triple.counter_vault.current_share_price)).toString(10)}
-              </ThemedText>
-            )}
           </View>
 
         </ThemedView>
@@ -177,6 +183,11 @@ const styles = StyleSheet.create({
   secondary: {
     opacity: 0.6,
     fontSize: 12,
+    borderWidth: 2,
+
+    borderRadius: 12,
+    paddingHorizontal: 6,
+    marginRight: 4,
   },
   vaultLink: {
     marginTop: 10,
@@ -188,8 +199,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   positionsColumn: {
-    flexDirection: 'column',
-    justifyContent: 'space-between',
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
     alignItems: 'flex-start',
     marginTop: 6,
   },
