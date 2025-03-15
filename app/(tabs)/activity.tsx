@@ -38,7 +38,7 @@ query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
     
     atom {
       id
-      emoji
+      type
       image
       label
       type
@@ -67,21 +67,21 @@ query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
       subject {
         id
         image
-        emoji
+        type
         label
         type
       }
       predicate {
         id
         image
-        emoji
+        type
         label
         type
       }
       object {
         id
         image
-        emoji
+        type
         label
         type
       }

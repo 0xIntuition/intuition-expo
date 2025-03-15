@@ -51,19 +51,19 @@ query Triple ($id: numeric!, $address: String){
     }
       subject {
         id
-        emoji
+        type
         label 
         image
       }
       predicate {
         id
-        emoji
+        type
         label
         image
       }
       object {
         id
-        emoji
+        type
         label
         image
       }
@@ -183,7 +183,7 @@ export default function TriplePage() {
           }}
         />
         <View style={{ padding: 8 }}>
-          <Triple triple={triple} layout="list-item" />
+          <Triple triple={triple} layout="swipeable" />
         </View>
 
 

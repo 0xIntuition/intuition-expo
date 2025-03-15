@@ -13,7 +13,7 @@ import { useThemeColor } from '@/hooks/useThemeColor';
 // Define an interface for the Atom data structure
 interface AtomData {
   id: string;
-  emoji?: string;
+  type?: string;
   label?: string;
   image?: string;
 }
@@ -70,6 +70,7 @@ interface TripleProps {
 const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, inProgress }) => {
   const textColor = useThemeColor({}, 'text');
   const backgroundColor = useThemeColor({}, 'backgroundSecondary');
+  const backgroundColor2 = useThemeColor({}, 'background');
   switch (layout) {
     case 'swipeable':
       return <SwipeableListItem
@@ -85,8 +86,13 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
           <Link style={styles.vaultLink} href={{ pathname: '/t/[id]', params: { id: triple.id } }}>
             <View style={[styles.vaultContent, { backgroundColor }]}>
               <Atom atom={triple.subject} layout='text-avatar' />
-              <Atom atom={triple.predicate} layout='text-avatar' />
-              <Atom atom={triple.object} layout='text-avatar' />
+              {triple.predicate.type === 'Keywords' && <ThemedView style={[styles.keywordContainer, { backgroundColor: backgroundColor2 }]} >
+                <ThemedText style={styles.keyword}>{triple.object.label}</ThemedText>
+              </ThemedView>}
+              {triple.predicate.type !== 'Keywords' && <>
+                <Atom atom={triple.predicate} layout='text-avatar' />
+                <Atom atom={triple.object} layout='text-avatar' />
+              </>}
             </View>
           </Link>
 
@@ -187,7 +193,17 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     marginTop: 6,
   },
-
+  keywordContainer: {
+    marginTop: 4,
+    padding: 4,
+    paddingHorizontal: 8,
+    borderRadius: 5,
+    marginVertical: 2,
+  },
+  keyword: {
+    fontSize: 12,
+    opacity: 0.8,
+  },
   detailsContainer: {
     padding: 16,
   },

@@ -23,7 +23,7 @@ query GetAtoms($offset: Int) {
   ) {
     id
     image
-    emoji
+    type
     label
     creator {
       id

@@ -13,11 +13,10 @@ interface CachedImage {
 // Define AtomData type based on the expected response
 export interface AtomData {
   id: string;
-  emoji?: string;
+  type?: string;
   image?: string;
   cached_image?: CachedImage;
   label?: string;
-  type?: string;
 }
 
 type LayoutType = 'text' | 'text-avatar' | 'list-item' | 'summary-card' | 'details';
@@ -33,7 +32,7 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
     case 'text':
       return (
         <ThemedText style={styles.text}>
-          {atom.emoji ? `${atom.emoji} ` : ''}{atom.label}
+          {atom.type ? `${atom.type} ` : ''}{atom.label}
         </ThemedText>
       );
 
@@ -66,7 +65,7 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
       return (
         <View style={styles.card}>
           <ThemedText style={styles.cardTitle}>
-            {atom.emoji ? `${atom.emoji} ` : ''}{atom.label}
+            {atom.type ? `${atom.type} ` : ''}{atom.label}
           </ThemedText>
           {atom.cached_image?.url && (
             <Image
@@ -83,7 +82,7 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
         <View style={styles.detailsContainer}>
           <ThemedText style={styles.detailText}>ID: {atom.id}</ThemedText>
           <ThemedText style={styles.detailText}>
-            Label: {atom.emoji ? `${atom.emoji} ` : ''}{atom.label}
+            Label: {atom.type ? `${atom.type} ` : ''}{atom.label}
           </ThemedText>
           {atom.type && <ThemedText style={styles.detailText}>Type: {atom.type}</ThemedText>}
           {imageUrl && (

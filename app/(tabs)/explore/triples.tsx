@@ -13,19 +13,19 @@ export interface TripleItem {
   id: string;
   subject: {
     id: string;
-    emoji?: string | null;
+    type?: string | null;
     label?: string | null;
     image?: string | null;
   };
   predicate: {
     id: string;
-    emoji?: string | null;
+    type?: string | null;
     label?: string | null;
     image?: string | null;
   };
   object: {
     id: string;
-    emoji?: string | null;
+    type?: string | null;
     label?: string | null;
     image?: string | null;
   };
@@ -70,19 +70,19 @@ query GetTriples($offset: Int, $address: String) {
     id
     subject {
       id
-      emoji
+      type
       label
       image
     }
     predicate {
       id
-      emoji
+      type
       label
       image
     }
     object {
       id
-      emoji
+      type
       label
       image
     }

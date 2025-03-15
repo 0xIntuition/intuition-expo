@@ -196,19 +196,19 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onRefetch
             ...item,
             subject: {
               ...item.subject,
-              emoji: item.subject.emoji || undefined,
+              type: item.subject.type || undefined,
               label: item.subject.label || undefined,
               image: item.subject.image || undefined
             },
             predicate: {
               ...item.predicate,
-              emoji: item.predicate.emoji || undefined,
+              type: item.predicate.type || undefined,
               label: item.predicate.label || undefined,
               image: item.predicate.image || undefined
             },
             object: {
               ...item.object,
-              emoji: item.object.emoji || undefined,
+              type: item.object.type || undefined,
               label: item.object.label || undefined,
               image: item.object.image || undefined
             },

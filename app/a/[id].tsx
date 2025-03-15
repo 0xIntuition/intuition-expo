@@ -22,7 +22,7 @@ query GetAtom($id: numeric!, $address: String) {
     id
     label
     image
-    emoji
+    type
     type
     vault {
       total_shares

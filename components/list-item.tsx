@@ -8,7 +8,7 @@ import Ionicons from '@expo/vector-icons/Ionicons'
 interface ListItemProps {
   id?: Address;
   href?: Href;
-  emoji?: string | null;
+  type?: string | null;
   image?: string | null;
   label: string;
   subLabel?: string;
@@ -23,7 +23,7 @@ export const ListItem: FC<ListItemProps> = ({
   children,
   id,
   href,
-  emoji,
+  type,
   image,
   label,
   subLabel,
@@ -37,8 +37,8 @@ export const ListItem: FC<ListItemProps> = ({
 
   const icon = image ? (
     <Image source={{ uri: image }} style={styles.icon} />
-  ) : emoji ? (
-    <Text style={styles.emoji}>{emoji}</Text>
+  ) : type ? (
+    <Text style={styles.type}>{type}</Text>
   ) : null;
 
   const content = (
@@ -105,7 +105,7 @@ const styles = StyleSheet.create({
     height: 24,
     borderRadius: 12,
   },
-  emoji: {
+  type: {
     fontSize: 24,
   },
   idIcon: {
