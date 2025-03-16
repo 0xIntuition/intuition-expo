@@ -63,9 +63,7 @@ query Triple ($id: numeric!, $address: String){
         image
       }
   }
-  positions(where: { account_id: {_eq: $address}, vault_id: { _eq: $id} }, limit: 1) {
-    shares
-  }
+
 }`;
 
 export default function TriplePage() {
@@ -165,31 +163,12 @@ export default function TriplePage() {
   };
 
   return (
-
     <ThemedView style={styles.container}>
-
-      <View style={{ padding: 8 }}>
-        <Triple triple={triple} layout="swipeable" />
+      <View style={{ padding: 8, height: 170 }}>
+        <Triple triple={triple} layout="list-item" />
       </View>
-
-
-      <View style={{ flexDirection: 'row', justifyContent: 'center', }}>
-        {signalInProgress ? (
-          <ThemedText>Signal in progress...</ThemedText>
-        ) : (
-          <>
-            {isReady && <Button title="Triple Upvote +↑" onPress={handleTripleDeposit} />}
-            {data?.positions && data?.positions.length > 0 && (
-              <Button title="Withdraw all" onPress={() => handleWithdraw(BigInt(data?.positions[0]?.shares))} />
-            )}
-          </>
-        )}
-      </View>
-      {errorMesage && <ThemedText>{errorMesage}</ThemedText>}
-
       <ListComponent id={triple.object.id.toString()} />
     </ThemedView>
-
   );
 }
 
