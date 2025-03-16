@@ -130,11 +130,7 @@ export default function Triples() {
       {error && <ThemedText>{error.message}</ThemedText>}
       {data && (
         <TriplesList
-          triples={data.triples.map((item: TripleItem) => ({
-            ...item,
-
-
-          }))}
+          triples={data.triples}
           onRefresh={() => refetch({ offset: 0, address })}
           onRefetch={() => refetch({ offset: variables?.offset || 0, address })}
           onEndReached={() => {

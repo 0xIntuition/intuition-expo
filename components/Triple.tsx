@@ -75,8 +75,6 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
     case 'list-item':
       return (
         <ThemedView style={[styles.listContainer]}>
-
-
           <Link style={styles.vaultLink} href={{ pathname: '/t/[id]', params: { id: triple.id } }}>
             <View style={[styles.vaultContent, { backgroundColor: backgroundSecondary }]}>
               <Atom atom={triple.subject} layout='text-avatar' />
@@ -92,40 +90,40 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
 
           <View style={styles.positionsColumn}>
             {triple.counter_vault && triple.counter_vault.position_count > 0 && (
-              <Pressable onPress={() => { onDownvote?.(); }}>
-                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary, color: textSecondary }]}>
-                  <Ionicons size={13} name='arrow-up' />
 
-                  {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (<Avatar size={13} radius={13} style={{ paddingLeft: 12, marginBottom: 3 }} id={triple.counter_vault.positions[0].account_id} />)}
+              <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary, color: textSecondary }]}>
+                <Ionicons size={13} name='arrow-down' />
 
-                  {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && getUpvotes(BigInt(triple.counter_vault.positions[0].shares), BigInt(triple.counter_vault.current_share_price)).toString(10) + " ∙ "}
+                {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (<Avatar size={13} radius={13} style={{ paddingLeft: 12, marginBottom: 3 }} id={triple.counter_vault.positions[0].account_id} />)}
 
-                  {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)}
-                </ThemedText>
-              </Pressable>
+                {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && getUpvotes(BigInt(triple.counter_vault.positions[0].shares), BigInt(triple.counter_vault.current_share_price)).toString(10) + " ∙ "}
+
+                {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)}
+              </ThemedText>
+
             )}
 
 
             {triple.vault && (
-              <Pressable onPress={() => { onUpvote?.(); }}>
-                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary, color: textSecondary }]}>
-                  <Ionicons size={13} name='arrow-down' />
 
-                  {triple.vault.positions != null && triple.vault.positions.length > 0 && (<Avatar size={13} radius={13} style={{ paddingLeft: 12, marginBottom: 3 }} id={triple.vault.positions[0].account_id} />)}
+              <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary, color: textSecondary }]}>
+                <Ionicons size={13} name='arrow-up' />
 
-                  {triple.vault.positions != null && triple.vault.positions.length > 0 && getUpvotes(BigInt(triple.vault.positions[0].shares), BigInt(triple.vault.current_share_price)).toString(10) + " ∙ "}
+                {triple.vault.positions != null && triple.vault.positions.length > 0 && (<Avatar size={13} radius={13} style={{ paddingLeft: 12, marginBottom: 3 }} id={triple.vault.positions[0].account_id} />)}
 
-                  {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)}
+                {triple.vault.positions != null && triple.vault.positions.length > 0 && getUpvotes(BigInt(triple.vault.positions[0].shares), BigInt(triple.vault.current_share_price)).toString(10) + " ∙ "}
+
+                {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)}
 
 
-                </ThemedText>
-              </Pressable>
+              </ThemedText>
+
             )}
 
 
             {inProgress && (
 
-              <ActivityIndicator size="small" color={textColor} style={{ position: 'absolute', top: 0, right: 0 }} />
+              <ActivityIndicator size="small" color={textColor} />
 
             )}
 
