@@ -15,7 +15,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { MasonryFlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
-import { getCachedImage } from '@/lib/utils';
+import { getCachedImage, formatNumber } from '@/lib/utils';
 const GetListQuery = gql(`
 query GetList($listId: numeric!, $offset: Int) {
     triples_aggregate(
@@ -72,8 +72,13 @@ query GetList($listId: numeric!, $offset: Int) {
 `);
 
 export default function List() {
-  const textColor = useThemeColor({}, 'text');
   const { id } = useLocalSearchParams();
+  return <ListComponent id={id as string} />;
+}
+
+export function ListComponent({ id }: { id: string }) {
+
+  const textColor = useThemeColor({}, 'text');
   const { loading, error, data, refetch, fetchMore } = useQuery(GetListQuery, {
     variables: {
       listId: Number(id),
@@ -154,7 +159,7 @@ export function ListItem({ item }: { item: any }) {
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{item.subject.label}</ThemedText>
-            <ThemedText style={styles.secondary}>↑ {getUpvotes(BigInt(item.vault.total_shares), BigInt(item.vault.current_share_price)).toString(10)}</ThemedText>
+            <ThemedText style={styles.secondary}>↑ {formatNumber(Number(getUpvotes(BigInt(item.vault.total_shares), BigInt(item.vault.current_share_price))))}</ThemedText>
           </View>
         </Pressable>
       </Link>
@@ -268,7 +273,7 @@ const styles = StyleSheet.create({
   titleImage: {
     width: 32,
     height: 32,
-    borderRadius: 16,
+    borderRadius: 3,
     marginRight: 8,
   },
 });
