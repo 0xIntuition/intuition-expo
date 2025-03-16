@@ -1,4 +1,4 @@
-import { View, StyleSheet, RefreshControl, ActivityIndicator, Image, Pressable } from 'react-native';
+import { View, StyleSheet, RefreshControl, ActivityIndicator, Image, Pressable, useWindowDimensions } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@apollo/client';
 import React, { useState } from 'react';
@@ -13,6 +13,8 @@ import { getUpvotes } from '@/hooks/useUpvotes';
 import { shareAsync } from 'expo-sharing';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import { MasonryFlashList } from '@shopify/flash-list';
+
 const GetListQuery = gql(`
 query GetList($listId: numeric!, $offset: Int) {
     triples_aggregate(
@@ -38,12 +40,18 @@ query GetList($listId: numeric!, $offset: Int) {
     subject {
       id
       label
-      image
+        cached_image {
+          safe
+          url
+        }
     }
     creator {
       id
       label
-      image
+      cached_image {
+        safe
+        url
+      }
     }
     block_timestamp
     vault {
@@ -69,6 +77,7 @@ export default function List() {
       offset: 0
     }
   });
+  const width = useWindowDimensions().width;
 
   if (loading && !data) return <ActivityIndicator size="large" />;
 
@@ -88,7 +97,8 @@ export default function List() {
         }}
       />
       {error && <ThemedText>{error.message}</ThemedText>}
-      {!loading && data && <FlashList
+      {!loading && data && <MasonryFlashList
+        numColumns={Math.floor(width / 150)}
         data={data.triples}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => <ListItem item={item} />}
@@ -124,27 +134,42 @@ export default function List() {
   );
 }
 
+function getImage(subject: any) {
+  // replace ipfs:// with https://ipfs.io/ipfs/
+  return subject.cached_image?.url?.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
+}
+
 export function ListItem({ item }: { item: any }) {
+  const backgroundColor = useThemeColor({}, 'backgroundSecondary');
   return (
-    <ThemedView style={styles.listContainer}>
+    <ThemedView style={[styles.masonryContainer, { backgroundColor }]}>
 
       <Link
+        asChild
         href={{
           pathname: '/a/[id]',
           params: { id: item.subject.id }
         }}>
-        <Avatar image={item.subject.image} style={styles.avatar} />
+        <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+          <Image source={getImage(item.subject)} style={styles.image} />
 
-        <View>
-          <ThemedText style={styles.name}>{item.subject.label}</ThemedText>
-          <ThemedText style={styles.secondary}>↑ {getUpvotes(BigInt(item.vault.total_shares), BigInt(item.vault.current_share_price)).toString(10)}</ThemedText>
-        </View>
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
+            <ThemedText style={styles.name}>{item.subject.label}</ThemedText>
+            <ThemedText style={styles.secondary}>↑ {getUpvotes(BigInt(item.vault.total_shares), BigInt(item.vault.current_share_price)).toString(10)}</ThemedText>
+          </View>
+        </Pressable>
       </Link>
     </ThemedView>
   );
 }
 
 const styles = StyleSheet.create({
+  image: {
+    width: '100%',
+    aspectRatio: 4 / 3,
+    borderRadius: 10,
+    resizeMode: 'cover',
+  },
   counterVault: {
     // color: 'red'
   },
@@ -170,12 +195,7 @@ const styles = StyleSheet.create({
   shortText: {
     fontSize: 11,
   },
-  image: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    marginRight: 5,
-  },
+
   vaultContent: {
     flex: 1,
     flexDirection: 'column',
@@ -202,13 +222,13 @@ const styles = StyleSheet.create({
   },
   masonryContainer: {
     flex: 1,
-    marginTop: 10,
-    marginRight: 10,
     padding: 10,
-    borderWidth: 1,
-    borderStyle: 'solid',
-    borderColor: '#ddd',
+    marginTop: 10,
+    marginBottom: 10,
+    marginRight: 10,
     borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   avatar: {
     marginRight: 10,
@@ -217,6 +237,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '500',
     marginBottom: 2,
+    textAlign: 'center',
   },
   secondary: {
     color: '#888',

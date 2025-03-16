@@ -76,6 +76,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
     case 'list-item':
       return (
         <ThemedView style={[styles.listContainer]}>
+
           <Link style={styles.vaultLink} href={{ pathname: '/t/[id]', params: { id: triple.id } }}>
             <View style={[styles.vaultContent, { backgroundColor: backgroundSecondary }]}>
               <Atom atom={triple.subject} layout='text-avatar' />

@@ -28,7 +28,10 @@ query GetLists($offset: Int) {
     claim_count
     triple_count
     object {
-      image
+      cached_image {
+        safe
+        url
+      }
       label
       id
     }
@@ -86,6 +89,10 @@ export default function Accounts() {
   );
 }
 
+function getImage(predicateObject: any) {
+  // replace ipfs:// with https://ipfs.io/ipfs/
+  return predicateObject.object.cached_image?.url?.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
+}
 
 export function PredicateObjectListItem({ predicateObject }: { predicateObject: any }) {
   const backgroundColor = useThemeColor({}, 'backgroundSecondary');
@@ -99,7 +106,7 @@ export function PredicateObjectListItem({ predicateObject }: { predicateObject: 
           params: { id: predicateObject.object.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          {predicateObject.object.image && <Image source={predicateObject.object.image} style={styles.image} />}
+          {getImage(predicateObject) && <Image source={getImage(predicateObject)} style={styles.image} />}
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{predicateObject.object.label}</ThemedText>
