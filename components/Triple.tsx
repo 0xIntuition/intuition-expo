@@ -9,6 +9,7 @@ import Atom from '@/components/Atom';
 import { getUpvotes } from '@/hooks/useUpvotes';
 import SwipeableListItem from './SwipeableListItem';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import Avatar from './Avatar';
 
 // Define an interface for the Atom data structure
 interface AtomData {
@@ -35,11 +36,7 @@ interface TripleData {
     current_share_price: string;
     positions?: Array<{
       shares: string;
-      account: {
-        id: string;
-        image?: string;
-        label?: string;
-      }
+      account_id: string;
     }>;
   };
   counter_vault?: {
@@ -48,11 +45,7 @@ interface TripleData {
     current_share_price: string;
     positions?: Array<{
       shares: string;
-      account: {
-        id: string;
-        image?: string;
-        label?: string;
-      }
+      account_id: string;
     }>;
   };
 }
@@ -69,6 +62,7 @@ interface TripleProps {
 
 const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, inProgress }) => {
   const textColor = useThemeColor({}, 'text');
+  const textSecondary = useThemeColor({}, 'textSecondary');
   const backgroundSecondary = useThemeColor({}, 'backgroundSecondary');
   const background = useThemeColor({}, 'background');
   switch (layout) {
@@ -99,12 +93,14 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
           <View style={styles.positionsColumn}>
             {triple.counter_vault && triple.counter_vault.position_count > 0 && (
               <Pressable onPress={() => { onDownvote?.(); }}>
-                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary }]}>
-                  ↓{' '}
-                  {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.counter_vault.position_count}
-                  {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (" ∙ ")}
-                  {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (<Ionicons size={13} name='person-outline' style={{ marginLeft: 4 }} />)}
-                  {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && getUpvotes(BigInt(triple.counter_vault.positions[0].shares), BigInt(triple.counter_vault.current_share_price)).toString(10)}
+                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary, color: textSecondary }]}>
+                  <Ionicons size={13} name='arrow-up' />
+
+                  {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && (<Avatar size={13} radius={13} style={{ paddingLeft: 12, marginBottom: 3 }} id={triple.counter_vault.positions[0].account_id} />)}
+
+                  {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && getUpvotes(BigInt(triple.counter_vault.positions[0].shares), BigInt(triple.counter_vault.current_share_price)).toString(10) + " ∙ "}
+
+                  {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)}
                 </ThemedText>
               </Pressable>
             )}
@@ -112,13 +108,16 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
 
             {triple.vault && (
               <Pressable onPress={() => { onUpvote?.(); }}>
-                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary }]}>
-                  ↑{' '}
-                  {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)} ∙ <Ionicons size={13} name='globe' /> {triple.vault.position_count}
+                <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary, color: textSecondary }]}>
+                  <Ionicons size={13} name='arrow-down' />
 
-                  {triple.vault.positions != null && triple.vault.positions.length > 0 && (" ∙ ")}
-                  {triple.vault.positions != null && triple.vault.positions.length > 0 && (<Ionicons size={13} name='person-outline' style={{ marginLeft: 4 }} />)}
-                  {triple.vault.positions != null && triple.vault.positions.length > 0 && getUpvotes(BigInt(triple.vault.positions[0].shares), BigInt(triple.vault.current_share_price)).toString(10)}
+                  {triple.vault.positions != null && triple.vault.positions.length > 0 && (<Avatar size={13} radius={13} style={{ paddingLeft: 12, marginBottom: 3 }} id={triple.vault.positions[0].account_id} />)}
+
+                  {triple.vault.positions != null && triple.vault.positions.length > 0 && getUpvotes(BigInt(triple.vault.positions[0].shares), BigInt(triple.vault.current_share_price)).toString(10) + " ∙ "}
+
+                  {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)}
+
+
                 </ThemedText>
               </Pressable>
             )}
@@ -183,10 +182,12 @@ const styles = StyleSheet.create({
   secondary: {
     fontSize: 12,
     borderWidth: 1,
-    opacity: 0.7,
     borderRadius: 12,
     paddingHorizontal: 6,
     marginRight: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   vaultLink: {
     marginTop: 10,

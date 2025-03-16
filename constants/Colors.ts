@@ -9,6 +9,7 @@ const tintColorDark = '#fff';
 export const Colors = {
   light: {
     text: '#000000',
+    textSecondary: '#687076',
     background: '#FFFFFF',
     backgroundSecondary: '#F2F2F7',
     tint: '#007AFF', // iOS blue
@@ -18,6 +19,7 @@ export const Colors = {
   },
   dark: {
     text: '#FFFFFF',
+    textSecondary: '#A1A1A1',
     background: '#000000',
     backgroundSecondary: '#1C1C1E',
     tint: '#0A84FF', // iOS blue (dark mode)
