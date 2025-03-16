@@ -11,6 +11,7 @@ import SwipeableListItem from './SwipeableListItem';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import Avatar from './Avatar';
 import { formatNumber } from '@/lib/utils';
+import { shareAsync } from 'expo-sharing';
 
 // Define an interface for the Atom data structure
 interface AtomData {
@@ -121,6 +122,11 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
               </ThemedText>
 
             )}
+            <Pressable onPress={async () => {
+              await shareAsync('https://app.i7n.xyz/t/' + triple.id);
+            }} style={{ marginRight: 10 }}>
+              <Ionicons name="share-outline" size={18} color={textSecondary} style={{ marginLeft: 5, paddingTop: 4 }} />
+            </Pressable>
 
 
             {inProgress && (
