@@ -20,7 +20,7 @@ export default function Avatar({ image, style, size = 36, radius = 999, id }: { 
   return (
     <View style={style}>
       {uri ? (
-        <Image source={uri} style={[styles.avatar, SIZING, { borderRadius: radius }]} />
+        <Image source={uri} recyclingKey={uri} style={[styles.avatar, SIZING, { borderRadius: radius }]} />
       ) : (
         <View
           style={[

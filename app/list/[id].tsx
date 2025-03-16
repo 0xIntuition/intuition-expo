@@ -148,7 +148,7 @@ export function ListItem({ item }: { item: any }) {
           params: { id: item.subject.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          {item.subject.cached_image !== null && <Image source={getCachedImage(item.subject.cached_image)} style={styles.image} />}
+          {item.subject.cached_image !== null && <Image recyclingKey={item.subject.cached_image.url} source={getCachedImage(item.subject.cached_image)} style={styles.image} />}
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{item.subject.label}</ThemedText>

@@ -102,7 +102,7 @@ export function PredicateObjectListItem({ predicateObject }: { predicateObject: 
           params: { id: predicateObject.object.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          {predicateObject.object.cached_image !== null && <Image source={getCachedImage(predicateObject.object.cached_image)} style={styles.image} />}
+          {predicateObject.object.cached_image !== null && <Image recyclingKey={predicateObject.object.cached_image.url} source={getCachedImage(predicateObject.object.cached_image)} style={styles.image} />}
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{predicateObject.object.label}</ThemedText>

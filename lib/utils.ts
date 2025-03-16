@@ -16,5 +16,8 @@ export function formatNumber(number: number) {
 }
 
 export function getCachedImage(cached_image: any) {
-  return cached_image?.url?.replace('ipfs://', 'https://intuition-expo.mypinata.cloud/ipfs/') + '?pinataGatewayToken=' + process.env.EXPO_PUBLIC_PINATA_GATEWAY_TOKEN;
+  if (cached_image?.url?.includes('ipfs://')) {
+    return cached_image?.url?.replace('ipfs://', 'https://intuition-expo.mypinata.cloud/ipfs/') + '?pinataGatewayToken=' + process.env.EXPO_PUBLIC_PINATA_GATEWAY_TOKEN;
+  }
+  return cached_image?.url;
 }
