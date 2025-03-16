@@ -76,7 +76,6 @@ export default function TriplePage() {
     fetchPolicy: 'network-only',
     variables: { id: Number(id), address: (address !== undefined ? address : '') }
   });
-  console.log(data);
   const wait = useWaitForTransactionEvents();
   const generalConfig = useGeneralConfig();
   const [signalInProgress, setSignalInProgress] = useState(false);
