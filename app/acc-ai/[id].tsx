@@ -1,6 +1,6 @@
-import { Button, SafeAreaView, View, Pressable, ScrollView } from 'react-native';
+import { Button, SafeAreaView, View, Pressable } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
-import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
+import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery, gql } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -32,7 +32,6 @@ query Account($id: String!) {
 export default function Account() {
   const textColor = useThemeColor({}, 'text');
   const { id } = useLocalSearchParams();
-  const router = useRouter();
   const { loading, error, data, refetch } = useQuery(GET_ACCOUNT, { variables: { id: id.toString().toLowerCase() } });
 
   if (loading) return <ThemedText>Loading...</ThemedText>;
@@ -47,29 +46,26 @@ export default function Account() {
     <View style={styles.container}>
       <Stack.Screen
         options={{
-          headerRight: () => <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Link href={`/acc-ai/${id}`} style={{ marginRight: 10 }}>
-              <Ionicons name="chatbubble-ellipses-outline" size={24} color={textColor} />
-            </Link>
-            <Pressable onPress={async () => {
-              await shareAsync('https://app.i7n.xyz/acc/' + id);
-            }} style={{ marginRight: 10 }}>
-              <Ionicons name="share-outline" size={24} color={textColor} />
-            </Pressable>
-
-          </View>,
+          headerRight: () => <Pressable onPress={async () => {
+            await shareAsync('https://app.i7n.xyz/acc/' + id);
+          }} style={{ marginRight: 10 }}>
+            <Ionicons name="share-outline" size={24} color={textColor} />
+          </Pressable>,
           headerTitle: () => <View style={styles.header} >
             {account.image !== null && <Image style={styles.image} source={{ uri: account.image }} />}
             <ThemedText>{account.label}</ThemedText>
           </View>,
         }}
       />
-      <ScrollView>
-        {data?.account?.atom?.as_subject_claims.map((claim: any) => (
-          <ThemedText key={claim.predicate.label}>{claim.predicate.label}: {claim.object.label}</ThemedText>
-        ))}
-      </ScrollView>
-
+      <SafeAreaView style={styles.container}>
+        <Chat
+          assistantMessage={`What do you want to know about ${account.label}?`}
+          systemPrompt={`${systemPrompt} You that can answer questions about ${account.label} ${account.id}.`}
+          sampleQuestions={[
+            `Summary of the account`,
+          ]}
+        />
+      </SafeAreaView>
     </View>
   );
 }
@@ -89,6 +85,5 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    padding: 10,
   },
 });

@@ -58,6 +58,13 @@ export default function App() {
               }}
             />
             <Stack.Screen
+              name="acc-ai"
+              options={{
+                presentation: 'modal',
+                headerShown: false,
+              }}
+            />
+            <Stack.Screen
               name="list"
               options={{
                 presentation: 'modal',
