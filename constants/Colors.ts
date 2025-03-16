@@ -15,7 +15,7 @@ export const Colors = {
     tint: '#007AFF', // iOS blue
     icon: '#3C3C43',
     tabIconDefault: '#3C3C43',
-    tabIconSelected: '#007AFF',
+    tabIconSelected: '#000000',
   },
   dark: {
     text: '#FFFFFF',
@@ -25,6 +25,6 @@ export const Colors = {
     tint: '#0A84FF', // iOS blue (dark mode)
     icon: '#EBEBF5',
     tabIconDefault: '#EBEBF5',
-    tabIconSelected: '#0A84FF',
+    tabIconSelected: '#FFFFFF',
   },
 };

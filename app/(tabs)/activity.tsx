@@ -15,8 +15,9 @@ import Triple from '@/components/Triple';
 import Atom from '@/components/Atom';
 import { getUpvotes, getUpvotePrice } from '@/hooks/useUpvotes';
 import Avatar from '@/components/Avatar';
+import { useEmbeddedEthereumWallet } from '@privy-io/expo';
 const GET_SIGNALS = gql(`
-query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
+query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int, $address: String) {
   signals_aggregate(where: { delta: { _gt: $minDelta } }) {
     aggregate {
       count
@@ -47,6 +48,10 @@ query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
         current_share_price
         total_shares
         position_count
+        positions(where: { account_id: {_eq: $address} }, limit: 1) {
+          shares
+          account_id
+        }
       }
     }
 
@@ -57,12 +62,20 @@ query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
         current_share_price
         total_shares
         position_count
+        positions(where: { account_id: {_eq: $address} }, limit: 1) {
+          shares
+          account_id
+        }
       }
       counter_vault {
         id
         total_shares
         position_count
         current_share_price
+        positions(where: { account_id: {_eq: $address} }, limit: 1) {
+          shares
+          account_id
+        }
       }
 
       subject {
@@ -92,13 +105,16 @@ query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
 `);
 
 export default function Signals() {
+  const { wallets } = useEmbeddedEthereumWallet();
+  const address = wallets[0]?.address?.toLowerCase() || '0x0000000000000000000000000000000000000000';
 
   const minDelta = getUpvotePrice() * BigInt(80) / BigInt(100);
 
   const { loading, error, data, fetchMore, refetch } = useQuery(GET_SIGNALS, {
     variables: {
       limit: 100,
-      minDelta: parseInt(minDelta.toString())
+      minDelta: parseInt(minDelta.toString()),
+      address
     },
   });
   const { width } = useWindowDimensions();
