@@ -8,7 +8,7 @@ import { Link } from 'expo-router';
 import { gql } from '@/lib/generated';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { numberFormatter } from '@/lib/utils';
+import { formatNumber } from '@/lib/utils';
 const GetAccountsQuery = gql(`
 query GetAccounts($offset: Int, $orderBy: [accounts_order_by!]) {
   accounts_aggregate(where: { type: { _eq: Default } }) {
@@ -122,9 +122,9 @@ export function AccountListItem({ account }: { account: any }) {
 
           {account.label.toLowerCase() !== shortId(account.id).toLowerCase() && <ThemedText style={styles.name}>{account.label}</ThemedText>}
           <View style={{ flexDirection: 'row', alignItems: 'center', }}>
-            <ThemedText style={styles.secondary}><Ionicons size={13} name='volume-high-outline' style={{ marginLeft: 4 }} /> {numberFormatter.format(account.signals_aggregate.aggregate.count)} </ThemedText>
+            <ThemedText style={styles.secondary}><Ionicons size={13} name='volume-high-outline' style={{ marginLeft: 4 }} /> {formatNumber(account.signals_aggregate.aggregate.count)} </ThemedText>
 
-            <ThemedText style={styles.secondary}><Ionicons size={13} name='color-filter-outline' style={{ marginLeft: 4 }} /> {numberFormatter.format(account.claims_aggregate.aggregate.count)} </ThemedText>
+            <ThemedText style={styles.secondary}><Ionicons size={13} name='color-filter-outline' style={{ marginLeft: 4 }} /> {formatNumber(account.claims_aggregate.aggregate.count)} </ThemedText>
           </View>
           <ThemedText style={styles.tertiary}>{shortId(account.id)}</ThemedText>
         </Pressable>

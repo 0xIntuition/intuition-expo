@@ -10,6 +10,7 @@ import { getUpvotes } from '@/hooks/useUpvotes';
 import SwipeableListItem from './SwipeableListItem';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import Avatar from './Avatar';
+import { formatNumber } from '@/lib/utils';
 
 // Define an interface for the Atom data structure
 interface AtomData {
@@ -98,7 +99,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
 
                 {triple.counter_vault.positions != null && triple.counter_vault.positions.length > 0 && getUpvotes(BigInt(triple.counter_vault.positions[0].shares), BigInt(triple.counter_vault.current_share_price)).toString(10) + " ∙ "}
 
-                {getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price)).toString(10)}
+                {formatNumber(Number(getUpvotes(BigInt(triple.counter_vault.total_shares), BigInt(triple.counter_vault.current_share_price))))}
               </ThemedText>
 
             )}
@@ -113,7 +114,7 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
 
                 {triple.vault.positions != null && triple.vault.positions.length > 0 && getUpvotes(BigInt(triple.vault.positions[0].shares), BigInt(triple.vault.current_share_price)).toString(10) + " ∙ "}
 
-                {getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price)).toString(10)}
+                {formatNumber(Number(getUpvotes(BigInt(triple.vault.total_shares), BigInt(triple.vault.current_share_price))))}
 
 
               </ThemedText>

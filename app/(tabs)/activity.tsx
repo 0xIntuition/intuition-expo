@@ -14,6 +14,7 @@ import { Link } from 'expo-router';
 import Triple from '@/components/Triple';
 import Atom from '@/components/Atom';
 import { getUpvotes, getUpvotePrice } from '@/hooks/useUpvotes';
+import Avatar from '@/components/Avatar';
 const GET_SIGNALS = gql(`
 query GetSignals($minDelta: numeric!, $offset: Int, $limit: Int) {
   signals_aggregate(where: { delta: { _gt: $minDelta } }) {
@@ -155,7 +156,8 @@ export function SignalListItem({ item }: { item: any }) {
       <View style={styles.topRow}>
 
 
-        <ThemedText style={styles.date}>{`${item.delta > 0 ? '↑' : '↓'}${(upvotes)} ∙ ${item.account?.label} ∙ ${formatDistanceToNow(new Date(parseInt(item.block_timestamp.toString()) * 1000), { addSuffix: true })}`}</ThemedText>
+        <Avatar size={10} radius={10} style={{ marginRight: 1, paddingTop: 6, paddingRight: 6 }} id={item.account?.id} />
+        <ThemedText style={styles.date}>{`${item.delta > 0 ? '↑' : '↓'}${(upvotes)} ∙ ${formatDistanceToNow(new Date(parseInt(item.block_timestamp.toString()) * 1000), { addSuffix: true })}`}</ThemedText>
       </View>
       {item.atom !== null ? (
         <Link
@@ -181,7 +183,6 @@ const styles = StyleSheet.create({
   },
   topRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'flex-start',
     paddingTop: 8,
   },

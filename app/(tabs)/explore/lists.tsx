@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { gql } from '@/lib/generated';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { numberFormatter } from '@/lib/utils';
+import { formatNumber } from '@/lib/utils';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image } from 'expo-image';
 const GetListsQuery = gql(`
@@ -103,7 +103,7 @@ export function PredicateObjectListItem({ predicateObject }: { predicateObject: 
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{predicateObject.object.label}</ThemedText>
-            <ThemedText style={styles.secondary}><Ionicons size={12} name='list-outline' style={{}} /> {numberFormatter.format(predicateObject.triple_count)} <Ionicons size={12} name='color-filter-outline' style={{ marginLeft: 4 }} />{numberFormatter.format(predicateObject.claim_count)}  </ThemedText>
+            <ThemedText style={styles.secondary}><Ionicons size={12} name='list-outline' style={{}} /> {formatNumber(predicateObject.triple_count)} <Ionicons size={12} name='color-filter-outline' style={{ marginLeft: 4 }} />{formatNumber(predicateObject.claim_count)}  </ThemedText>
           </View>
         </Pressable>
       </Link>
