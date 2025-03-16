@@ -7,7 +7,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { Link } from 'expo-router';
 import { gql } from '@/lib/generated';
 import { useThemeColor } from '@/hooks/useThemeColor';
-import { formatNumber } from '@/lib/utils';
+import { formatNumber, getCachedImage } from '@/lib/utils';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Image } from 'expo-image';
 const GetListsQuery = gql(`
@@ -89,10 +89,6 @@ export default function Accounts() {
   );
 }
 
-function getImage(predicateObject: any) {
-  // replace ipfs:// with https://ipfs.io/ipfs/
-  return predicateObject.object.cached_image?.url?.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
-}
 
 export function PredicateObjectListItem({ predicateObject }: { predicateObject: any }) {
   const backgroundColor = useThemeColor({}, 'backgroundSecondary');
@@ -106,7 +102,7 @@ export function PredicateObjectListItem({ predicateObject }: { predicateObject: 
           params: { id: predicateObject.object.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          {getImage(predicateObject) && <Image source={getImage(predicateObject)} style={styles.image} />}
+          {predicateObject.object.cached_image !== null && <Image source={getCachedImage(predicateObject.object.cached_image)} style={styles.image} />}
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{predicateObject.object.label}</ThemedText>

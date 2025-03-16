@@ -8,7 +8,7 @@ import { Link } from 'expo-router';
 import { gql } from '@/lib/generated';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { formatNumber } from '@/lib/utils';
+import { formatNumber, getCachedImage } from '@/lib/utils';
 const GetAccountsQuery = gql(`
 query GetAccounts($offset: Int, $orderBy: [accounts_order_by!]) {
   accounts_aggregate(where: { type: { _eq: Default } }) {
@@ -102,10 +102,7 @@ export default function Accounts() {
     </ThemedView>
   );
 }
-function getImage(account: any) {
-  // replace ipfs:// with https://ipfs.io/ipfs/
-  return account.cached_image?.url?.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
-}
+
 export function AccountListItem({ account }: { account: any }) {
   const backgroundColor = useThemeColor({}, 'backgroundSecondary');
   return (
@@ -118,7 +115,7 @@ export function AccountListItem({ account }: { account: any }) {
           params: { id: account.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Avatar image={getImage(account)} style={styles.avatar} size={100} radius={50} id={account.id} />
+          <Avatar image={getCachedImage(account.cached_image)} style={styles.avatar} size={100} radius={50} id={account.id} />
 
           {account.label.toLowerCase() !== shortId(account.id).toLowerCase() && <ThemedText style={styles.name}>{account.label}</ThemedText>}
           <View style={{ flexDirection: 'row', alignItems: 'center', }}>

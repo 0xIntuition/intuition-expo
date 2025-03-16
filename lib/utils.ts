@@ -14,3 +14,7 @@ export function formatNumber(number: number) {
     trimMantissa: true
   });
 }
+
+export function getCachedImage(cached_image: any) {
+  return cached_image?.url?.replace('ipfs://', 'https://intuition-expo.mypinata.cloud/ipfs/') + '?pinataGatewayToken=' + process.env.EXPO_PUBLIC_PINATA_GATEWAY_TOKEN;
+}

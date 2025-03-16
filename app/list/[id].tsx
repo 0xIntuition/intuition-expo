@@ -15,6 +15,7 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { MasonryFlashList } from '@shopify/flash-list';
 import { Image } from 'expo-image';
+import { getCachedImage } from '@/lib/utils';
 const GetListQuery = gql(`
 query GetList($listId: numeric!, $offset: Int) {
     triples_aggregate(
@@ -135,11 +136,6 @@ export default function List() {
   );
 }
 
-function getImage(subject: any) {
-  // replace ipfs:// with https://ipfs.io/ipfs/
-  return subject.cached_image?.url?.replace('ipfs://', 'https://gateway.pinata.cloud/ipfs/');
-}
-
 export function ListItem({ item }: { item: any }) {
   const backgroundColor = useThemeColor({}, 'backgroundSecondary');
   return (
@@ -152,7 +148,7 @@ export function ListItem({ item }: { item: any }) {
           params: { id: item.subject.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          <Image source={getImage(item.subject)} style={styles.image} />
+          {item.subject.cached_image !== null && <Image source={getCachedImage(item.subject.cached_image)} style={styles.image} />}
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{item.subject.label}</ThemedText>
