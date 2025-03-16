@@ -1,4 +1,4 @@
-import { View, StyleSheet, RefreshControl, ActivityIndicator, Image, Pressable, useWindowDimensions } from 'react-native';
+import { View, StyleSheet, RefreshControl, ActivityIndicator, Pressable, useWindowDimensions } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useQuery } from '@apollo/client';
 import React, { useState } from 'react';
@@ -14,7 +14,7 @@ import { shareAsync } from 'expo-sharing';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useThemeColor } from '@/hooks/useThemeColor';
 import { MasonryFlashList } from '@shopify/flash-list';
-
+import { Image } from 'expo-image';
 const GetListQuery = gql(`
 query GetList($listId: numeric!, $offset: Int) {
     triples_aggregate(
@@ -41,6 +41,7 @@ query GetList($listId: numeric!, $offset: Int) {
       id
       label
         cached_image {
+          original_url
           safe
           url
         }
