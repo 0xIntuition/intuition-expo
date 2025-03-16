@@ -28,6 +28,7 @@ query GetLists($offset: Int) {
     claim_count
     triple_count
     object {
+      image
       cached_image {
         safe
         url
@@ -92,6 +93,7 @@ export default function Accounts() {
 
 export function PredicateObjectListItem({ predicateObject }: { predicateObject: any }) {
   const backgroundColor = useThemeColor({}, 'backgroundSecondary');
+  const image = predicateObject.object.cached_image !== null ? getCachedImage(predicateObject.object.cached_image) : predicateObject.object.image;
   return (
     <ThemedView style={[styles.masonryContainer, { backgroundColor }]}>
 
@@ -102,7 +104,12 @@ export function PredicateObjectListItem({ predicateObject }: { predicateObject: 
           params: { id: predicateObject.object.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          {predicateObject.object.cached_image !== null && <Image recyclingKey={predicateObject.object.cached_image.url} source={getCachedImage(predicateObject.object.cached_image)} style={styles.image} />}
+          {image !== null && image !== undefined && image !== '' && <Image
+            recyclingKey={image}
+            source={image}
+            style={styles.image}
+            contentFit='cover'
+          />}
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{predicateObject.object.label}</ThemedText>
@@ -119,7 +126,7 @@ const styles = StyleSheet.create({
     width: '100%',
     aspectRatio: 4 / 3,
     borderRadius: 10,
-    resizeMode: 'cover',
+
   },
   container: {
     flex: 1,

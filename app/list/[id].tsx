@@ -41,11 +41,12 @@ query GetList($listId: numeric!, $offset: Int) {
     subject {
       id
       label
-        cached_image {
-          original_url
-          safe
-          url
-        }
+      image
+      cached_image {
+        original_url
+        safe
+        url
+      }
     }
     creator {
       id
@@ -138,6 +139,7 @@ export default function List() {
 
 export function ListItem({ item }: { item: any }) {
   const backgroundColor = useThemeColor({}, 'backgroundSecondary');
+  const image = item.subject.cached_image !== null ? getCachedImage(item.subject.cached_image) : item.subject.image;
   return (
     <ThemedView style={[styles.masonryContainer, { backgroundColor }]}>
 
@@ -148,7 +150,7 @@ export function ListItem({ item }: { item: any }) {
           params: { id: item.subject.id }
         }}>
         <Pressable style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-          {item.subject.cached_image !== null && <Image recyclingKey={item.subject.cached_image.url} source={getCachedImage(item.subject.cached_image)} style={styles.image} />}
+          {image !== null && image !== undefined && image !== '' && <Image recyclingKey={image} source={image} style={styles.image} />}
 
           <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', marginTop: 10 }}>
             <ThemedText style={styles.name}>{item.subject.label}</ThemedText>
@@ -162,6 +164,7 @@ export function ListItem({ item }: { item: any }) {
 
 const styles = StyleSheet.create({
   image: {
+    flex: 1,
     width: '100%',
     aspectRatio: 4 / 3,
     borderRadius: 10,
@@ -231,6 +234,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
   },
   name: {
+    flex: 1,
     fontSize: 15,
     fontWeight: '500',
     marginBottom: 2,
