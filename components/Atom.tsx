@@ -1,8 +1,9 @@
 import React from 'react';
-import { View, Image, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import { ListItem } from '@/components/list-item';
 import { Address } from 'viem';
 import { ThemedText } from '@/components/ThemedText';
+import { Image } from 'expo-image';
 
 // Define a type for the cached_image sub-object
 interface CachedImage {
@@ -41,6 +42,7 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
         <View style={styles.row}>
           {imageUrl && (
             <Image
+              recyclingKey={imageUrl}
               source={{ uri: imageUrl }}
               style={styles.avatar}
             />
@@ -69,6 +71,7 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
           </ThemedText>
           {atom.cached_image?.url && (
             <Image
+              recyclingKey={imageUrl}
               source={{ uri: imageUrl }}
               style={styles.cardImage}
             />
@@ -87,6 +90,7 @@ const Atom: React.FC<AtomProps> = ({ atom, layout }) => {
           {atom.type && <ThemedText style={styles.detailText}>Type: {atom.type}</ThemedText>}
           {imageUrl && (
             <Image
+              recyclingKey={imageUrl}
               source={{ uri: imageUrl }}
               style={styles.detailImage}
             />
