@@ -25,6 +25,7 @@ query AccountInfo($id: String!) {
           vault: { position_count: { _gt: 0 } }
         }
       ) {
+        id
         predicate {
           label
           type
@@ -113,18 +114,20 @@ export function AccountInfo({ id }: { id: string }) {
           </View>,
         }}
       />
-      <ThemedView style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 10 }}>
-        {data?.account?.atom?.tags.map((claim: any) => (
-          <Link href={`/a/${claim.object.id}`} key={claim.id}>
-            <ThemedView style={[styles.keywordContainer, { backgroundColor: backgroundSecondaryColor, marginRight: 4 }]}>
-              <ThemedText key={claim.id} style={styles.keyword}>{claim.object.label}</ThemedText>
-            </ThemedView>
-          </Link>
-        ))}
-        <ThemedView style={{ marginRight: 4 }}>
-          <Avatar size={24} radius={24} id={data?.account?.id} style={{ marginRight: 4, marginTop: Platform.OS === 'ios' ? 4 : 8 }} />
+      <ScrollView style={{ padding: 8, height: 100, flexGrow: 0 }}>
+        <ThemedView style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 10 }}>
+          {data?.account?.atom?.tags.map((claim: any) => (
+            <Link href={`/t/${claim.id}`} key={claim.id}>
+              <ThemedView style={[styles.keywordContainer, { backgroundColor: backgroundSecondaryColor, marginRight: 4 }]}>
+                <ThemedText key={claim.id} style={styles.keyword}>{claim.object.label}</ThemedText>
+              </ThemedView>
+            </Link>
+          ))}
+          <ThemedView style={{ marginRight: 4 }}>
+            <Avatar size={24} radius={24} id={data?.account?.id} style={{ marginRight: 4, marginTop: Platform.OS === 'ios' ? 4 : 8 }} />
+          </ThemedView>
         </ThemedView>
-      </ThemedView>
+      </ScrollView>
       {/* {data?.account?.atom?.as_subject_claims.map((claim: any) => (
           <ThemedText key={claim.predicate.label}>{claim.predicate.label}: {claim.object.label}</ThemedText>
         ))} */}
