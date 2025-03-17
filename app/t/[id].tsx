@@ -238,6 +238,7 @@ export default function TriplePage() {
         <Triple
           triple={triple}
           layout="swipeable"
+          linkToAtoms={true}
           inProgress={actionInProgress || loading}
           onUpvote={async () => {
             try {

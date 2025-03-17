@@ -60,9 +60,10 @@ interface TripleProps {
   onUpvote?: () => Promise<void>;
   onDownvote?: () => Promise<void>;
   inProgress?: boolean;
+  linkToAtoms?: boolean;
 }
 
-const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, inProgress }) => {
+const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, inProgress, linkToAtoms = false }) => {
   const textColor = useThemeColor({}, 'text');
   const textSecondary = useThemeColor({}, 'textSecondary');
   const backgroundSecondary = useThemeColor({}, 'backgroundSecondary');
@@ -72,24 +73,45 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
       return <SwipeableListItem
         onLeftSwipe={inProgress ? undefined : onUpvote}
         onRightSwipe={inProgress ? undefined : onDownvote}>
-        <Triple triple={triple} layout="list-item" inProgress={inProgress} />
+        <Triple triple={triple} layout="list-item" inProgress={inProgress} linkToAtoms={linkToAtoms} />
       </SwipeableListItem>;
     case 'list-item':
       return (
         <ThemedView style={[styles.listContainer]}>
 
-          <Link style={styles.vaultLink} href={{ pathname: '/t/[id]', params: { id: triple.id } }}>
-            <View style={[styles.vaultContent, { backgroundColor: backgroundSecondary }]}>
-              <Atom atom={triple.subject} layout='text-avatar' />
-              {triple.predicate.type === 'Keywords' && <ThemedView style={[styles.keywordContainer, { backgroundColor: background }]} >
-                <ThemedText style={styles.keyword}>{triple.object.label}</ThemedText>
-              </ThemedView>}
+          {!linkToAtoms ? (
+            <Link style={styles.vaultLink} href={{ pathname: '/t/[id]', params: { id: triple.id } }}>
+              <View style={[styles.vaultContent, { backgroundColor: backgroundSecondary }]}>
+                <Atom atom={triple.subject} layout='text-avatar' />
+                {triple.predicate.type === 'Keywords' && <ThemedView style={[styles.keywordContainer, { backgroundColor: background }]} >
+                  <ThemedText style={styles.keyword}>{triple.object.label}</ThemedText>
+                </ThemedView>}
+                {triple.predicate.type !== 'Keywords' && <>
+                  <Atom atom={triple.predicate} layout='text-avatar' />
+                  <Atom atom={triple.object} layout='text-avatar' />
+                </>}
+              </View>
+            </Link>
+          ) : (
+            <View style={[styles.vaultContent, { backgroundColor: backgroundSecondary, marginTop: 4 }]}>
+              <Link href={{ pathname: '/a/[id]', params: { id: triple.subject.id } }}>
+                <Atom atom={triple.subject} layout='text-avatar' />
+              </Link>
+              {triple.predicate.type === 'Keywords' && <Link href={{ pathname: '/a/[id]', params: { id: triple.object.id } }}>
+                <ThemedView style={[styles.keywordContainer, { backgroundColor: background, paddingTop: 4 }]} >
+                  <ThemedText style={styles.keyword}>{triple.object.label}</ThemedText>
+                </ThemedView>
+              </Link>}
               {triple.predicate.type !== 'Keywords' && <>
-                <Atom atom={triple.predicate} layout='text-avatar' />
-                <Atom atom={triple.object} layout='text-avatar' />
+                <Link href={{ pathname: '/a/[id]', params: { id: triple.predicate.id } }}>
+                  <Atom atom={triple.predicate} layout='text-avatar' />
+                </Link>
+                <Link href={{ pathname: '/a/[id]', params: { id: triple.object.id } }}>
+                  <Atom atom={triple.object} layout='text-avatar' />
+                </Link>
               </>}
             </View>
-          </Link>
+          )}
 
           <View style={styles.positionsColumn}>
             {triple.counter_vault && triple.counter_vault.position_count > 0 && (
