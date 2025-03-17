@@ -141,9 +141,9 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
     <View style={{ flex: 1, backgroundColor: backgroundColor }}>
       <Stack.Screen
         options={{
-          headerRight: () => <Pressable onPress={() => reset()} style={{ marginRight: 10 }}>
+          headerRight: () => messages.length > 2 ? <Pressable onPress={() => reset()} style={{ marginRight: 10 }}>
             <Ionicons name="refresh" size={24} color={textColor} />
-          </Pressable>,
+          </Pressable> : null,
         }}
       />
       {showConfig && (
@@ -205,15 +205,17 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
             <ThemedText style={{ fontSize: 12 }}>{progressMessage}</ThemedText>
           </View> : null
         )}
+
         renderBubble={props => (
           <Bubble
             {...props}
             wrapperStyle={{
               right: {
-                backgroundColor: backgroundSecondaryColor
+                backgroundColor: backgroundSecondaryColor,
               },
               left: {
-                backgroundColor: backgroundSecondaryColor,
+                backgroundColor: backgroundColor,
+                width: '100%',
               }
             }}
             textStyle={{
@@ -291,7 +293,8 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
           }
         }}
         renderAvatar={props => (
-          <Image source={require('@/assets/images/logo-small.png')} style={{ width: 32, height: 32, borderRadius: 16 }} />
+          null
+          // <Image source={require('@/assets/images/logo-small.png')} style={{ width: 32, height: 32, borderRadius: 16 }} />
         )}
 
         renderTime={props => null}
