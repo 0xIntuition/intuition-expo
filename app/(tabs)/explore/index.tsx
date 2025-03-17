@@ -1,8 +1,9 @@
-import { View, ScrollView } from 'react-native';
+import { View, ScrollView, TextInput } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { StyleSheet } from 'react-native';
 import { useQuery } from '@apollo/client';
 import { gql } from '@/lib/generated';
+import { useState } from 'react';
 
 import { Link, Slot, usePathname, router } from 'expo-router';
 
@@ -39,12 +40,29 @@ query GetAggregates {
 `);
 
 export default function ExploreIndex() {
-
+  const [searchQuery, setSearchQuery] = useState('');
   const { data, loading } = useQuery(GET_AGGREGATES);
   const backgroundColor = useThemeColor({}, 'background');
+  const textColor = useThemeColor({}, 'text');
+  const backgroundSecondaryColor = useThemeColor({}, 'backgroundSecondary');
 
   return (
     <ScrollView style={[styles.container, { backgroundColor }]}>
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={[
+            styles.searchInput,
+            {
+              color: textColor,
+              backgroundColor: backgroundSecondaryColor
+            }
+          ]}
+          placeholder="Search..."
+          placeholderTextColor={useThemeColor({}, 'tabIconDefault')}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+        />
+      </View>
 
       <Link href="/explore/atoms" style={styles.item}>
         <ThemedText style={styles.title}>Atoms</ThemedText>
@@ -79,7 +97,17 @@ export default function ExploreIndex() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
+  },
+  searchContainer: {
+    padding: 16,
+    paddingBottom: 8,
+  },
+  searchInput: {
+    height: 40,
+    borderWidth: 1,
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    fontSize: 16,
   },
   item: {
     padding: 16,

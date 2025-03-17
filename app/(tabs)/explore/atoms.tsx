@@ -9,6 +9,7 @@ import { formatDistanceToNow } from 'date-fns';
 import { gql } from '@/lib/generated';
 import Atom from '@/components/Atom';
 import { getUpvotes } from '@/hooks/useUpvotes';
+import { useThemeColor } from '@/hooks/useThemeColor';
 const GetAtomsQuery = gql(`
 query GetAtoms($offset: Int) {
   atoms_aggregate {
@@ -40,9 +41,10 @@ query GetAtoms($offset: Int) {
 }`);
 
 export default function Atoms() {
+  const textColor = useThemeColor({}, 'text');
   const { loading, error, data, refetch, fetchMore } = useQuery(GetAtomsQuery);
 
-  if (loading && !data) return <ActivityIndicator size="large" />;
+  if (loading && !data) return <ActivityIndicator size="large" color={textColor} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
 
   return (
     <ThemedView style={styles.container}>

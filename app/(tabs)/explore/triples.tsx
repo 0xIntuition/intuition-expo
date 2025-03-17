@@ -7,6 +7,7 @@ import { gql } from '@apollo/client';
 import TriplesList from '@/components/TriplesList';
 import { useGeneralConfig } from '@/hooks/useGeneralConfig';
 import { usePrivy, useEmbeddedEthereumWallet } from '@privy-io/expo';
+import { useThemeColor } from '@/hooks/useThemeColor';
 
 // Define interfaces for our GraphQL query results
 export interface TripleItem {
@@ -117,13 +118,14 @@ query GetTriples($offset: Int, $address: String) {
 `);
 
 export default function Triples() {
+  const textColor = useThemeColor({}, 'text');
   const { wallets } = useEmbeddedEthereumWallet();
   const address = wallets[0]?.address?.toLowerCase() || '0x0000000000000000000000000000000000000000';
   const { loading, error, data, refetch, fetchMore, variables } = useQuery(GetTriplesQuery, {
     variables: { address }
   });
 
-  if (loading && !data) return <ActivityIndicator size="large" />;
+  if (loading && !data) return <ActivityIndicator size="large" color={textColor} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
 
   return (
     <ThemedView style={styles.container}>

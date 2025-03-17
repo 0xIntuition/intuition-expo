@@ -44,12 +44,12 @@ function shortId(id: string): string {
 }
 
 export default function Accounts() {
-
+  const textColor = useThemeColor({}, 'text');
   const { loading, error, data, refetch, fetchMore } = useQuery(GetListsQuery);
   const width = useWindowDimensions().width;
 
 
-  if (loading && !data) return <ActivityIndicator size="large" />;
+  if (loading && !data) return <ActivityIndicator size="large" color={textColor} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
   return (
     <ThemedView style={styles.container}>
       {error && <ThemedText>{error.message}</ThemedText>}
