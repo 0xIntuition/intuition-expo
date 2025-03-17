@@ -1,13 +1,10 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { router, Stack, useRouter } from 'expo-router';
+import { useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import React, { useEffect } from 'react';
 import 'react-native-reanimated';
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
-import { relayStylePagination } from '@apollo/client/utilities';
 import { PrivyProvider, PrivyElements } from '@privy-io/expo';
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 import { Platform } from 'react-native';
@@ -24,9 +21,6 @@ if (__DEV__) {
   loadDevMessages();
   loadErrorMessages();
 }
-
-
-
 
 export default function RootLayout() {
   const router = useRouter();

@@ -7,6 +7,8 @@ import { gql } from '@/lib/generated';
 import { Link, Slot, usePathname, router } from 'expo-router';
 
 import { Text, Pressable } from 'react-native';
+import { ThemedView } from '@/components/ThemedView';
+import { useThemeColor } from '@/hooks/useThemeColor';
 const GET_AGGREGATES = gql(`
 query GetAggregates {
   accounts_aggregate(where: {type:  {
@@ -39,10 +41,11 @@ query GetAggregates {
 export default function ExploreIndex() {
 
   const { data, loading } = useQuery(GET_AGGREGATES);
-
+  const backgroundColor = useThemeColor({}, 'background');
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={[styles.container, { backgroundColor }]}>
+
       <Link href="/explore/atoms" style={styles.item}>
         <ThemedText style={styles.title}>Atoms</ThemedText>
         <ThemedText style={styles.count}>
@@ -68,7 +71,8 @@ export default function ExploreIndex() {
           - {loading ? '...' : data?.predicate_objects_aggregate.aggregate?.count ?? 0}
         </ThemedText>
       </Link>
-    </ScrollView>
+
+    </ScrollView >
   );
 }
 

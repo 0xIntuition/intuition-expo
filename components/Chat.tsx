@@ -25,6 +25,7 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
   const [progressMessage, setProgressMessage] = useState<string>('')
   const client = useApolloClient();
   const backgroundColor = useThemeColor({}, 'background');
+  const backgroundSecondaryColor = useThemeColor({}, 'backgroundSecondary');
   const textColor = useThemeColor({}, 'text');
   const openAI = React.useMemo(
     () =>
@@ -137,7 +138,7 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
   }, [messages, openAI]);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: backgroundColor }}>
       <Stack.Screen
         options={{
           headerRight: () => <Pressable onPress={() => reset()} style={{ marginRight: 10 }}>
@@ -182,7 +183,7 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
             <Pressable
               key={index}
               onPress={() => onSend([{ _id: Math.random().toString(), createdAt: new Date(), text: question, user: { _id: 1 } }])}
-              style={{ marginBottom: 10, backgroundColor: backgroundColor, padding: 10, borderRadius: 10 }}
+              style={{ marginBottom: 10, backgroundColor: backgroundSecondaryColor, padding: 10, borderRadius: 10 }}
             >
               <ThemedText>{question}</ThemedText>
             </Pressable>
@@ -209,15 +210,15 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
             {...props}
             wrapperStyle={{
               right: {
-                backgroundColor: '#3c4245'
+                backgroundColor: backgroundSecondaryColor
               },
               left: {
-                backgroundColor: '#282c2e',
+                backgroundColor: backgroundSecondaryColor,
               }
             }}
             textStyle={{
               left: {
-                color: 'white'
+                color: textColor
               }
             }}
             renderMessageText={props => (
@@ -229,7 +230,7 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
                       <Link
                         key={node.key}
                         href={node.attributes.href}
-                        style={[styles.link, { color: '#1e90ff' }]}
+                        style={[styles.link, { color: textColor }]}
                       >
                         {children}
                       </Link>
@@ -254,14 +255,14 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
               marginHorizontal: 4,
             }}
           >
-            <Ionicons name="send" size={24} color="white" />
+            <Ionicons name="send" size={24} color={textColor} />
           </Send>)}
         renderInputToolbar={props => (
           <InputToolbar
             {...props}
 
             containerStyle={{
-              backgroundColor: '#151718',
+              backgroundColor: backgroundSecondaryColor,
               borderTopWidth: 0,
               padding: 5,
               borderRadius: 20,
@@ -274,7 +275,7 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
           <Composer
             {...props}
             textInputStyle={{
-              color: '#ECEDEE',
+              color: textColor,
               backgroundColor: 'transparent',
 
 
@@ -283,10 +284,10 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
         )}
         timeTextStyle={{
           right: {
-            color: 'gray'
+            color: textColor
           },
           left: {
-            color: 'gray'
+            color: textColor
           }
         }}
         renderAvatar={props => (

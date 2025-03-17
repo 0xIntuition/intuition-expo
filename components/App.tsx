@@ -1,17 +1,12 @@
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { useFonts } from 'expo-font';
-import { router, Stack, useRouter } from 'expo-router';
-import * as SplashScreen from 'expo-splash-screen';
+import { Stack } from 'expo-router';
 import React, { useEffect } from 'react';
 import 'react-native-reanimated';
 import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
 import { relayStylePagination } from '@apollo/client/utilities';
-import { PrivyProvider, PrivyElements } from '@privy-io/expo';
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import { useShareIntentContext } from "expo-share-intent";
+import { Appearance, Platform } from 'react-native';
 const client = new ApolloClient({
   uri: process.env.EXPO_PUBLIC_API_URL,
   cache: new InMemoryCache({
@@ -25,8 +20,16 @@ const client = new ApolloClient({
   }),
 });
 export default function App() {
-  const router = useRouter();
   const colorScheme = useColorScheme();
+  useEffect(() => {
+    if (Platform.OS === 'web') {
+      if (colorScheme === 'dark') {
+        document.documentElement.style.colorScheme = 'dark';
+      } else {
+        document.documentElement.style.colorScheme = 'light';
+      }
+    }
+  }, [colorScheme]);
 
   return (
     <GestureHandlerRootView>
