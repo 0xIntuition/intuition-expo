@@ -1,5 +1,5 @@
 import { Button, View, TouchableOpacity, Pressable } from 'react-native';
-import { Image, StyleSheet } from 'react-native';
+import { Image, StyleSheet, ScrollView } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@apollo/client';
 import { ThemedText } from '@/components/ThemedText';
@@ -16,6 +16,8 @@ import { getUpvotes } from '@/hooks/useUpvotes';
 import { usePrivy, useLogin, useEmbeddedEthereumWallet, useFundWallet, usePrivyClient } from '@privy-io/expo';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useThemeColor } from '@/hooks/useThemeColor';
+import Markdown from 'react-native-markdown-display';
+import { styles as markdownStyles } from '@/lib/chat-styles';
 const GetAtomQuery = gql(`
 query GetAtom($id: numeric!, $address: String) {
   atom(id: $id) {
@@ -161,63 +163,82 @@ export default function Atom() {
   const description = data?.atom?.value?.thing?.description || data?.atom?.value?.person?.description || data?.atom?.value?.organization?.description || '';
 
   return (
-    <ThemedView style={styles.container}>
-      <Stack.Screen
-        options={{
-          headerTitle: () => <View style={styles.header} >
-            {data?.atom?.image !== null && <Image style={styles.image} source={{ uri: data?.atom?.image }} />}
-            <ThemedText>{data?.atom?.label}</ThemedText>
-          </View>,
-          headerRight: () => <Pressable onPress={async () => {
-            await shareAsync('https://app.i7n.xyz/a/' + id);
-          }} style={{ marginRight: 10 }}>
-            <Ionicons name="share-outline" size={24} color={textColor} />
-          </Pressable>,
-        }}
-      />
-      <Section >
-        <ListItem
-          label={description}
-          subLabel={`${data?.atom?.type} ∙ ID: ${data?.atom?.id}`}
+    <ScrollView>
+      <ThemedView style={styles.container}>
+        <Stack.Screen
+          options={{
+            headerTitle: () => <View style={styles.header} >
+              {data?.atom?.image !== null && <Image style={styles.image} source={{ uri: data?.atom?.image }} />}
+              <ThemedText>{data?.atom?.label}</ThemedText>
+            </View>,
+            headerRight: () => <Pressable onPress={async () => {
+              await shareAsync('https://app.i7n.xyz/a/' + id);
+            }} style={{ marginRight: 10 }}>
+              <Ionicons name="share-outline" size={24} color={textColor} />
+            </Pressable>,
+          }}
         />
-        {data && data.positions && data.positions.length > 0 && (
+        <ThemedView style={{ padding: 8 }}>
+          <Markdown
+            style={markdownStyles}
+            rules={{
+              link: (node, children, parent, styles) => {
+                return (
+                  <Link
+                    key={node.key}
+                    href={node.attributes.href}
+                    style={[styles.link, { color: textColor }]}
+                  >
+                    {children}
+                  </Link>
+                );
+              }
+            }}
+          >{description + (data?.atom?.value?.thing?.url ? '\n\n' + '[' + data?.atom?.value?.thing?.url + '](' + data?.atom?.value?.thing?.url + ')' : '')}
+
+          </Markdown>
+        </ThemedView>
+        <Section >
+
+          {data && data.positions && data.positions.length > 0 && (
+            <ListItem
+              label="My upvotes"
+              value={`↑ ${(getUpvotes(BigInt(data?.positions[0]?.shares), BigInt(data?.atom?.vault?.current_share_price))).toString(10)}`}
+            />
+          )}
           <ListItem
-            label="My upvotes"
-            value={`↑ ${(getUpvotes(BigInt(data?.positions[0]?.shares), BigInt(data?.atom?.vault?.current_share_price))).toString(10)}`}
+            label="Total upvotes"
+            subLabel={`Voters: ${data?.atom?.vault?.position_count}`}
+            value={`↑ ${(getUpvotes(BigInt(data?.atom?.vault?.total_shares), BigInt(data?.atom?.vault?.current_share_price))).toString(10)}`}
+            last
           />
-        )}
-        <ListItem
-          label="Total upvotes"
-          subLabel={`Voters: ${data?.atom?.vault?.position_count}`}
-          value={`↑ ${(getUpvotes(BigInt(data?.atom?.vault?.total_shares), BigInt(data?.atom?.vault?.current_share_price))).toString(10)}`}
-          last
-        />
 
-      </Section>
+        </Section>
 
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: 8, paddingLeft: 8 }}>
-        {signalInProgress && <ThemedText>Signal in progress...</ThemedText>}
-        {!signalInProgress && isReady && <Button title="Upvote +↑" onPress={handleDeposit} />}
-        {!signalInProgress && data?.positions && data?.positions.length > 0 && <Button title="Withdraw all" onPress={() => handleWithdraw(BigInt(data?.positions[0]?.shares))} />}
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', paddingRight: 8, paddingLeft: 8 }}>
+          {signalInProgress && <ThemedText>Signal in progress...</ThemedText>}
+          {!signalInProgress && isReady && <Button title="Upvote +↑" onPress={handleDeposit} />}
+          {!signalInProgress && data?.positions && data?.positions.length > 0 && <Button title="Withdraw all" onPress={() => handleWithdraw(BigInt(data?.positions[0]?.shares))} />}
 
-      </View>
+        </View>
 
-      <ThemedText>{errorMesage}</ThemedText>
-      {errorMesage && <Link href={{ pathname: '/(tabs)/me' }}><ThemedText>Go to me</ThemedText></Link>}
-      <Section title="Top Upvoters">
-        {data?.atom?.vault?.positions.map(({ shares, account }) => (
-          <ListItem
-            key={account?.id || ''}
-            id={account?.id as Address}
-            image={account?.image || ''}
-            label={account?.label || ''}
-            href={{ pathname: '/acc/[id]', params: { id: account?.id || '' } }}
-            value={`↑ ${(getUpvotes(BigInt(shares), BigInt(data?.atom?.vault?.current_share_price))).toString(10)}`}
-          />
-        ))}
-      </Section>
+        <ThemedText>{errorMesage}</ThemedText>
+        {errorMesage && <Link href={{ pathname: '/(tabs)/me' }}><ThemedText>Go to me</ThemedText></Link>}
+        <Section title="Top Upvoters">
+          {data?.atom?.vault?.positions.map(({ shares, account }) => (
+            <ListItem
+              key={account?.id || ''}
+              id={account?.id as Address}
+              image={account?.image || ''}
+              label={account?.label || ''}
+              href={{ pathname: '/acc/[id]', params: { id: account?.id || '' } }}
+              value={`↑ ${(getUpvotes(BigInt(shares), BigInt(data?.atom?.vault?.current_share_price))).toString(10)}`}
+            />
+          ))}
+        </Section>
 
-    </ThemedView>
+      </ThemedView>
+    </ScrollView>
   );
 }
 
