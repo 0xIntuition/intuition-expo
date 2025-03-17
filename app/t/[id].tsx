@@ -81,7 +81,7 @@ export default function TriplePage() {
   const [signalInProgress, setSignalInProgress] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [actionInProgress, setActionInProgress] = useState(false);
-  if (loading) return <ActivityIndicator size="large" color={textColor} />;
+  if (loading) return <ActivityIndicator size="large" color={textColor} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
   if (error) return <ThemedText>{error.message}</ThemedText>;
 
   if (!data.triple) {

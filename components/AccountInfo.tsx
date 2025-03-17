@@ -1,4 +1,4 @@
-import { Button, SafeAreaView, View, Pressable, ScrollView, Platform } from 'react-native';
+import { Button, SafeAreaView, View, Pressable, ScrollView, Platform, ActivityIndicator } from 'react-native';
 import { Image, StyleSheet } from 'react-native';
 import { Link, Stack, useLocalSearchParams, useRouter } from 'expo-router';
 import { useQuery, gql } from '@apollo/client';
@@ -85,7 +85,7 @@ export function AccountInfo({ id }: { id: string }) {
   const router = useRouter();
   const { loading, error, data, refetch } = useQuery(GET_ACCOUNT, { variables: { id: id.toString().toLowerCase() } });
 
-  if (loading) return <ThemedText>Loading...</ThemedText>;
+  if (loading) return <ActivityIndicator size="large" color={textColor} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
   if (error) return <ThemedText>{error.message}</ThemedText>;
 
   if (!data.account) {

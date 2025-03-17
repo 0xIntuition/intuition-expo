@@ -1,4 +1,4 @@
-import { Button, View, TouchableOpacity, Pressable } from 'react-native';
+import { Button, View, TouchableOpacity, Pressable, ActivityIndicator } from 'react-native';
 import { Image, StyleSheet, ScrollView } from 'react-native';
 import { Link, Stack, useLocalSearchParams } from 'expo-router';
 import { useQuery } from '@apollo/client';
@@ -25,7 +25,22 @@ query GetAtom($id: numeric!, $address: String) {
     label
     image
     type
-    type
+    tags: as_subject_triples(
+        where: {
+          predicate: { type: { _eq: "Keywords" } }
+          vault: { position_count: { _gt: 0 } }
+        }
+      ) {
+        id
+        predicate {
+          label
+          type
+        }
+        object {
+          id
+          label
+        }
+      }
     vault {
       total_shares
       position_count
@@ -68,6 +83,9 @@ query GetAtom($id: numeric!, $address: String) {
 
 export default function Atom() {
   const textColor = useThemeColor({}, 'text');
+  const secondaryTextColor = useThemeColor({}, 'textSecondary');
+  const backgroundColor = useThemeColor({}, 'background');
+  const backgroundSecondaryColor = useThemeColor({}, 'backgroundSecondary');
   const wait = useWaitForTransactionEvents();
   const { isReady } = usePrivy();
   const { wallets } = useEmbeddedEthereumWallet();
@@ -81,7 +99,7 @@ export default function Atom() {
   const [errorMesage, setErrorMesage] = useState<string | null>(null);
   const generalConfig = useGeneralConfig();
 
-  if (loading) return <ThemedText>Loading...</ThemedText>;
+  if (loading) return <ActivityIndicator size="large" color={textColor} style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }} />;
   if (error) return <ThemedText>{error.message}</ThemedText>;
 
   if (!loading && !data?.atom) {
@@ -161,6 +179,7 @@ export default function Atom() {
   };
 
   const description = data?.atom?.value?.thing?.description || data?.atom?.value?.person?.description || data?.atom?.value?.organization?.description || '';
+  const url = data?.atom?.value?.thing?.url || data?.atom?.value?.person?.url || data?.atom?.value?.organization?.url || '';
 
   return (
     <ScrollView>
@@ -194,10 +213,22 @@ export default function Atom() {
                 );
               }
             }}
-          >{description + (data?.atom?.value?.thing?.url ? '\n\n' + '[' + data?.atom?.value?.thing?.url + '](' + data?.atom?.value?.thing?.url + ')' : '')}
+          >{description + (url ? '\n\n' + '[' + url + '](' + url + ')' : '')}
 
           </Markdown>
         </ThemedView>
+
+        <ThemedView style={{ flexDirection: 'row', flexWrap: 'wrap', marginBottom: 10, padding: 8 }}>
+          {data?.atom?.tags.map((claim: any) => (
+            <Link href={`/t/${claim.id}`} key={claim.id}>
+              <ThemedView style={[styles.keywordContainer, { backgroundColor: backgroundSecondaryColor, marginRight: 4 }]}>
+                <ThemedText key={claim.id} style={styles.keyword}>{claim.object.label}</ThemedText>
+              </ThemedView>
+            </Link>
+          ))}
+
+        </ThemedView>
+
         <Section >
 
           {data && data.positions && data.positions.length > 0 && (
@@ -224,18 +255,7 @@ export default function Atom() {
 
         <ThemedText>{errorMesage}</ThemedText>
         {errorMesage && <Link href={{ pathname: '/(tabs)/me' }}><ThemedText>Go to me</ThemedText></Link>}
-        <Section title="Top Upvoters">
-          {data?.atom?.vault?.positions.map(({ shares, account }) => (
-            <ListItem
-              key={account?.id || ''}
-              id={account?.id as Address}
-              image={account?.image || ''}
-              label={account?.label || ''}
-              href={{ pathname: '/acc/[id]', params: { id: account?.id || '' } }}
-              value={`↑ ${(getUpvotes(BigInt(shares), BigInt(data?.atom?.vault?.current_share_price))).toString(10)}`}
-            />
-          ))}
-        </Section>
+
 
       </ThemedView>
     </ScrollView>
@@ -256,5 +276,15 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
+  },
+  keywordContainer: {
+    marginTop: 4,
+    padding: 4,
+    paddingHorizontal: 8,
+    borderRadius: 5,
+    marginVertical: 2,
+  },
+  keyword: {
+    fontSize: 12,
   },
 });
