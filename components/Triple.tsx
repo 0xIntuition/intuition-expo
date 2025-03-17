@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import { View, StyleSheet, ActivityIndicator, Pressable, Platform } from 'react-native';
 import { Link } from 'expo-router';
 import { formatDistanceToNow } from 'date-fns';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -134,7 +134,10 @@ const Triple: React.FC<TripleProps> = ({ triple, layout, onUpvote, onDownvote, i
               <ThemedText numberOfLines={1} style={[styles.secondary, { borderColor: backgroundSecondary, color: textSecondary }]}>
                 <Ionicons size={13} name='arrow-up' />
 
-                {triple.vault.positions != null && triple.vault.positions.length > 0 && (<Avatar size={13} radius={13} style={{ paddingLeft: 12, marginBottom: 3 }} id={triple.vault.positions[0].account_id} />)}
+                {triple.vault.positions != null && triple.vault.positions.length > 0 && (<Avatar size={13} radius={13} style={{
+                  paddingLeft: Platform.OS === 'ios' ? 12 : 3,
+                  marginBottom: Platform.OS === 'ios' ? 3 : 0,
+                }} id={triple.vault.positions[0].account_id} />)}
 
                 {triple.vault.positions != null && triple.vault.positions.length > 0 && getUpvotes(BigInt(triple.vault.positions[0].shares), BigInt(triple.vault.current_share_price)).toString(10) + " ∙ "}
 

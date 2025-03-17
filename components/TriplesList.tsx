@@ -190,6 +190,7 @@ const TriplesList: React.FC<TriplesListProps> = ({ triples, onRefresh, onRefetch
         refreshing={loading}
         onEndReachedThreshold={onEndReachedThreshold}
         keyExtractor={(item) => item.id}
+        estimatedItemSize={150}
         renderItem={({ item }) => {
           // Convert null values to undefined to satisfy type requirements
           const tripleData = {

@@ -5,13 +5,16 @@ import React, { useEffect, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
-import { Link } from 'expo-router';
+import { Link, Stack } from 'expo-router';
 import { usePrivy, useLogin, useEmbeddedEthereumWallet, useFundWallet, usePrivyClient } from '@privy-io/expo';
 import { base } from 'viem/chains';
 import { getMultiVault } from '@/hooks/useMultiVault';
 import { Multivault } from '@/lib/protocol';
 import { Address, PublicClient, WalletClient, formatEther } from 'viem';
+import { AccountInfo } from '@/components/AccountInfo';
+import { useThemeColor } from '@/hooks/useThemeColor';
 export default function Me() {
+  const textColor = useThemeColor({}, 'text');
   const [balance, setBalance] = useState(0n);
   const { fundWallet } = useFundWallet();
   const { login } = useLogin();
@@ -52,27 +55,28 @@ export default function Me() {
   };
   return (
     <ThemedView style={styles.container}>
+      <Stack.Screen
+        options={{
+          headerLeft: () => {
+            return user !== null && <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <Pressable onPress={handleButtonPress}>
+                <Ionicons name="log-out-outline" size={24} color={textColor} />
+              </Pressable>
+              <Pressable onPress={() => fundWallet({ address, chain: base, amount: "0.01" })}>
+                <ThemedText style={{ marginLeft: 16, fontSize: 12 }}>{parseFloat(formatEther(balance)).toFixed(3)} ETH</ThemedText>
+              </Pressable>
+            </View>
+          }
+        }}
+      />
       {error && <ThemedText>{error.message}</ThemedText>}
-      {isReady && (
-        <ThemedText>{user ? user.id : "No Connected"}</ThemedText>
-      )}
-      <Pressable onPress={handleButtonPress} style={styles.pressableMargin}>
-        <ThemedText>{user ? "Disconnect" : "Connect"}</ThemedText>
-      </Pressable>
-      {address !== undefined && (
-        <ThemedView>
-          <Link
-            href={{
-              pathname: '/acc/[id]',
-              params: { id: address }
-            }}>
-            <ThemedText>{address}</ThemedText>
-          </Link>
-          <Pressable onPress={() => fundWallet({ address, chain: base, amount: "0.01" })}>
-            <ThemedText>Fund</ThemedText>
-          </Pressable>
-          <ThemedText>{formatEther(balance)}</ThemedText>
-        </ThemedView>
+
+      {user === null && <Pressable onPress={handleButtonPress} style={styles.pressableMargin}>
+        <ThemedText style={{ fontSize: 25, fontWeight: 'bold', color: textColor, textAlign: 'center', marginTop: 16 }}>{"Connect"}</ThemedText>
+      </Pressable>}
+
+      {user !== null && (
+        <AccountInfo id={address as string} />
       )}
 
     </ThemedView>
@@ -86,7 +90,7 @@ const styles = StyleSheet.create({
   },
   container: {
     flex: 1,
-    paddingLeft: 16,
+
   },
 });
 
