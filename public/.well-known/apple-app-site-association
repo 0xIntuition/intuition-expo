@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "H4PHXGB739.systems.intuition.mobile",
+        "paths": ["/", "/a/*", "/t/*", "/acc/*", "/acc-ai/*", "/list/*", "/explore/*", "/me/*"]
+      }
+    ]
+  },
+  "activitycontinuation": {
+    "apps": ["H4PHXGB739.systems.intuition.mobile"]
+  }
+}
