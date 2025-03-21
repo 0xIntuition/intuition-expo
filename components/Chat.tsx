@@ -106,7 +106,7 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
     })
       .on("connect", () => {
         console.log("Connecting...")
-        setProgressMessage("")
+        setProgressMessage("Thinking...")
         setIsTyping(true)
       })
       .on("functionCall", (event: any) => {
@@ -138,7 +138,7 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
   }, [messages, openAI]);
 
   return (
-    <View style={{ flex: 1, backgroundColor: backgroundColor }}>
+    <ThemedView style={{ flex: 1 }}>
       <Stack.Screen
         options={{
           headerRight: () => messages.length > 2 ? <Pressable onPress={() => reset()} style={{ marginRight: 10 }}>
@@ -300,6 +300,6 @@ export default function Chat({ systemPrompt, assistantMessage, sampleQuestions }
         renderTime={props => null}
         renderSystemMessage={props => null}
       />
-    </View>
+    </ThemedView>
   )
 }
