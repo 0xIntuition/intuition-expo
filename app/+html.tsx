@@ -22,6 +22,15 @@ export default function Root({ children }: PropsWithChildren) {
         {/* Using raw CSS styles as an escape-hatch to ensure the background color never flickers in dark-mode. */}
         <style dangerouslySetInnerHTML={{ __html: responsiveBackground }} />
         {/* Add any additional <head> elements that you want globally available on web... */}
+        <title>Intuition</title>
+        <meta name="description" content="Bringing trust to trustless systems" />
+        <meta property="og:image" content="/images/cover.png" />
+        <meta property="og:title" content="Intuition" />
+        <meta property="og:description" content="Bringing trust to trustless systems" />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Intuition" />
+        <meta property="og:locale" content="en_US" />
+
       </head>
       <body>{children}</body>
     </html>
