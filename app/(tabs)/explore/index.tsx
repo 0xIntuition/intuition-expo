@@ -245,22 +245,7 @@ export default function ExploreIndex() {
         />
       </View>
 
-      <Link href="/explore/lists" style={styles.item}>
-        <ThemedText style={styles.title}>Collections</ThemedText>
-        <ThemedText style={styles.count}>
-          {loading ? '...' : data?.predicate_objects_aggregate.aggregate?.count ?? 0} &gt;
-        </ThemedText>
-      </Link>
 
-      {!searchLoading && searchData && (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.horizontalList}>
-          {searchData.collections.map((item: any) => (
-            <View key={item.id} style={styles.listItem}>
-              <PredicateObjectListItem predicateObject={item} />
-            </View>
-          ))}
-        </ScrollView>
-      )}
 
       {searchLoading && (
         <View style={styles.item}>
@@ -314,6 +299,25 @@ export default function ExploreIndex() {
         </View>
       )}
 
+      <Link href="/explore/lists" style={styles.item}>
+        <ThemedText style={styles.title}>Collections</ThemedText>
+        <ThemedText style={styles.count}>
+          {loading ? '...' : data?.predicate_objects_aggregate.aggregate?.count ?? 0} &gt;
+        </ThemedText>
+      </Link>
+
+      {!searchLoading && searchData && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}
+          contentContainerStyle={[styles.horizontalList, { maxHeight: 250 }]}
+        >
+          {searchData.collections.map((item: any) => (
+            <View key={item.id} style={styles.listItem}>
+              <PredicateObjectListItem predicateObject={item} />
+            </View>
+          ))}
+        </ScrollView>
+      )}
+
       <Link href="/explore/atoms" style={styles.item}>
         <ThemedText style={styles.title}>Atoms</ThemedText>
         <ThemedText style={styles.count}>
@@ -363,11 +367,12 @@ const styles = StyleSheet.create({
   },
   title: {
     marginTop: 10,
-    fontSize: 23,
+    fontSize: 20,
     fontWeight: '500',
+    marginRight: 16,
   },
   count: {
-    paddingLeft: 16,
+    fontSize: 16,
     opacity: 0.7,
   },
   horizontalList: {
