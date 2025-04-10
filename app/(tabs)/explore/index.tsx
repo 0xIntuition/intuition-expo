@@ -1,4 +1,4 @@
-import { View, ScrollView, TextInput } from 'react-native';
+import { View, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { StyleSheet } from 'react-native';
 import { useQuery } from '@apollo/client';
@@ -262,6 +262,12 @@ export default function ExploreIndex() {
         </ScrollView>
       )}
 
+      {searchLoading && (
+        <View style={styles.item}>
+          <ActivityIndicator size="large" color={textColor} />
+        </View>
+      )}
+
       <Link href="/explore/triples" style={styles.item}>
         <ThemedText style={styles.title}>Triples</ThemedText>
         <ThemedText style={styles.count}>
@@ -277,6 +283,12 @@ export default function ExploreIndex() {
             </View>
           ))}
         </ScrollView>
+      )}
+
+      {searchLoading && (
+        <View style={styles.item}>
+          <ActivityIndicator size="large" color={textColor} />
+        </View>
       )}
 
       <Link href="/explore/accounts" style={styles.item}>
@@ -296,6 +308,12 @@ export default function ExploreIndex() {
         </ScrollView>
       )}
 
+      {searchLoading && (
+        <View style={styles.item}>
+          <ActivityIndicator size="large" color={textColor} />
+        </View>
+      )}
+
       <Link href="/explore/atoms" style={styles.item}>
         <ThemedText style={styles.title}>Atoms</ThemedText>
         <ThemedText style={styles.count}>
@@ -311,6 +329,12 @@ export default function ExploreIndex() {
             </View>
           ))}
         </ScrollView>
+      )}
+
+      {searchLoading && (
+        <View style={styles.item}>
+          <ActivityIndicator size="large" color={textColor} />
+        </View>
       )}
 
     </ScrollView >
