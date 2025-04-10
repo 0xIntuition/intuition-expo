@@ -245,14 +245,6 @@ export default function ExploreIndex() {
         />
       </View>
 
-
-
-      {searchLoading && (
-        <View style={styles.item}>
-          <ActivityIndicator size="large" color={textColor} />
-        </View>
-      )}
-
       <Link href="/explore/triples" style={styles.item}>
         <ThemedText style={styles.title}>Triples</ThemedText>
         <ThemedText style={styles.count}>
