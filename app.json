@@ -17,6 +17,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "associatedDomains": [
+        "applinks:portal.intuition.systems",
         "applinks:portal.intuition.systems"
       ],
       "bundleIdentifier": "systems.intuition.mobile",
@@ -32,6 +33,14 @@
           "metamask",
           "trust",
           "rainbow",
+          "uniswap",
+          "metamask",
+          "trust",
+          "rainbow",
+          "uniswap",
+          "metamask",
+          "trust",
+          "rainbow",
           "uniswap"
         ],
         "ITSAppUsesNonExemptEncryption": false
@@ -39,6 +48,21 @@
     },
     "android": {
       "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "https",
+              "host": "portal.intuition.systems",
+              "pathPrefix": "/"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        },
         {
           "action": "VIEW",
           "autoVerify": true,
@@ -98,6 +122,9 @@
     "owner": "intuition",
     "runtimeVersion": {
       "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/3fb69fd4-fbcd-4631-80ea-550700baf159"
     }
   }
 }
