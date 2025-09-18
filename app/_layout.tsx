@@ -1,33 +1,36 @@
+import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { useRouter } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import 'react-native-reanimated';
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { loadDevMessages, loadErrorMessages } from '@apollo/client/dev';
-import { PrivyProvider, PrivyElements } from '@privy-io/expo';
+
+import { useColorScheme } from '@/components/useColorScheme';
+
+export {
+  // Catch any errors thrown by the Layout component.
+  ErrorBoundary,
+} from 'expo-router';
+
+export const unstable_settings = {
+  // Ensure that reloading on `/modal` keeps a back button present.
+  initialRouteName: '(tabs)',
+};
+
 // Prevent the splash screen from auto-hiding before asset loading is complete.
-import { Platform } from 'react-native';
-import { base } from 'viem/chains';
-import { ShareIntentProvider } from "expo-share-intent";
-import App from '@/components/App';
-if (typeof window !== 'undefined') { window.React = React; }
-
-const isWeb = Platform.OS === 'web';
-
 SplashScreen.preventAutoHideAsync();
 
-if (__DEV__) {
-  loadDevMessages();
-  loadErrorMessages();
-}
-
 export default function RootLayout() {
-  const router = useRouter();
-  const colorScheme = useColorScheme();
-  const [loaded] = useFonts({
+  const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
+    ...FontAwesome.font,
   });
+
+  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
+  useEffect(() => {
+    if (error) throw error;
+  }, [error]);
 
   useEffect(() => {
     if (loaded) {
@@ -38,41 +41,19 @@ export default function RootLayout() {
   if (!loaded) {
     return null;
   }
-  if (!process.env.EXPO_PUBLIC_PRIVY_APP_ID || !process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID) {
-    throw new Error('Privy app ID and client ID are not set');
-  }
 
-  if (isWeb) {
-    return <App />;
-  }
+  return <RootLayoutNav />;
+}
+
+function RootLayoutNav() {
+  const colorScheme = useColorScheme();
+
   return (
-    <ShareIntentProvider
-      options={{
-        debug: true,
-        resetOnBackground: true,
-        onResetShareIntent: () =>
-          // used when app going in background and when the reset button is pressed
-          router.replace({
-            pathname: "/",
-          }),
-      }}
-    >
-      <PrivyProvider
-        appId={process.env.EXPO_PUBLIC_PRIVY_APP_ID}
-        clientId={process.env.EXPO_PUBLIC_PRIVY_CLIENT_ID}
-        supportedChains={[base]}
-        config={{
-          embedded: {
-            ethereum: {
-              createOnLogin: 'users-without-wallets', // defaults to 'off'
-            },
-          },
-        }}
-      >
-        <App />
-        <PrivyElements config={{ appearance: { colorScheme: colorScheme === 'dark' ? 'dark' : 'light' } }} />
-      </PrivyProvider>
-    </ShareIntentProvider>
-
+    <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+      <Stack>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+      </Stack>
+    </ThemeProvider>
   );
 }

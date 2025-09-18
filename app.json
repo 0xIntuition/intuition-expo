@@ -2,13 +2,14 @@
   "expo": {
     "name": "Intuition",
     "slug": "intuition",
-    "version": "1.0.5",
+    "version": "2.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "i7n",
+    "scheme": "intuition",
     "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
@@ -16,7 +17,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "associatedDomains": [
-        "applinks:app.i7n.xyz"
+        "applinks:portal.intuition.systems"
       ],
       "bundleIdentifier": "systems.intuition.mobile",
       "infoPlist": {
@@ -44,7 +45,7 @@
           "data": [
             {
               "scheme": "https",
-              "host": "app.i7n.xyz",
+              "host": "portal.intuition.systems",
               "pathPrefix": "/"
             }
           ],
@@ -56,8 +57,10 @@
       ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#000000"
       },
+      "edgeToEdgeEnabled": true,
+      "predictiveBackGestureEnabled": false,
       "package": "systems.intuition.mobile"
     },
     "web": {
@@ -67,31 +70,17 @@
     },
     "plugins": [
       "expo-router",
-      "expo-font",
-      "expo-asset",
-      "expo-secure-store",
-      "expo-apple-authentication",
       [
-        "expo-build-properties",
+        "expo-splash-screen",
         {
-          "ios": {
-            "deploymentTarget": "17.5"
+          "backgroundColor": "#232323",
+          "image": "./assets/images/splash-black.png",
+          "dark": {
+            "image": "./assets/images/splash-white.png",
+            "backgroundColor": "#000000"
           },
-          "android": {
-            "compileSdkVersion": 34
-          }
-        }
-      ],
-      [
-        "expo-share-intent",
-        {
-          "iosActivationRules": {
-            "NSExtensionActivationSupportsWebURLWithMaxCount": 1,
-            "NSExtensionActivationSupportsWebPageWithMaxCount": 1,
-            "NSExtensionActivationSupportsImageWithMaxCount": 1,
-            "NSExtensionActivationSupportsMovieWithMaxCount": 1
-          },
-          "androidIntentFilters": ["text/*", "image/*"]
+          "imageWidth": 100,
+          "resizeMode": "cover"
         }
       ]
     ],
@@ -109,9 +98,6 @@
     "owner": "intuition",
     "runtimeVersion": {
       "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/3fb69fd4-fbcd-4631-80ea-550700baf159"
     }
   }
 }

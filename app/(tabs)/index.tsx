@@ -1,16 +1,29 @@
-import React from 'react'
-import Chat from '@/components/Chat';
-import { systemPrompt } from '@/lib/system-prompt';
-export default function Ask() {
+import { Pressable, StyleSheet } from 'react-native';
+import { Text, View } from '@/components/Themed';
+import { Link } from 'expo-router';
+
+export default function TabOneScreen() {
   return (
-    <Chat
-      systemPrompt={systemPrompt}
-      assistantMessage="Hello how can I help?"
-      sampleQuestions={[
-        "Show me web3 collections",
-        "What is the favourite book of simonas.eth?",
-        "Show me top 10 Pro Crypto Politicians?",
-      ]}
-    />
-  )
+    <View style={styles.container}>
+      <Text style={styles.title}>This is home</Text>
+      <Link href="/modal" asChild>
+        <Pressable>
+          <Text>Open modal</Text>
+        </Pressable>
+      </Link>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  title: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20
+  },
+});
