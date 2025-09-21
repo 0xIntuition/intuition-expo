@@ -17,8 +17,7 @@
       "usesAppleSignIn": true,
       "supportsTablet": true,
       "associatedDomains": [
-        "applinks:portal.intuition.systems",
-        "applinks:portal.intuition.systems"
+        "applinks:portal.intuition.systems" 
       ],
       "bundleIdentifier": "systems.intuition.mobile",
       "infoPlist": {
@@ -26,18 +25,6 @@
           "NSAllowsArbitraryLoads": true
         },
         "LSApplicationQueriesSchemes": [
-          "metamask",
-          "trust",
-          "rainbow",
-          "uniswap",
-          "metamask",
-          "trust",
-          "rainbow",
-          "uniswap",
-          "metamask",
-          "trust",
-          "rainbow",
-          "uniswap",
           "metamask",
           "trust",
           "rainbow",

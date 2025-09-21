@@ -14,6 +14,13 @@ export default function TabLayout() {
           android: <Icon src={<VectorIcon family={MaterialIcons} name="home" />} />,
         })}
       </NativeTabs.Trigger>
+      <NativeTabs.Trigger name="account" >
+        <Label>Account</Label>
+        {Platform.select({
+          ios: <Icon sf="person" />,
+          android: <Icon src={<VectorIcon family={MaterialIcons} name="person" />} />,
+        })}
+      </NativeTabs.Trigger>
       <NativeTabs.Trigger name="search" role='search' >
         <Label>Search</Label>
         {Platform.select({
