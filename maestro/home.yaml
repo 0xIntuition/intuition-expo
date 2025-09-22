@@ -1,0 +1,6 @@
+appId: systems.intuition.mobile
+---
+- launchApp
+- assertVisible: 'This is home'
+- tapOn: 'Open modal'
+- assertVisible: 'Modal'
