@@ -24,8 +24,12 @@ This is the Intuition POC Mobile App, a React Native Expo application that provi
 ### Project Structure
 - `app/` - Main application code using Expo Router file-based routing
   - `app/(tabs)/` - Tab-based navigation structure
-  - `app/_layout.tsx` - Root layout with providers (Wagmi, React Query, Theme)
+  - `app/_layout.tsx` - Root layout with theme and routing
 - `components/` - Reusable React components
+- `config/` - Configuration files
+  - `config/web3/` - Web3 and blockchain configuration (Wagmi, Reown)
+- `providers/` - React context providers
+  - `providers/Web3Provider.tsx` - Web3 providers wrapper (Wagmi, React Query, AppKit)
 - `constants/` - App constants and configuration
 - `assets/` - Static assets (fonts, images)
 - `test-utils/` - Testing utilities and mocks
@@ -40,10 +44,12 @@ This is the Intuition POC Mobile App, a React Native Expo application that provi
 
 ### Wallet Integration
 The app uses Reown AppKit (WalletConnect v3) for wallet connections:
+- Configuration located in `config/web3/`
 - Project ID: `9894a080a383df0833d5e82404186fdd`
 - Supports email auth, social logins (X, Apple, Discord)
 - Configured for mainnet and Intuition testnet
 - Deep linking: `intuition://`
+- Web3 providers wrapped in `providers/Web3Provider.tsx`
 
 ### Navigation Structure
 - Tab-based navigation with three main tabs:
