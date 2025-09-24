@@ -133,7 +133,7 @@ export default function AccountIndex() {
           headerRight: () => <AppKitButton />,
         }}
       />
-      <ScrollView >
+      <ScrollView style={styles.container}>
         {data?.predicate_objects.map((p) => (<View key={p.id}>
           <Link href={`/explore/atom/${p.object.term_id}`} asChild>
             <Pressable>
@@ -157,6 +157,7 @@ export default function AccountIndex() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
   },
   title: {
     fontSize: 20,

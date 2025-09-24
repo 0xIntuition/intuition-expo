@@ -1,7 +1,6 @@
 import { Link, Stack } from 'expo-router';
 import { Pressable, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
@@ -115,10 +114,8 @@ export default function ExploreIndex() {
           },
         }}
       />
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <ScrollView contentContainerStyle={styles.container}>
-            {isLoading && <Text>Loading</Text>}
+      <ScrollView style={styles.container}>
+          {isLoading && <Text>Loading</Text>}
 
             <Text style={styles.title}>Accounts</Text>
             {data?.accounts.map(account => (<View key={account.id}>
@@ -154,9 +151,7 @@ export default function ExploreIndex() {
               <Text>{collection.object.label}</Text>
             </View>))}
 
-          </ScrollView>
-        </SafeAreaView>
-      </SafeAreaProvider>
+      </ScrollView>
     </>
   );
 }
@@ -164,6 +159,7 @@ export default function ExploreIndex() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
   },
   title: {
     fontSize: 20,

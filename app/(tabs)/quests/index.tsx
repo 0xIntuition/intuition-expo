@@ -6,7 +6,7 @@ import { QUESTS } from '@/constants/quests';
 
 export default function Quests() {
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView style={styles.container}>
       {QUESTS.map((q) => (<View key={q.index} style={styles.card}>
 
         <Link href={q.link} asChild>
@@ -25,6 +25,7 @@ export default function Quests() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
   },
   title: {
     fontSize: 20,
@@ -34,7 +35,7 @@ const styles = StyleSheet.create({
   card: {
     margin: 5,
     borderRadius: 10,
-    backgroundColor: 'rgba(100,100,100,0.5)',
+    backgroundColor: 'rgba(100,100,100,0.3)',
     padding: 16,
   },
 });

@@ -42,7 +42,7 @@ export default function Atom() {
 
     <SafeAreaProvider>
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ScrollView contentContainerStyle={styles.container}>
+        <ScrollView>
           {isLoading && <Text>Loading</Text>}
           {data !== undefined && <View>
 

@@ -1,33 +1,65 @@
 import React from 'react';
+import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { NativeTabs, Icon, Label, VectorIcon } from 'expo-router/unstable-native-tabs';
+import { Tabs } from 'expo-router';
+import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
 import { Platform } from 'react-native';
 
 export default function TabLayout() {
 
+  if (Platform.OS === 'ios') {
+    // Use NativeTabs on iOS for better native experience
+    return (
+      <NativeTabs>
+        <NativeTabs.Trigger name="quests">
+          <Label>Quests</Label>
+          <Icon sf="bolt" />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="account">
+          <Label>My Intuition</Label>
+          <Icon sf="person" />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="explore" role="search">
+          <Label>Explore</Label>
+          <Icon sf="magnifyingglass" />
+        </NativeTabs.Trigger>
+      </NativeTabs>
+    );
+  }
+
+  // Use legacy Tabs on Android for better scroll compatibility
   return (
-    <NativeTabs minimizeBehavior="onScrollDown">
-      <NativeTabs.Trigger name="quests" >
-        <Label>Quests</Label>
-        {Platform.select({
-          ios: <Icon sf="bolt" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="bolt" />} />,
-        })}
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="account" >
-        <Label>My Intuition</Label>
-        {Platform.select({
-          ios: <Icon sf="person" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="person" />} />,
-        })}
-      </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="explore" role='search' >
-        <Label>Explore</Label>
-        {Platform.select({
-          ios: <Icon sf="magnifyingglass" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="search" />} />,
-        })}
-      </NativeTabs.Trigger>
-    </NativeTabs>
+    <Tabs
+      screenOptions={{
+        headerShown: false,
+      }}>
+      <Tabs.Screen
+        name="index"
+        options={{
+          href: null, // Hide from tab bar
+        }}
+      />
+      <Tabs.Screen
+        name="quests"
+        options={{
+          title: 'Quests',
+          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="bolt" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="account"
+        options={{
+          title: 'My Intuition',
+          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="person" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="explore"
+        options={{
+          title: 'Explore',
+          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="search" color={color} />,
+        }}
+      />
+    </Tabs>
   );
 }
