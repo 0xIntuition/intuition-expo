@@ -16,7 +16,7 @@ export const metadata = {
   },
 };
 
-export const chains = [mainnet, intuitionTestnet] as const;
+export const chains = [intuitionTestnet] as const;
 
 export const auth = authConnector({ projectId, metadata });
 
@@ -24,5 +24,5 @@ export const wagmiConfig = defaultWagmiConfig({
   chains,
   projectId,
   metadata,
-  extraConnectors: [auth]
+  // extraConnectors: [auth] // not available on intuitionTestnet yet
 });

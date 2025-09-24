@@ -11580,6 +11580,31 @@ export type Vaults_Variance_Order_By = {
   total_shares?: InputMaybe<Order_By>;
 };
 
+export type GetAtomQueryVariables = Exact<{
+  term_id: Scalars['String']['input'];
+}>;
+
+
+export type GetAtomQuery = { __typename?: 'query_root', atom?: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null };
+
+export type GlobalSearchQueryVariables = Exact<{
+  likeStr?: InputMaybe<Scalars['String']['input']>;
+  accountsLimit?: InputMaybe<Scalars['Int']['input']>;
+  atomsLimit?: InputMaybe<Scalars['Int']['input']>;
+  triplesLimit?: InputMaybe<Scalars['Int']['input']>;
+  collectionsLimit?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GlobalSearchQuery = { __typename?: 'query_root', accounts: Array<{ __typename?: 'accounts', id: string, atom_id?: string | null, label: string, image?: string | null, triples_aggregate: { __typename?: 'triples_aggregate', aggregate?: { __typename?: 'triples_aggregate_fields', count: number } | null }, signals_aggregate: { __typename?: 'signals_aggregate', aggregate?: { __typename?: 'signals_aggregate_fields', count: number } | null }, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null }>, atoms: Array<{ __typename?: 'atoms', term_id: string, image?: string | null, type: any, label?: string | null, created_at: any, creator: { __typename?: 'accounts', id: string, label: string, image?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null }, value?: { __typename?: 'atom_values', account?: { __typename?: 'accounts', id: string, label: string } | null, person?: { __typename?: 'persons', name?: string | null, description?: string | null, email?: string | null, url?: string | null, identifier?: string | null } | null, thing?: { __typename?: 'things', url?: string | null, name?: string | null, description?: string | null } | null, organization?: { __typename?: 'organizations', name?: string | null, email?: string | null, description?: string | null, url?: string | null } | null } | null, term: { __typename?: 'terms', vaults: Array<{ __typename?: 'vaults', curve_id: any, term_id: string, position_count: number, current_share_price: any, total_shares: any, total_assets: any, market_cap: any }> } }>, triples: Array<{ __typename?: 'triples', term_id: string, object: { __typename?: 'atoms', term_id: string, label?: string | null, image?: string | null, type: any }, predicate: { __typename?: 'atoms', term_id: string, label?: string | null, image?: string | null, type: any }, subject: { __typename?: 'atoms', term_id: string, label?: string | null, image?: string | null, type: any }, counter_term?: { __typename?: 'terms', vaults: Array<{ __typename?: 'vaults', curve_id: any, term_id: string, position_count: number, current_share_price: any, total_shares: any, total_assets: any, market_cap: any }> } | null, term?: { __typename?: 'terms', vaults: Array<{ __typename?: 'vaults', curve_id: any, term_id: string, position_count: number, current_share_price: any, total_shares: any, total_assets: any, market_cap: any }> } | null }>, collections: Array<{ __typename?: 'predicate_objects', triple_count: number, object: { __typename?: 'atoms', label?: string | null, term_id: string, image?: string | null, value?: { __typename?: 'atom_values', thing?: { __typename?: 'things', description?: string | null } | null } | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> };
+
+export type GetTripleQueryVariables = Exact<{
+  term_id: Scalars['String']['input'];
+}>;
+
+
+export type GetTripleQuery = { __typename?: 'query_root', triple?: { __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, predicate: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } } | null };
+
 export type StatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -11604,6 +11629,197 @@ export class TypedDocumentString<TResult, TVariables>
   }
 }
 
+export const GetAtomDocument = new TypedDocumentString(`
+    query GetAtom($term_id: String!) {
+  atom(term_id: $term_id) {
+    label
+    cached_image {
+      url
+      safe
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<GetAtomQuery, GetAtomQueryVariables>;
+export const GlobalSearchDocument = new TypedDocumentString(`
+    query GlobalSearch($likeStr: String, $accountsLimit: Int, $atomsLimit: Int, $triplesLimit: Int, $collectionsLimit: Int) {
+  accounts(
+    limit: $accountsLimit
+    where: {type: {_eq: Default}, atom_id: {_is_null: false}, _or: [{label: {_ilike: $likeStr}}, {atom: {data: {_ilike: $likeStr}}}]}
+  ) {
+    id
+    atom_id
+    label
+    image
+    triples_aggregate {
+      aggregate {
+        count
+      }
+    }
+    signals_aggregate {
+      aggregate {
+        count
+      }
+    }
+    cached_image {
+      safe
+      url
+    }
+  }
+  atoms(
+    order_by: {term: {triple: {term: {total_market_cap: desc}}}}
+    limit: $atomsLimit
+    where: {_or: [{data: {_ilike: $likeStr}}, {value: {text_object: {data: {_ilike: $likeStr}}}}, {value: {thing: {url: {_ilike: $likeStr}}}}, {value: {thing: {name: {_ilike: $likeStr}}}}, {value: {thing: {description: {_ilike: $likeStr}}}}, {value: {person: {url: {_ilike: $likeStr}}}}, {value: {person: {name: {_ilike: $likeStr}}}}, {value: {person: {description: {_ilike: $likeStr}}}}, {value: {organization: {url: {_ilike: $likeStr}}}}, {value: {organization: {name: {_ilike: $likeStr}}}}, {value: {organization: {description: {_ilike: $likeStr}}}}]}
+  ) {
+    term_id
+    image
+    type
+    label
+    created_at
+    creator {
+      id
+      label
+      image
+      cached_image {
+        safe
+        url
+      }
+    }
+    value {
+      account {
+        id
+        label
+      }
+      person {
+        name
+        description
+        email
+        url
+        identifier
+      }
+      thing {
+        url
+        name
+        description
+      }
+      organization {
+        name
+        email
+        description
+        url
+      }
+    }
+    term {
+      vaults(where: {curve_id: {_eq: "1"}}, order_by: {curve_id: asc}) {
+        curve_id
+        term_id
+        position_count
+        current_share_price
+        total_shares
+        total_assets
+        market_cap
+      }
+    }
+  }
+  triples(
+    limit: $triplesLimit
+    where: {_and: [{_or: [{term: {vaults: {position_count: {_gt: 0}, curve_id: {_eq: "1"}}}}, {counter_term: {vaults: {position_count: {_gt: 0}, curve_id: {_eq: "1"}}}}]}, {_or: [{subject: {label: {_ilike: $likeStr}}}, {predicate: {label: {_like: $likeStr}}}, {object: {label: {_like: $likeStr}}}]}]}
+    order_by: {term: {total_market_cap: desc}}
+  ) {
+    term_id
+    object {
+      term_id
+      label
+      image
+      type
+    }
+    predicate {
+      term_id
+      label
+      image
+      type
+    }
+    subject {
+      term_id
+      label
+      image
+      type
+    }
+    counter_term {
+      vaults(where: {curve_id: {_eq: "1"}}, order_by: {curve_id: asc}) {
+        curve_id
+        term_id
+        position_count
+        current_share_price
+        total_shares
+        total_assets
+        market_cap
+      }
+    }
+    term {
+      vaults(where: {curve_id: {_eq: "1"}}, order_by: {curve_id: asc}) {
+        curve_id
+        term_id
+        position_count
+        current_share_price
+        total_shares
+        total_assets
+        market_cap
+      }
+    }
+  }
+  collections: predicate_objects(
+    where: {predicate: {type: {_eq: Keywords}}, object: {label: {_ilike: $likeStr}}}
+    order_by: [{triple_count: desc}]
+    limit: $collectionsLimit
+  ) {
+    triple_count
+    object {
+      label
+      term_id
+      image
+      value {
+        thing {
+          description
+        }
+      }
+      cached_image {
+        safe
+        url
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<GlobalSearchQuery, GlobalSearchQueryVariables>;
+export const GetTripleDocument = new TypedDocumentString(`
+    query GetTriple($term_id: String!) {
+  triple(term_id: $term_id) {
+    subject {
+      term_id
+      label
+      cached_image {
+        url
+        safe
+      }
+    }
+    predicate {
+      term_id
+      label
+      cached_image {
+        url
+        safe
+      }
+    }
+    object {
+      term_id
+      label
+      cached_image {
+        url
+        safe
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<GetTripleQuery, GetTripleQueryVariables>;
 export const StatsDocument = new TypedDocumentString(`
     query Stats {
   stats {

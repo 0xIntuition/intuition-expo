@@ -10,11 +10,11 @@ export const createWeb3AppKit = () => {
     defaultChain: intuitionTestnet,
     enableAnalytics: true,
     features: {
-      email: true,
-      emailShowWallets: false,
+      email: false,
+      // emailShowWallets: false,
       swaps: true,
       onramp: true,
-      socials: ['x', 'apple', 'discord'],
+      // socials: ['x', 'apple', 'discord'],
     }
   });
 };

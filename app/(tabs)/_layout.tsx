@@ -8,10 +8,10 @@ export default function TabLayout() {
   return (
     <NativeTabs minimizeBehavior="onScrollDown">
       <NativeTabs.Trigger name="index" >
-        <Label>Home</Label>
+        <Label>Quests</Label>
         {Platform.select({
-          ios: <Icon sf="house.fill" />,
-          android: <Icon src={<VectorIcon family={MaterialIcons} name="home" />} />,
+          ios: <Icon sf="bolt" />,
+          android: <Icon src={<VectorIcon family={MaterialIcons} name="bolt" />} />,
         })}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="account" >
@@ -21,10 +21,10 @@ export default function TabLayout() {
           android: <Icon src={<VectorIcon family={MaterialIcons} name="person" />} />,
         })}
       </NativeTabs.Trigger>
-      <NativeTabs.Trigger name="search" role='search' >
-        <Label>Search</Label>
+      <NativeTabs.Trigger name="explore" role='search' >
+        <Label>Explore</Label>
         {Platform.select({
-          ios: <Icon sf="house.fill" />,
+          ios: <Icon sf="magnifyingglass" />,
           android: <Icon src={<VectorIcon family={MaterialIcons} name="search" />} />,
         })}
       </NativeTabs.Trigger>
