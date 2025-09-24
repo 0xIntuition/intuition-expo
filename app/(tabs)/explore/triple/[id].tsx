@@ -57,7 +57,6 @@ export default function Triple() {
     })
   })
 
-  console.log(data.triple?.predicate?.cached_image)
   return (
 
     <SafeAreaProvider>

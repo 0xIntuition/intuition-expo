@@ -28,30 +28,14 @@ query GlobalSearch(
     }
   ) {
     id
-    atom_id
     label
-    image
-    triples_aggregate {
-      aggregate {
-        count
-      }
-    }
-    signals_aggregate {
-      aggregate {
-        count
-      }
-    }
-    cached_image {
-      safe
-      url
-    }
   }
   atoms(
-    order_by: { term: { triple: { term: { total_market_cap: desc } } } }
     limit: $atomsLimit
     where: {
       _or: [
         { data: { _ilike: $likeStr } }
+        { label: { _ilike: $likeStr } }
         { value: { text_object: { data: { _ilike: $likeStr } } } }
         { value: { thing: { url: { _ilike: $likeStr } } } }
         { value: { thing: { name: { _ilike: $likeStr } } } }
@@ -66,124 +50,27 @@ query GlobalSearch(
     }
   ) {
     term_id
-    image
-    type
     label
-    created_at
-    creator {
-      id
-      label
-      image
-      cached_image {
-        safe
-        url
-      }
-    }
-    value {
-      account {
-        id
-        label
-      }
-      person {
-        name
-        description
-        email
-        url
-        identifier
-      }
-      thing {
-        url
-        name
-        description
-      }
-      organization {
-        name
-        email
-        description
-        url
-      }
-    }
-    term {
-      vaults(where: { curve_id: { _eq: "1" } }, order_by: { curve_id: asc }) {
-        curve_id
-        term_id
-        position_count
-        current_share_price
-        total_shares
-        total_assets
-        market_cap
-      }
-    }
   }
   triples(
     limit: $triplesLimit
     where: {
-      _and: [
-        {
-          _or: [
-            {
-              term: {
-                vaults: { position_count: { _gt: 0 }, curve_id: { _eq: "1" } }
-              }
-            }
-            {
-              counter_term: {
-                vaults: { position_count: { _gt: 0 }, curve_id: { _eq: "1" } }
-              }
-            }
-          ]
-        }
-        {
-          _or: [
-            { subject: { label: { _ilike: $likeStr } } }
-            { predicate: { label: { _like: $likeStr } } }
-            { object: { label: { _like: $likeStr } } }
-          ]
-        }
+      _or: [
+        { subject: { label: { _ilike: $likeStr } } }
+        { predicate: { label: { _like: $likeStr } } }
+        { object: { label: { _like: $likeStr } } }
       ]
     }
-    order_by: { term: { total_market_cap: desc } }
   ) {
     term_id
     object {
-      term_id
       label
-      image
-      type
     }
     predicate {
-      term_id
       label
-      image
-      type
     }
     subject {
-      term_id
       label
-      image
-      type
-    }
-    counter_term {
-      vaults(where: { curve_id: { _eq: "1" } }, order_by: { curve_id: asc }) {
-        curve_id
-        term_id
-        position_count
-        current_share_price
-        total_shares
-        total_assets
-        market_cap
-      }
-    }
-    term {
-      vaults(where: { curve_id: { _eq: "1" } }, order_by: { curve_id: asc }) {
-        curve_id
-        term_id
-        position_count
-        current_share_price
-        total_shares
-        total_assets
-        market_cap
-      }
     }
   }
   collections: predicate_objects(
@@ -192,26 +79,11 @@ query GlobalSearch(
       object: { label: { _ilike: $likeStr } }
     }
     order_by: [{ triple_count: desc }]
-    # TODO: Doesnt exist on backend schema
-    # { claim_count: desc }
     limit: $collectionsLimit
   ) {
-    # TODO: Doesnt exist on backend schema
-    # claim_count
-    triple_count
     object {
       label
       term_id
-      image
-      value {
-        thing {
-          description
-        }
-      }
-      cached_image {
-        safe
-        url
-      }
     }
   }
 }
