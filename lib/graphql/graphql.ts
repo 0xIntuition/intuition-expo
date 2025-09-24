@@ -11580,6 +11580,13 @@ export type Vaults_Variance_Order_By = {
   total_shares?: InputMaybe<Order_By>;
 };
 
+export type GetAccountQueryVariables = Exact<{
+  id: Scalars['String']['input'];
+}>;
+
+
+export type GetAccountQuery = { __typename?: 'query_root', account?: { __typename?: 'accounts', id: string, label: string, atom?: { __typename?: 'atoms', cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null } | null };
+
 export type GetAtomQueryVariables = Exact<{
   term_id: Scalars['String']['input'];
 }>;
@@ -11629,6 +11636,20 @@ export class TypedDocumentString<TResult, TVariables>
   }
 }
 
+export const GetAccountDocument = new TypedDocumentString(`
+    query GetAccount($id: String!) {
+  account(id: $id) {
+    id
+    label
+    atom {
+      cached_image {
+        url
+        safe
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<GetAccountQuery, GetAccountQueryVariables>;
 export const GetAtomDocument = new TypedDocumentString(`
     query GetAtom($term_id: String!) {
   atom(term_id: $term_id) {

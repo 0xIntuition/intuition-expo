@@ -122,10 +122,14 @@ export default function ExploreIndex() {
 
             <Text style={styles.title}>Accounts</Text>
             {data?.accounts.map(account => (<View key={account.id}>
-              <Text>{account.label}</Text>
+              <Link href={`/explore/account/${account.id}`} asChild>
+                <Pressable>
+                  <Text>{account.label}</Text>
+                </Pressable>
+              </Link>
             </View>))}
 
-            <Text style={styles.title}>Atoms</Text>
+            <Text style={styles.title}>Identities</Text>
             {data?.atoms.map(atom => (<View key={atom.term_id}>
               <Link href={`/explore/atom/${atom.term_id}`} asChild>
                 <Pressable>
@@ -136,7 +140,7 @@ export default function ExploreIndex() {
 
             </View>))}
 
-            <Text style={styles.title}>Triples</Text>
+            <Text style={styles.title}>Claims</Text>
             {data?.triples.map(triple => (<View key={triple.term_id}>
               <Link href={`/explore/triple/${triple.term_id}`} asChild>
                 <Pressable>
@@ -145,7 +149,7 @@ export default function ExploreIndex() {
               </Link>
             </View>))}
 
-            <Text style={styles.title}>Collections</Text>
+            <Text style={styles.title}>Lists</Text>
             {data?.collections.map(collection => (<View key={collection.object.term_id}>
               <Text>{collection.object.label}</Text>
             </View>))}
