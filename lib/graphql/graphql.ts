@@ -11616,17 +11616,22 @@ export type GlobalSearchQueryVariables = Exact<{
 
 export type GlobalSearchQuery = { __typename?: 'query_root', accounts: Array<{ __typename?: 'accounts', id: string, label: string }>, atoms: Array<{ __typename?: 'atoms', term_id: string, label?: string | null }>, triples: Array<{ __typename?: 'triples', term_id: string, object: { __typename?: 'atoms', label?: string | null }, predicate: { __typename?: 'atoms', label?: string | null }, subject: { __typename?: 'atoms', label?: string | null } }>, collections: Array<{ __typename?: 'predicate_objects', object: { __typename?: 'atoms', label?: string | null, term_id: string } }> };
 
+export type ListQueryVariables = Exact<{
+  objectId: Scalars['String']['input'];
+  term?: InputMaybe<Terms_Bool_Exp>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type ListQuery = { __typename?: 'query_root', triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> };
+
 export type GetTripleQueryVariables = Exact<{
   term_id: Scalars['String']['input'];
 }>;
 
 
 export type GetTripleQuery = { __typename?: 'query_root', triple?: { __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, predicate: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } } | null };
-
-export type StatsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type StatsQuery = { __typename?: 'query_root', stats: Array<{ __typename?: 'stats', total_accounts?: number | null, total_atoms?: number | null, total_triples?: number | null }> };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -11765,6 +11770,25 @@ export const GlobalSearchDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<GlobalSearchQuery, GlobalSearchQueryVariables>;
+export const ListDocument = new TypedDocumentString(`
+    query List($objectId: String!, $term: terms_bool_exp, $limit: Int, $offset: Int) {
+  triples(
+    where: {object_id: {_eq: $objectId}, predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, term: $term}
+    limit: $limit
+    offset: $offset
+    order_by: {term: {total_market_cap: desc}}
+  ) {
+    subject {
+      term_id
+      label
+      cached_image {
+        safe
+        url
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<ListQuery, ListQueryVariables>;
 export const GetTripleDocument = new TypedDocumentString(`
     query GetTriple($term_id: String!) {
   triple(term_id: $term_id) {
@@ -11795,12 +11819,3 @@ export const GetTripleDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<GetTripleQuery, GetTripleQueryVariables>;
-export const StatsDocument = new TypedDocumentString(`
-    query Stats {
-  stats {
-    total_accounts
-    total_atoms
-    total_triples
-  }
-}
-    `) as unknown as TypedDocumentString<StatsQuery, StatsQueryVariables>;

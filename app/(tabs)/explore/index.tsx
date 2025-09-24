@@ -148,7 +148,11 @@ export default function ExploreIndex() {
 
             <Text style={styles.title}>Lists</Text>
             {data?.collections.map(collection => (<View key={collection.object.term_id}>
-              <Text>{collection.object.label}</Text>
+              <Link href={`/explore/list/${collection.object.term_id}`} asChild>
+                <Pressable>
+                  <Text>{collection.object.label}</Text>
+                </Pressable>
+              </Link>
             </View>))}
 
       </ScrollView>

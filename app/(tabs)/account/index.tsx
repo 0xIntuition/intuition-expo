@@ -135,7 +135,7 @@ export default function AccountIndex() {
       />
       <ScrollView style={styles.container}>
         {data?.predicate_objects.map((p) => (<View key={p.id}>
-          <Link href={`/explore/atom/${p.object.term_id}`} asChild>
+          <Link href={`/explore/list/${p.object.term_id}`} asChild>
             <Pressable>
               <Text style={styles.title}>{p.object.label}</Text>
             </Pressable>
