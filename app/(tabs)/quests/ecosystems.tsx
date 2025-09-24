@@ -1,12 +1,11 @@
 import { Pressable, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native';
 import { Text, View } from '@/components/Themed';
-import { Link } from 'expo-router';
-import { QUESTS } from '@/constants/quests';
 
-export default function Quests() {
+export default function EcosystemsQuest() {
   return (
-    <ScrollView>
+    <ScrollView contentContainerStyle={styles.container}>
+      <Text>This is Ecosystems quest</Text>
     </ScrollView>
   );
 }
@@ -15,8 +14,6 @@ export default function Quests() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
   title: {
     fontSize: 20,

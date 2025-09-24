@@ -7,7 +7,7 @@ export default function TabLayout() {
 
   return (
     <NativeTabs minimizeBehavior="onScrollDown">
-      <NativeTabs.Trigger name="index" >
+      <NativeTabs.Trigger name="quests" >
         <Label>Quests</Label>
         {Platform.select({
           ios: <Icon sf="bolt" />,
@@ -15,7 +15,7 @@ export default function TabLayout() {
         })}
       </NativeTabs.Trigger>
       <NativeTabs.Trigger name="account" >
-        <Label>Account</Label>
+        <Label>My Intuition</Label>
         {Platform.select({
           ios: <Icon sf="person" />,
           android: <Icon src={<VectorIcon family={MaterialIcons} name="person" />} />,

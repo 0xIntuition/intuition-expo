@@ -11580,6 +11580,17 @@ export type Vaults_Variance_Order_By = {
   total_shares?: InputMaybe<Order_By>;
 };
 
+export type SavedListsQueryVariables = Exact<{
+  where?: InputMaybe<Predicate_Objects_Bool_Exp>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<Predicate_Objects_Order_By> | Predicate_Objects_Order_By>;
+  triplesWhere?: InputMaybe<Triples_Bool_Exp>;
+}>;
+
+
+export type SavedListsQuery = { __typename?: 'query_root', predicate_objects_aggregate: { __typename?: 'predicate_objects_aggregate', aggregate?: { __typename?: 'predicate_objects_aggregate_fields', count: number } | null }, predicate_objects: Array<{ __typename?: 'predicate_objects', id: string, triple_count: number, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, value?: { __typename?: 'atom_values', thing?: { __typename?: 'things', description?: string | null } | null } | null, as_object_triples_aggregate: { __typename?: 'triples_aggregate', aggregate?: { __typename?: 'triples_aggregate_fields', count: number } | null }, as_object_triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> } }> };
+
 export type GetAccountQueryVariables = Exact<{
   id: Scalars['String']['input'];
 }>;
@@ -11636,6 +11647,56 @@ export class TypedDocumentString<TResult, TVariables>
   }
 }
 
+export const SavedListsDocument = new TypedDocumentString(`
+    query SavedLists($where: predicate_objects_bool_exp, $limit: Int, $offset: Int, $orderBy: [predicate_objects_order_by!], $triplesWhere: triples_bool_exp) {
+  predicate_objects_aggregate(where: $where) {
+    aggregate {
+      count
+    }
+  }
+  predicate_objects(
+    where: $where
+    limit: $limit
+    offset: $offset
+    order_by: $orderBy
+  ) {
+    id
+    triple_count
+    object {
+      term_id
+      label
+      cached_image {
+        safe
+        url
+      }
+      value {
+        thing {
+          description
+        }
+      }
+      as_object_triples_aggregate(where: $triplesWhere) {
+        aggregate {
+          count
+        }
+      }
+      as_object_triples(
+        where: $triplesWhere
+        limit: 6
+        order_by: {term: {total_market_cap: desc}}
+      ) {
+        subject {
+          term_id
+          label
+          cached_image {
+            safe
+            url
+          }
+        }
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<SavedListsQuery, SavedListsQueryVariables>;
 export const GetAccountDocument = new TypedDocumentString(`
     query GetAccount($id: String!) {
   account(id: $id) {
