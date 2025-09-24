@@ -53,7 +53,7 @@ export default function List() {
     queryKey: ['list', objectId, address],
     queryFn: () => execute(ListQuery, {
       objectId: objectId,
-      term: {
+      term: address ? {
         vaults: {
           positions: {
             account_id: {
@@ -64,11 +64,11 @@ export default function List() {
             }
           }
         }
-      },
+      } : {},
       limit: 50,
       offset: 0
     }),
-    enabled: !!objectId && !!address
+    enabled: !!objectId
   });
 
   return (

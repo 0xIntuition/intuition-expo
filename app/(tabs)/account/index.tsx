@@ -1,13 +1,13 @@
-import { Pressable, StyleSheet } from 'react-native';
+import { StyleSheet, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native';
-import { Text, View } from '@/components/Themed';
+import { Text, View, useThemeColor } from '@/components/Themed';
 import { AppKitButton } from '@reown/appkit-wagmi-react-native';
-import { formatEther } from 'viem';
-import { Link, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useAccount } from "wagmi";
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
 import { execute } from '@/lib/graphql/execute';
+import { ListCard } from '@/components/ListCard';
 
 const SavedListsQuery = graphql(`
 query SavedLists(
@@ -55,7 +55,6 @@ query SavedLists(
       ) {
         subject {
           term_id
-          label
           cached_image {
             safe
             url
@@ -70,26 +69,26 @@ query SavedLists(
 
 export default function AccountIndex() {
   const { address, status } = useAccount();
+  const backgroundColor = useThemeColor({}, 'background');
 
   const { data, isLoading } = useQuery({
-    enabled: status === 'connected',
     queryKey: ['savedLists', address],
     queryFn: () => execute(SavedListsQuery, {
       "orderBy": { "triple_count": "desc" },
 
       "triplesWhere": {
-        "term": {
+        "term": address ? {
           "vaults": {
             "positions": {
               "account_id": {
-                "_eq": "0x19711CD19e609FEBdBF607960220898268B7E24b"
+                "_eq": address
               },
               "shares": {
                 "_gt": "0"
               }
             }
           }
-        }
+        } : {}
       },
       "where": {
         "_and": [
@@ -104,18 +103,18 @@ export default function AccountIndex() {
                 "predicate_id": {
                   "_eq": "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"
                 },
-                "term": {
+                "term": address ? {
                   "vaults": {
                     "positions": {
                       "account_id": {
-                        "_eq": "0x19711CD19e609FEBdBF607960220898268B7E24b"
+                        "_eq": address
                       },
                       "shares": {
                         "_gt": "0"
                       }
                     }
                   }
-                }
+                } : {}
               }
             }
           }
@@ -124,7 +123,39 @@ export default function AccountIndex() {
       "limit": 18,
       "offset": 0,
     })
-  })
+  });
+
+  const renderContent = () => {
+
+
+    if (isLoading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+          <Text style={styles.loadingText}>Loading your lists...</Text>
+        </View>
+      );
+    }
+
+    if (!data?.predicate_objects || data.predicate_objects.length === 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No saved lists found</Text>
+          <Text style={styles.emptySubtext}>Start exploring to save your first list!</Text>
+        </View>
+      );
+    }
+
+    return data.predicate_objects.map((p) => (
+      <ListCard
+        key={p.id}
+        id={p.id}
+        triple_count={p.triple_count}
+        object={p.object}
+      />
+    ));
+  };
+
   return (
     <>
       <Stack.Screen
@@ -133,22 +164,12 @@ export default function AccountIndex() {
           headerRight: () => <AppKitButton />,
         }}
       />
-      <ScrollView style={styles.container}>
-        {data?.predicate_objects.map((p) => (<View key={p.id}>
-          <Link href={`/explore/list/${p.object.term_id}`} asChild>
-            <Pressable>
-              <Text style={styles.title}>{p.object.label}</Text>
-            </Pressable>
-          </Link>
-          {p.object.as_object_triples.map((t) => (<View key={t.subject.term_id}>
-            <Link href={`/explore/atom/${t.subject.term_id}`} asChild>
-              <Pressable>
-                <Text >{t.subject.label}</Text>
-              </Pressable>
-            </Link>
-          </View>))}
-
-        </View>))}
+      <ScrollView
+        style={[styles.container, { backgroundColor }]}
+        contentContainerStyle={styles.contentContainer}
+        showsVerticalScrollIndicator={false}
+      >
+        {renderContent()}
       </ScrollView>
     </>
   );
@@ -157,18 +178,38 @@ export default function AccountIndex() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginTop: 10,
-    marginBottom: 5,
+  contentContainer: {
+    paddingVertical: 16,
   },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+    paddingVertical: 64,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtext: {
+    fontSize: 14,
+    textAlign: 'center',
+    opacity: 0.7,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 64,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 16,
+    opacity: 0.7,
   },
 });
 
