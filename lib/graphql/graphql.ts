@@ -11611,7 +11611,7 @@ export type GlobalSearchQueryVariables = Exact<{
 }>;
 
 
-export type GlobalSearchQuery = { __typename?: 'query_root', accounts: Array<{ __typename?: 'accounts', id: string, label: string }>, atoms: Array<{ __typename?: 'atoms', term_id: string, label?: string | null }>, triples: Array<{ __typename?: 'triples', term_id: string, object: { __typename?: 'atoms', label?: string | null }, predicate: { __typename?: 'atoms', label?: string | null }, subject: { __typename?: 'atoms', label?: string | null } }>, collections: Array<{ __typename?: 'predicate_objects', object: { __typename?: 'atoms', label?: string | null, term_id: string } }> };
+export type GlobalSearchQuery = { __typename?: 'query_root', accounts: Array<{ __typename?: 'accounts', id: string, label: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }>, atoms: Array<{ __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }>, triples: Array<{ __typename?: 'triples', term_id: string, object: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, predicate: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, subject: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, collections: Array<{ __typename?: 'predicate_objects', object: { __typename?: 'atoms', label?: string | null, term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> };
 
 export type ListQueryVariables = Exact<{
   objectId: Scalars['String']['input'];
@@ -11755,6 +11755,10 @@ export const GlobalSearchDocument = new TypedDocumentString(`
   ) {
     id
     label
+    cached_image {
+      url
+      safe
+    }
   }
   atoms(
     limit: $atomsLimit
@@ -11762,6 +11766,10 @@ export const GlobalSearchDocument = new TypedDocumentString(`
   ) {
     term_id
     label
+    cached_image {
+      url
+      safe
+    }
   }
   triples(
     limit: $triplesLimit
@@ -11770,12 +11778,24 @@ export const GlobalSearchDocument = new TypedDocumentString(`
     term_id
     object {
       label
+      cached_image {
+        url
+        safe
+      }
     }
     predicate {
       label
+      cached_image {
+        url
+        safe
+      }
     }
     subject {
       label
+      cached_image {
+        url
+        safe
+      }
     }
   }
   collections: predicate_objects(
@@ -11786,6 +11806,10 @@ export const GlobalSearchDocument = new TypedDocumentString(`
     object {
       label
       term_id
+      cached_image {
+        url
+        safe
+      }
     }
   }
 }
