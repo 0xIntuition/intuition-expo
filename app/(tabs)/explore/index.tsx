@@ -21,6 +21,13 @@ query GlobalSearch(
 ) {
   accounts(
     limit: $accountsLimit
+    order_by: [ {
+       atom:  {
+          term:  {
+             total_market_cap: desc
+          }
+       }
+    }]
     where: {
       type: { _eq: Default }
       atom_id: { _is_null: false }
@@ -39,6 +46,11 @@ query GlobalSearch(
   }
   atoms(
     limit: $atomsLimit
+    order_by: [ {
+       term:  {
+          total_market_cap: desc
+       }
+    }]
     where: {
       _or: [
         { data: { _ilike: $likeStr } }
@@ -65,6 +77,11 @@ query GlobalSearch(
   }
   triples(
     limit: $triplesLimit
+    order_by: [ {
+       triple_term:  {
+          total_market_cap: desc
+       }
+    }]
     where: {
       _or: [
         { subject: { label: { _ilike: $likeStr } } }

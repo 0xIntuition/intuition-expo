@@ -11751,6 +11751,7 @@ export const GlobalSearchDocument = new TypedDocumentString(`
     query GlobalSearch($likeStr: String, $accountsLimit: Int, $atomsLimit: Int, $triplesLimit: Int, $collectionsLimit: Int) {
   accounts(
     limit: $accountsLimit
+    order_by: [{atom: {term: {total_market_cap: desc}}}]
     where: {type: {_eq: Default}, atom_id: {_is_null: false}, _or: [{label: {_ilike: $likeStr}}, {atom: {data: {_ilike: $likeStr}}}]}
   ) {
     id
@@ -11762,6 +11763,7 @@ export const GlobalSearchDocument = new TypedDocumentString(`
   }
   atoms(
     limit: $atomsLimit
+    order_by: [{term: {total_market_cap: desc}}]
     where: {_or: [{data: {_ilike: $likeStr}}, {label: {_ilike: $likeStr}}, {value: {text_object: {data: {_ilike: $likeStr}}}}, {value: {thing: {url: {_ilike: $likeStr}}}}, {value: {thing: {name: {_ilike: $likeStr}}}}, {value: {thing: {description: {_ilike: $likeStr}}}}, {value: {person: {url: {_ilike: $likeStr}}}}, {value: {person: {name: {_ilike: $likeStr}}}}, {value: {person: {description: {_ilike: $likeStr}}}}, {value: {organization: {url: {_ilike: $likeStr}}}}, {value: {organization: {name: {_ilike: $likeStr}}}}, {value: {organization: {description: {_ilike: $likeStr}}}}]}
   ) {
     term_id
@@ -11773,6 +11775,7 @@ export const GlobalSearchDocument = new TypedDocumentString(`
   }
   triples(
     limit: $triplesLimit
+    order_by: [{triple_term: {total_market_cap: desc}}]
     where: {_or: [{subject: {label: {_ilike: $likeStr}}}, {predicate: {label: {_like: $likeStr}}}, {object: {label: {_like: $likeStr}}}]}
   ) {
     term_id
