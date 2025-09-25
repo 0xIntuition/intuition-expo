@@ -1,5 +1,4 @@
 import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import { Tabs } from 'expo-router';
 import { NativeTabs, Icon, Label } from 'expo-router/unstable-native-tabs';
@@ -10,10 +9,14 @@ export default function TabLayout() {
   if (Platform.OS === 'ios') {
     // Use NativeTabs on iOS for better native experience
     return (
-      <NativeTabs>
+      <NativeTabs minimizeBehavior='onScrollDown'>
         <NativeTabs.Trigger name="quests">
           <Label>Quests</Label>
           <Icon sf="bolt" />
+        </NativeTabs.Trigger>
+        <NativeTabs.Trigger name="lists">
+          <Label>Lists</Label>
+          <Icon sf="list.bullet" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="account">
           <Label>My Intuition</Label>
@@ -44,6 +47,13 @@ export default function TabLayout() {
         options={{
           title: 'Quests',
           tabBarIcon: ({ color }) => <MaterialIcons size={28} name="bolt" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="lists"
+        options={{
+          title: 'Lists',
+          tabBarIcon: ({ color }) => <MaterialIcons size={28} name="list" color={color} />,
         }}
       />
       <Tabs.Screen

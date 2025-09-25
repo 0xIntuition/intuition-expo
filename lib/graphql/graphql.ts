@@ -11580,16 +11580,13 @@ export type Vaults_Variance_Order_By = {
   total_shares?: InputMaybe<Order_By>;
 };
 
-export type SavedListsQueryVariables = Exact<{
-  where?: InputMaybe<Predicate_Objects_Bool_Exp>;
-  limit?: InputMaybe<Scalars['Int']['input']>;
-  offset?: InputMaybe<Scalars['Int']['input']>;
-  orderBy?: InputMaybe<Array<Predicate_Objects_Order_By> | Predicate_Objects_Order_By>;
-  triplesWhere?: InputMaybe<Triples_Bool_Exp>;
+export type AccountProfileQueryVariables = Exact<{
+  accountId: Scalars['String']['input'];
+  positionsBool?: InputMaybe<Positions_Bool_Exp>;
 }>;
 
 
-export type SavedListsQuery = { __typename?: 'query_root', predicate_objects_aggregate: { __typename?: 'predicate_objects_aggregate', aggregate?: { __typename?: 'predicate_objects_aggregate_fields', count: number } | null }, predicate_objects: Array<{ __typename?: 'predicate_objects', id: string, triple_count: number, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, value?: { __typename?: 'atom_values', thing?: { __typename?: 'things', description?: string | null } | null } | null, as_object_triples_aggregate: { __typename?: 'triples_aggregate', aggregate?: { __typename?: 'triples_aggregate_fields', count: number } | null }, as_object_triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> } }> };
+export type AccountProfileQuery = { __typename?: 'query_root', account?: { __typename?: 'accounts', atom?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, organizations: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, projects: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, skills: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, tags: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> } | null } | null };
 
 export type GetAccountQueryVariables = Exact<{
   id: Scalars['String']['input'];
@@ -11633,6 +11630,17 @@ export type GetTripleQueryVariables = Exact<{
 
 export type GetTripleQuery = { __typename?: 'query_root', triple?: { __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, predicate: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } } | null };
 
+export type SavedListsQueryVariables = Exact<{
+  where?: InputMaybe<Predicate_Objects_Bool_Exp>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<Array<Predicate_Objects_Order_By> | Predicate_Objects_Order_By>;
+  triplesWhere?: InputMaybe<Triples_Bool_Exp>;
+}>;
+
+
+export type SavedListsQuery = { __typename?: 'query_root', predicate_objects_aggregate: { __typename?: 'predicate_objects_aggregate', aggregate?: { __typename?: 'predicate_objects_aggregate_fields', count: number } | null }, predicate_objects: Array<{ __typename?: 'predicate_objects', id: string, triple_count: number, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, value?: { __typename?: 'atom_values', thing?: { __typename?: 'things', description?: string | null } | null } | null, as_object_triples_aggregate: { __typename?: 'triples_aggregate', aggregate?: { __typename?: 'triples_aggregate_fields', count: number } | null }, as_object_triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> } }> };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -11652,55 +11660,68 @@ export class TypedDocumentString<TResult, TVariables>
   }
 }
 
-export const SavedListsDocument = new TypedDocumentString(`
-    query SavedLists($where: predicate_objects_bool_exp, $limit: Int, $offset: Int, $orderBy: [predicate_objects_order_by!], $triplesWhere: triples_bool_exp) {
-  predicate_objects_aggregate(where: $where) {
-    aggregate {
-      count
-    }
-  }
-  predicate_objects(
-    where: $where
-    limit: $limit
-    offset: $offset
-    order_by: $orderBy
-  ) {
-    id
-    triple_count
-    object {
+export const AccountProfileDocument = new TypedDocumentString(`
+    query AccountProfile($accountId: String!, $positionsBool: positions_bool_exp) {
+  account(id: $accountId) {
+    atom {
       term_id
       label
       cached_image {
         safe
         url
       }
-      value {
-        thing {
-          description
-        }
-      }
-      as_object_triples_aggregate(where: $triplesWhere) {
-        aggregate {
-          count
-        }
-      }
-      as_object_triples(
-        where: $triplesWhere
-        limit: 6
-        order_by: {term: {total_market_cap: desc}}
+      organizations: as_subject_triples(
+        where: {predicate_id: {_eq: "0x41f20a29ee2587b977cf5b1386f44392224b05280b6ea6e3188be7b673b98c4d"}, positions: $positionsBool}
       ) {
-        subject {
+        object {
           term_id
+          label
           cached_image {
-            safe
             url
+            safe
+          }
+        }
+      }
+      projects: as_subject_triples(
+        where: {predicate_id: {_eq: "0x35614b2d339d64b8ecad5d4b39968be8d3d5eb31d4ccf81185d152487805d7fb"}, positions: $positionsBool}
+      ) {
+        object {
+          term_id
+          label
+          cached_image {
+            url
+            safe
+          }
+        }
+      }
+      skills: as_subject_triples(
+        where: {predicate_id: {_eq: "0xb5b5a44a01d657bf5a3f747c7609a1c665dff44b0b2c3a64556b137e3f0f9d02"}, positions: $positionsBool}
+      ) {
+        object {
+          term_id
+          label
+          cached_image {
+            url
+            safe
+          }
+        }
+      }
+      tags: as_subject_triples(
+        where: {predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, positions: $positionsBool}
+      ) {
+        object {
+          term_id
+          label
+          cached_image {
+            url
+            safe
           }
         }
       }
     }
   }
 }
-    `) as unknown as TypedDocumentString<SavedListsQuery, SavedListsQueryVariables>;
+    `) as unknown as TypedDocumentString<AccountProfileQuery, AccountProfileQueryVariables>;
 export const GetAccountDocument = new TypedDocumentString(`
     query GetAccount($id: String!) {
   account(id: $id) {
@@ -11818,3 +11839,52 @@ export const GetTripleDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<GetTripleQuery, GetTripleQueryVariables>;
+export const SavedListsDocument = new TypedDocumentString(`
+    query SavedLists($where: predicate_objects_bool_exp, $limit: Int, $offset: Int, $orderBy: [predicate_objects_order_by!], $triplesWhere: triples_bool_exp) {
+  predicate_objects_aggregate(where: $where) {
+    aggregate {
+      count
+    }
+  }
+  predicate_objects(
+    where: $where
+    limit: $limit
+    offset: $offset
+    order_by: $orderBy
+  ) {
+    id
+    triple_count
+    object {
+      term_id
+      label
+      cached_image {
+        safe
+        url
+      }
+      value {
+        thing {
+          description
+        }
+      }
+      as_object_triples_aggregate(where: $triplesWhere) {
+        aggregate {
+          count
+        }
+      }
+      as_object_triples(
+        where: $triplesWhere
+        limit: 6
+        order_by: {term: {total_market_cap: desc}}
+      ) {
+        subject {
+          term_id
+          cached_image {
+            safe
+            url
+          }
+        }
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<SavedListsQuery, SavedListsQueryVariables>;
