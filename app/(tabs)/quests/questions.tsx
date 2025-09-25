@@ -1,12 +1,17 @@
 import { Pressable, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 
 export default function QuestionsQuest() {
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text>This is questions quest</Text>
-    </ScrollView>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView>
+          <Text>This is questions quest</Text>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

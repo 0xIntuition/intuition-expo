@@ -1,5 +1,6 @@
-import { StyleSheet, ActivityIndicator, Pressable } from 'react-native';
+import { StyleSheet, ActivityIndicator, Pressable, Platform } from 'react-native';
 import { ScrollView } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { AppKitButton } from '@reown/appkit-wagmi-react-native';
 import { Stack, Link } from 'expo-router';
@@ -193,9 +194,8 @@ export default function AccountIndex() {
 
     const atom = data.account.atom;
 
-    return (
-      <View>
-        {/* Profile Header */}
+    return {
+      profileHeader: (
         <View style={styles.profileHeader}>
           {atom.cached_image?.url && (
             <Image
@@ -207,99 +207,149 @@ export default function AccountIndex() {
           )}
           <Text style={styles.profileName}>{atom.label}</Text>
         </View>
+      ),
+      sectionsContent: (
+        <View>
 
-        {/* Organizations Section */}
-        {atom.organizations.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Organizations</Text>
-            <View style={styles.sectionContent}>
-              {atom.organizations.map((org, index) => (
-                <SectionItem
-                  key={org.object.term_id}
-                  item={org.object}
-                  isLast={index === atom.organizations.length - 1}
-                />
-              ))}
+          {/* Organizations Section */}
+          {atom.organizations.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Organizations</Text>
+              <View style={styles.sectionContent}>
+                {atom.organizations.map((org, index) => (
+                  <SectionItem
+                    key={org.object.term_id}
+                    item={org.object}
+                    isLast={index === atom.organizations.length - 1}
+                  />
+                ))}
+              </View>
             </View>
-          </View>
-        )}
+          )}
 
-        {/* Projects Section */}
-        {atom.projects.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Projects</Text>
-            <View style={styles.sectionContent}>
-              {atom.projects.map((project, index) => (
-                <SectionItem
-                  key={project.object.term_id}
-                  item={project.object}
-                  isLast={index === atom.projects.length - 1}
-                />
-              ))}
+          {/* Projects Section */}
+          {atom.projects.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Projects</Text>
+              <View style={styles.sectionContent}>
+                {atom.projects.map((project, index) => (
+                  <SectionItem
+                    key={project.object.term_id}
+                    item={project.object}
+                    isLast={index === atom.projects.length - 1}
+                  />
+                ))}
+              </View>
             </View>
-          </View>
-        )}
+          )}
 
-        {/* Skills Section */}
-        {atom.skills.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Skills</Text>
-            <View style={styles.sectionContent}>
-              {atom.skills.map((skill, index) => (
-                <SectionItem
-                  key={skill.object.term_id}
-                  item={skill.object}
-                  isLast={index === atom.skills.length - 1}
-                />
-              ))}
+          {/* Skills Section */}
+          {atom.skills.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Skills</Text>
+              <View style={styles.sectionContent}>
+                {atom.skills.map((skill, index) => (
+                  <SectionItem
+                    key={skill.object.term_id}
+                    item={skill.object}
+                    isLast={index === atom.skills.length - 1}
+                  />
+                ))}
+              </View>
             </View>
-          </View>
-        )}
+          )}
 
-        {/* Tags Section */}
-        {atom.tags.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Tags</Text>
-            <View style={styles.sectionContent}>
-              {atom.tags.map((tag, index) => (
-                <SectionItem
-                  key={tag.object.term_id}
-                  item={tag.object}
-                  isLast={index === atom.tags.length - 1}
-                />
-              ))}
+          {/* Tags Section */}
+          {atom.tags.length > 0 && (
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Tags</Text>
+              <View style={styles.sectionContent}>
+                {atom.tags.map((tag, index) => (
+                  <SectionItem
+                    key={tag.object.term_id}
+                    item={tag.object}
+                    isLast={index === atom.tags.length - 1}
+                  />
+                ))}
+              </View>
             </View>
-          </View>
-        )}
-      </View>
-    );
+          )}
+        </View>
+      )
+    };
   };
 
 
   return (
-    <>
+    <SafeAreaProvider>
       <Stack.Screen
         options={{
           title: '',
           headerRight: () => <AppKitButton />,
-          headerLeft: () => <CrossPlatformPicker
-            options={sources}
-            selectedIndex={sourceIndex}
-            onOptionSelected={({ nativeEvent: { index } }) => {
-              setSourceIndex(index);
-            }}
-            variant="segmented"
-          />,
         }}
       />
-      <ScrollView
-        style={[styles.container, { backgroundColor }]}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-      >
-        {renderContent()}
-      </ScrollView>
-    </>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView
+          style={[{ backgroundColor }]}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+          stickyHeaderIndices={status === 'connected' && data?.account?.atom ? [2] : []}
+        >
+          {(() => {
+            if (status === 'disconnected') {
+              return (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>Connect Your Wallet</Text>
+                  <Text style={styles.emptySubtext}>
+                    Connect your wallet to view your profile and contributions to the knowledge graph
+                  </Text>
+                </View>
+              );
+            }
+
+            if (isLoading) {
+              return (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" />
+                  <Text style={styles.loadingText}>Loading profile information...</Text>
+                </View>
+              );
+            }
+
+            if (!data?.account?.atom) {
+              return (
+                <View style={styles.emptyContainer}>
+                  <Text style={styles.emptyText}>No Profile Found</Text>
+                  <Text style={styles.emptySubtext}>
+                    This wallet address doesn't have a profile in the knowledge graph yet
+                  </Text>
+                </View>
+              );
+            }
+
+            const content = renderContent();
+            return (
+              <>
+                {content.profileHeader}
+                <View style={Platform.select({
+                  android: ({ alignItems: 'center' })
+                })}>
+                  <CrossPlatformPicker
+                    options={sources}
+                    selectedIndex={sourceIndex}
+                    onOptionSelected={({ nativeEvent: { index } }) => {
+                      setSourceIndex(index);
+                    }}
+                    variant="segmented"
+                  />
+                </View>
+                {content.sectionsContent}
+              </>
+            );
+          })()}
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

@@ -1,6 +1,7 @@
 import { Link, Stack } from 'expo-router';
 import { Pressable, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
@@ -103,7 +104,7 @@ export default function ExploreIndex() {
   })
 
   return (
-    <>
+    <SafeAreaProvider>
       <Stack.Screen
         options={{
           title: 'Explore',
@@ -114,7 +115,8 @@ export default function ExploreIndex() {
           },
         }}
       />
-      <ScrollView style={styles.container}>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
           {isLoading && <Text>Loading</Text>}
 
             <Text style={styles.title}>Accounts</Text>
@@ -155,14 +157,17 @@ export default function ExploreIndex() {
               </Link>
             </View>))}
 
-      </ScrollView>
-    </>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
     padding: 16,
   },
   title: {

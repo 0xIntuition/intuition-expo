@@ -1,5 +1,6 @@
 import { StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { ScrollView } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { AppKitButton } from '@reown/appkit-wagmi-react-native';
 import { Stack } from 'expo-router';
@@ -129,7 +130,16 @@ export default function AccountIndex() {
   });
 
   const renderContent = () => {
-
+    // If "My" is selected but user is not connected, show connection prompt
+    if (sourceIndex === 1 && status !== 'connected') {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Connect your wallet</Text>
+          <Text style={styles.emptySubtext}>Connect your wallet to see your saved lists</Text>
+          <AppKitButton />
+        </View>
+      );
+    }
 
     if (isLoading) {
       return (
@@ -160,30 +170,34 @@ export default function AccountIndex() {
   };
 
   return (
-    <>
+    <SafeAreaProvider>
       <Stack.Screen
         options={{
           headerShown: false
         }}
       />
-      <ScrollView
-        style={[styles.container, { backgroundColor }]}
-        contentContainerStyle={styles.contentContainer}
-        showsVerticalScrollIndicator={false}
-        stickyHeaderIndices={[0]}
-      ><View style={Platform.select({
-        android: ({ alignItems: 'center' })
-      })}><CrossPlatformPicker
-            options={sources}
-            selectedIndex={sourceIndex}
-            onOptionSelected={({ nativeEvent: { index } }) => {
-              setSourceIndex(index);
-            }}
-            variant="segmented"
-          /></View>
-        {renderContent()}
-      </ScrollView>
-    </>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView
+          style={[{ backgroundColor }]}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+          stickyHeaderIndices={[0]}
+        ><View style={Platform.select({
+
+          ios: ({ flex: 1, backgroundColor, paddingBottom: 10 }),
+          android: ({ alignItems: 'center', flex: 1, backgroundColor })
+        })}><CrossPlatformPicker
+              options={sources}
+              selectedIndex={sourceIndex}
+              onOptionSelected={({ nativeEvent: { index } }) => {
+                setSourceIndex(index);
+              }}
+              variant="segmented"
+            /></View>
+          {renderContent()}
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 

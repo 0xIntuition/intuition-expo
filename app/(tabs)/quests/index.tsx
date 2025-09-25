@@ -1,12 +1,15 @@
 import { Pressable, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import { Link } from 'expo-router';
 import { QUESTS } from '@/constants/quests';
 
 export default function Quests() {
   return (
-    <ScrollView style={styles.container}>
+    <SafeAreaProvider>
+      <SafeAreaView style={styles.container} edges={['top']}>
+        <ScrollView contentContainerStyle={styles.scrollContent}>
       {QUESTS.map((q) => (<View key={q.index} style={styles.card}>
 
         <Link href={q.link} asChild>
@@ -17,7 +20,9 @@ export default function Quests() {
         </Link>
 
       </View>))}
-    </ScrollView>
+        </ScrollView>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 }
 
@@ -25,6 +30,8 @@ export default function Quests() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  scrollContent: {
     padding: 16,
   },
   title: {
