@@ -14,7 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { CrossPlatformPicker } from '@/components/CrossPlatformPicker';
 
 const ListQuery = graphql(`
-query List($objectId: String!, $term: terms_bool_exp, $limit: Int, $offset: Int) {
+query List($objectId: String!, $term: terms_bool_exp, $subject: atoms_bool_exp, $limit: Int, $offset: Int) {
   object: atom(term_id: $objectId) {
     label
   }
@@ -27,6 +27,7 @@ query List($objectId: String!, $term: terms_bool_exp, $limit: Int, $offset: Int)
         _eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"
       }
       term: $term
+      subject: $subject
     }
     limit: $limit
     offset: $offset
@@ -93,19 +94,25 @@ export default function List() {
   const navigation = useNavigation();
   const { address, status } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
+  const [searchQuery, setSearhQuery] = useState('');
   const [sourceIndex, setSourceIndex] = useState(0);
 
-  useEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
+  // useEffect(() => {
+  //   navigation.setOptions({ headerShown: false });
+  // }, [navigation]);
 
   const { id } = useLocalSearchParams();
   const objectId = Array.isArray(id) ? id[0] : id;
 
   const { data, isLoading } = useQuery({
-    queryKey: ['list', objectId, address, sourceIndex],
+    queryKey: ['list', objectId, address, sourceIndex, searchQuery],
     queryFn: () => execute(ListQuery, {
       objectId: objectId,
+      subject: searchQuery.length > 0 ? {
+        label: {
+          _ilike: `%${searchQuery}%`
+        }
+      } : {},
       term: sourceIndex === 0 ? {} : address ? {
         vaults: {
           positions: {
@@ -175,7 +182,13 @@ export default function List() {
     <SafeAreaProvider>
       <Stack.Screen
         options={{
-          title: data?.object?.label || 'Untitled list'
+          title: data?.object?.label || 'Untitled list',
+          headerLargeTitle: true,
+          headerSearchBarOptions: {
+            placement: 'automatic',
+            placeholder: 'Search',
+            onChangeText: (e) => setSearhQuery(e.nativeEvent.text),
+          },
         }}
 
       />

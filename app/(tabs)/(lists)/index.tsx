@@ -239,11 +239,12 @@ const ListItem: React.FC<ListItemProps> = ({ object, isLast }) => {
 
 export default function AccountIndex() {
   const { address, status } = useAccount();
+  const [searchQuery, setSearhQuery] = useState('');
   const backgroundColor = useThemeColor({}, 'background');
   const [sourceIndex, setSourceIndex] = useState(0);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['savedLists', address, sourceIndex],
+    queryKey: ['savedLists', address, sourceIndex, searchQuery],
     queryFn: () => execute(SavedListsQuery, {
       "orderBy": { "triple_count": "desc" },
 
@@ -269,11 +270,19 @@ export default function AccountIndex() {
             }
           },
           {
+            "object": searchQuery.length > 0 ? {
+              "label": {
+                "_ilike": "%" + searchQuery + "%"
+              }
+            } : {}
+          },
+          {
             "object": {
               "as_object_triples": {
                 "predicate_id": {
                   "_eq": "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"
                 },
+
                 "term": sourceIndex === 0 ? {} : address ? {
                   "vaults": {
                     "positions": {
@@ -345,7 +354,13 @@ export default function AccountIndex() {
     <SafeAreaProvider>
       <Stack.Screen
         options={{
-          headerShown: false
+          title: 'Lists',
+          headerLargeTitle: true,
+          headerSearchBarOptions: {
+            placement: 'automatic',
+            placeholder: 'Search',
+            onChangeText: (e) => setSearhQuery(e.nativeEvent.text),
+          },
         }}
       />
       <SafeAreaView style={styles.container} edges={['top']}>

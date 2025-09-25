@@ -252,6 +252,7 @@ export default function ExploreIndex() {
       <Stack.Screen
         options={{
           title: 'Explore',
+          headerLargeTitle: true,
           headerSearchBarOptions: {
             placement: 'automatic',
             placeholder: 'Search',

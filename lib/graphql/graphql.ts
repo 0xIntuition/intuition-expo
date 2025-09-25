@@ -11608,6 +11608,7 @@ export type GetAtomQuery = { __typename?: 'query_root', atom?: { __typename?: 'a
 export type ListQueryVariables = Exact<{
   objectId: Scalars['String']['input'];
   term?: InputMaybe<Terms_Bool_Exp>;
+  subject?: InputMaybe<Atoms_Bool_Exp>;
   limit?: InputMaybe<Scalars['Int']['input']>;
   offset?: InputMaybe<Scalars['Int']['input']>;
 }>;
@@ -11756,12 +11757,12 @@ export const GetAtomDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<GetAtomQuery, GetAtomQueryVariables>;
 export const ListDocument = new TypedDocumentString(`
-    query List($objectId: String!, $term: terms_bool_exp, $limit: Int, $offset: Int) {
+    query List($objectId: String!, $term: terms_bool_exp, $subject: atoms_bool_exp, $limit: Int, $offset: Int) {
   object: atom(term_id: $objectId) {
     label
   }
   triples(
-    where: {object_id: {_eq: $objectId}, predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, term: $term}
+    where: {object_id: {_eq: $objectId}, predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, term: $term, subject: $subject}
     limit: $limit
     offset: $offset
     order_by: {term: {total_market_cap: desc}}
