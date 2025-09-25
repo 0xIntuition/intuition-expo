@@ -19,7 +19,7 @@ export default function TabLayout() {
           <Icon sf="list.bullet" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="account">
-          <Label>My Intuition</Label>
+          <Label>Me</Label>
           <Icon sf="person" />
         </NativeTabs.Trigger>
         <NativeTabs.Trigger name="explore" role="search">
@@ -59,7 +59,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="account"
         options={{
-          title: 'My Intuition',
+          title: 'Me',
           tabBarIcon: ({ color }) => <MaterialIcons size={28} name="person" color={color} />,
         }}
       />

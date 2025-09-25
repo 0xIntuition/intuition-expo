@@ -1,14 +1,15 @@
 import { Stack, useLocalSearchParams, useNavigation, Link } from 'expo-router';
-import { StyleSheet, ScrollView, Pressable } from 'react-native';
+import { StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-import { Text, View } from '@/components/Themed';
+import { Text, View, useThemeColor } from '@/components/Themed';
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
 import { execute } from '@/lib/graphql/execute';
 import { useEffect } from 'react';
 import { blurhash, getCachedImage } from '@/lib/utils';
 import { useAccount } from 'wagmi';
+import { Ionicons } from '@expo/vector-icons';
 
 const ListQuery = graphql(`
 query List($objectId: String!, $term: terms_bool_exp, $limit: Int, $offset: Int) {
@@ -38,9 +39,53 @@ query List($objectId: String!, $term: terms_bool_exp, $limit: Int, $offset: Int)
 }
 `);
 
+interface SectionItemProps {
+  item: {
+    term_id: string;
+    label?: string | null;
+    cached_image?: {
+      url?: string;
+      safe?: boolean;
+    } | null;
+  };
+  isLast: boolean;
+}
+
+const SectionItem: React.FC<SectionItemProps> = ({ item, isLast }) => {
+  const backgroundColor = useThemeColor({}, 'secondaryBackground');
+  const textColor = useThemeColor({}, 'text');
+  const separatorColor = useThemeColor({ light: '#e1e1e1', dark: '#333' }, 'tabIconDefault');
+  const chevronColor = useThemeColor({ light: '#8e8e93', dark: '#8e8e93' }, 'tabIconDefault');
+  const separator = !isLast ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: separatorColor } : {}
+
+  return (
+    <Link href={`/explore/atom/${item.term_id}`} asChild>
+      <Pressable
+        style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+      >
+        <View style={styles.sectionItemContent}>
+          {item.cached_image?.url && (
+            <Image
+              source={getCachedImage(item.cached_image.url)}
+              placeholder={blurhash}
+              blurRadius={item.cached_image?.safe ? 0 : 5}
+              style={styles.sectionItemImage}
+            />
+          )}
+          <Text style={[styles.sectionItemText, { color: textColor }]} numberOfLines={1}>
+            {item.label || 'Untitled'}
+          </Text>
+          <Ionicons name="chevron-forward" size={16} color={chevronColor} />
+        </View>
+      </Pressable>
+    </Link>
+  );
+};
+
 export default function List() {
   const navigation = useNavigation();
   const { address } = useAccount();
+  const backgroundColor = useThemeColor({}, 'background');
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -71,28 +116,53 @@ export default function List() {
     enabled: !!objectId
   });
 
+  if (isLoading) {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.container} edges={['top']}>
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" />
+            <Text style={styles.loadingText}>Loading...</Text>
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
+
+  if (!data?.triples || data.triples.length === 0) {
+    return (
+      <SafeAreaProvider>
+        <SafeAreaView style={styles.container} edges={['top']}>
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No Items Found</Text>
+            <Text style={styles.emptySubtext}>
+              This list doesn't contain any items yet
+            </Text>
+          </View>
+        </SafeAreaView>
+      </SafeAreaProvider>
+    );
+  }
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ScrollView>
-          {isLoading && <Text>Loading...</Text>}
-          {data?.triples?.map((triple) => (
-            <View key={triple.subject.term_id} style={styles.listItem}>
-              <Link href={`/explore/atom/${triple.subject.term_id}`} asChild>
-                <Pressable style={styles.itemContainer}>
-                  {triple.subject.cached_image?.url && (
-                    <Image
-                      source={getCachedImage(triple.subject.cached_image.url)}
-                      placeholder={blurhash}
-                      blurRadius={triple.subject.cached_image.safe ? 0 : 5}
-                      style={styles.itemImage}
-                    />
-                  )}
-                  <Text style={styles.itemLabel}>{triple.subject.label}</Text>
-                </Pressable>
-              </Link>
+        <ScrollView
+          style={[{ backgroundColor }]}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          <View style={styles.section}>
+            <View style={styles.sectionContent}>
+              {data.triples.map((triple, index) => (
+                <SectionItem
+                  key={triple.subject.term_id}
+                  item={triple.subject}
+                  isLast={index === data.triples.length - 1}
+                />
+              ))}
             </View>
-          ))}
+          </View>
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -103,25 +173,68 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  listItem: {
+  contentContainer: {
+    paddingVertical: 0,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 64,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 16,
+    opacity: 0.7,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+    paddingVertical: 64,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: '600',
+    textAlign: 'center',
     marginBottom: 8,
   },
-  itemContainer: {
+  emptySubtext: {
+    fontSize: 14,
+    textAlign: 'center',
+    opacity: 0.7,
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionContent: {
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    marginHorizontal: 16,
+    overflow: 'hidden',
+  },
+  sectionItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  sectionItemContent: {
+    paddingVertical: 3,
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 16,
-    backgroundColor: 'rgba(100,100,100,0.3)',
-    borderRadius: 8,
-    marginHorizontal: 16,
+    backgroundColor: 'transparent',
   },
-  itemImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
+  sectionItemImage: {
+    width: 29,
+    height: 29,
+    borderRadius: 6,
     marginRight: 12,
   },
-  itemLabel: {
-    fontSize: 16,
+  sectionItemText: {
     flex: 1,
+    fontSize: 17,
+    fontWeight: '400',
   },
 });
