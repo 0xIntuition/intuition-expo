@@ -11580,13 +11580,16 @@ export type Vaults_Variance_Order_By = {
   total_shares?: InputMaybe<Order_By>;
 };
 
-export type AccountProfileQueryVariables = Exact<{
-  accountId: Scalars['String']['input'];
-  positionsBool?: InputMaybe<Positions_Bool_Exp>;
+export type GlobalSearchQueryVariables = Exact<{
+  likeStr?: InputMaybe<Scalars['String']['input']>;
+  accountsLimit?: InputMaybe<Scalars['Int']['input']>;
+  atomsLimit?: InputMaybe<Scalars['Int']['input']>;
+  triplesLimit?: InputMaybe<Scalars['Int']['input']>;
+  collectionsLimit?: InputMaybe<Scalars['Int']['input']>;
 }>;
 
 
-export type AccountProfileQuery = { __typename?: 'query_root', account?: { __typename?: 'accounts', atom?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, organizations: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, projects: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, skills: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, tags: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> } | null } | null };
+export type GlobalSearchQuery = { __typename?: 'query_root', accounts: Array<{ __typename?: 'accounts', id: string, label: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }>, atoms: Array<{ __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }>, triples: Array<{ __typename?: 'triples', term_id: string, object: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, predicate: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, subject: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, collections: Array<{ __typename?: 'predicate_objects', object: { __typename?: 'atoms', label?: string | null, term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> };
 
 export type GetAccountQueryVariables = Exact<{
   id: Scalars['String']['input'];
@@ -11602,17 +11605,6 @@ export type GetAtomQueryVariables = Exact<{
 
 export type GetAtomQuery = { __typename?: 'query_root', atom?: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null };
 
-export type GlobalSearchQueryVariables = Exact<{
-  likeStr?: InputMaybe<Scalars['String']['input']>;
-  accountsLimit?: InputMaybe<Scalars['Int']['input']>;
-  atomsLimit?: InputMaybe<Scalars['Int']['input']>;
-  triplesLimit?: InputMaybe<Scalars['Int']['input']>;
-  collectionsLimit?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type GlobalSearchQuery = { __typename?: 'query_root', accounts: Array<{ __typename?: 'accounts', id: string, label: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }>, atoms: Array<{ __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }>, triples: Array<{ __typename?: 'triples', term_id: string, object: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, predicate: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, subject: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, collections: Array<{ __typename?: 'predicate_objects', object: { __typename?: 'atoms', label?: string | null, term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> };
-
 export type ListQueryVariables = Exact<{
   objectId: Scalars['String']['input'];
   term?: InputMaybe<Terms_Bool_Exp>;
@@ -11621,7 +11613,7 @@ export type ListQueryVariables = Exact<{
 }>;
 
 
-export type ListQuery = { __typename?: 'query_root', triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> };
+export type ListQuery = { __typename?: 'query_root', object?: { __typename?: 'atoms', label?: string | null } | null, triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> };
 
 export type GetTripleQueryVariables = Exact<{
   term_id: Scalars['String']['input'];
@@ -11640,6 +11632,14 @@ export type SavedListsQueryVariables = Exact<{
 
 
 export type SavedListsQuery = { __typename?: 'query_root', predicate_objects_aggregate: { __typename?: 'predicate_objects_aggregate', aggregate?: { __typename?: 'predicate_objects_aggregate_fields', count: number } | null }, predicate_objects: Array<{ __typename?: 'predicate_objects', id: string, triple_count: number, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, as_object_triples_aggregate: { __typename?: 'triples_aggregate', aggregate?: { __typename?: 'triples_aggregate_fields', count: number } | null }, as_object_triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> } }> };
+
+export type AccountProfileQueryVariables = Exact<{
+  accountId: Scalars['String']['input'];
+  positionsBool?: InputMaybe<Positions_Bool_Exp>;
+}>;
+
+
+export type AccountProfileQuery = { __typename?: 'query_root', account?: { __typename?: 'accounts', atom?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, organizations: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, projects: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, skills: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, tags: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> } | null } | null };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -11660,93 +11660,6 @@ export class TypedDocumentString<TResult, TVariables>
   }
 }
 
-export const AccountProfileDocument = new TypedDocumentString(`
-    query AccountProfile($accountId: String!, $positionsBool: positions_bool_exp) {
-  account(id: $accountId) {
-    atom {
-      term_id
-      label
-      cached_image {
-        safe
-        url
-      }
-      organizations: as_subject_triples(
-        where: {predicate_id: {_eq: "0x41f20a29ee2587b977cf5b1386f44392224b05280b6ea6e3188be7b673b98c4d"}, positions: $positionsBool}
-      ) {
-        object {
-          term_id
-          label
-          cached_image {
-            url
-            safe
-          }
-        }
-      }
-      projects: as_subject_triples(
-        where: {predicate_id: {_eq: "0x35614b2d339d64b8ecad5d4b39968be8d3d5eb31d4ccf81185d152487805d7fb"}, positions: $positionsBool}
-      ) {
-        object {
-          term_id
-          label
-          cached_image {
-            url
-            safe
-          }
-        }
-      }
-      skills: as_subject_triples(
-        where: {predicate_id: {_eq: "0xb5b5a44a01d657bf5a3f747c7609a1c665dff44b0b2c3a64556b137e3f0f9d02"}, positions: $positionsBool}
-      ) {
-        object {
-          term_id
-          label
-          cached_image {
-            url
-            safe
-          }
-        }
-      }
-      tags: as_subject_triples(
-        where: {predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, positions: $positionsBool}
-      ) {
-        object {
-          term_id
-          label
-          cached_image {
-            url
-            safe
-          }
-        }
-      }
-    }
-  }
-}
-    `) as unknown as TypedDocumentString<AccountProfileQuery, AccountProfileQueryVariables>;
-export const GetAccountDocument = new TypedDocumentString(`
-    query GetAccount($id: String!) {
-  account(id: $id) {
-    id
-    label
-    atom {
-      cached_image {
-        url
-        safe
-      }
-    }
-  }
-}
-    `) as unknown as TypedDocumentString<GetAccountQuery, GetAccountQueryVariables>;
-export const GetAtomDocument = new TypedDocumentString(`
-    query GetAtom($term_id: String!) {
-  atom(term_id: $term_id) {
-    label
-    cached_image {
-      url
-      safe
-    }
-  }
-}
-    `) as unknown as TypedDocumentString<GetAtomQuery, GetAtomQueryVariables>;
 export const GlobalSearchDocument = new TypedDocumentString(`
     query GlobalSearch($likeStr: String, $accountsLimit: Int, $atomsLimit: Int, $triplesLimit: Int, $collectionsLimit: Int) {
   accounts(
@@ -11817,8 +11730,36 @@ export const GlobalSearchDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<GlobalSearchQuery, GlobalSearchQueryVariables>;
+export const GetAccountDocument = new TypedDocumentString(`
+    query GetAccount($id: String!) {
+  account(id: $id) {
+    id
+    label
+    atom {
+      cached_image {
+        url
+        safe
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<GetAccountQuery, GetAccountQueryVariables>;
+export const GetAtomDocument = new TypedDocumentString(`
+    query GetAtom($term_id: String!) {
+  atom(term_id: $term_id) {
+    label
+    cached_image {
+      url
+      safe
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<GetAtomQuery, GetAtomQueryVariables>;
 export const ListDocument = new TypedDocumentString(`
     query List($objectId: String!, $term: terms_bool_exp, $limit: Int, $offset: Int) {
+  object: atom(term_id: $objectId) {
+    label
+  }
   triples(
     where: {object_id: {_eq: $objectId}, predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, term: $term}
     limit: $limit
@@ -11910,3 +11851,65 @@ export const SavedListsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<SavedListsQuery, SavedListsQueryVariables>;
+export const AccountProfileDocument = new TypedDocumentString(`
+    query AccountProfile($accountId: String!, $positionsBool: positions_bool_exp) {
+  account(id: $accountId) {
+    atom {
+      term_id
+      label
+      cached_image {
+        safe
+        url
+      }
+      organizations: as_subject_triples(
+        where: {predicate_id: {_eq: "0x41f20a29ee2587b977cf5b1386f44392224b05280b6ea6e3188be7b673b98c4d"}, positions: $positionsBool}
+      ) {
+        object {
+          term_id
+          label
+          cached_image {
+            url
+            safe
+          }
+        }
+      }
+      projects: as_subject_triples(
+        where: {predicate_id: {_eq: "0x35614b2d339d64b8ecad5d4b39968be8d3d5eb31d4ccf81185d152487805d7fb"}, positions: $positionsBool}
+      ) {
+        object {
+          term_id
+          label
+          cached_image {
+            url
+            safe
+          }
+        }
+      }
+      skills: as_subject_triples(
+        where: {predicate_id: {_eq: "0xb5b5a44a01d657bf5a3f747c7609a1c665dff44b0b2c3a64556b137e3f0f9d02"}, positions: $positionsBool}
+      ) {
+        object {
+          term_id
+          label
+          cached_image {
+            url
+            safe
+          }
+        }
+      }
+      tags: as_subject_triples(
+        where: {predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, positions: $positionsBool}
+      ) {
+        object {
+          term_id
+          label
+          cached_image {
+            url
+            safe
+          }
+        }
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<AccountProfileQuery, AccountProfileQueryVariables>;

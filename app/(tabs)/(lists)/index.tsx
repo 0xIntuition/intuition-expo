@@ -216,7 +216,7 @@ const ListItem: React.FC<ListItemProps> = ({ object, isLast }) => {
   const memberCount = object.as_object_triples_aggregate.aggregate.count;
 
   return (
-    <Link href={`/explore/list/${object.term_id}`} asChild>
+    <Link href={`/(lists)/list/${object.term_id}`} asChild>
       <Pressable
         style={{ ...styles.sectionItem, backgroundColor, ...separator }}
       >
@@ -328,7 +328,6 @@ export default function AccountIndex() {
 
     return (
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Lists</Text>
         <View style={styles.sectionContent}>
           {data.predicate_objects.map((p, index) => (
             <ListItem
@@ -357,7 +356,7 @@ export default function AccountIndex() {
           stickyHeaderIndices={[0]}
         >
           <View style={Platform.select({
-            ios: ({ flex: 1, backgroundColor, paddingBottom: 10 }),
+            ios: ({ flex: 1, backgroundColor, paddingBottom: 10, marginHorizontal: 16 }),
             android: ({ alignItems: 'center', flex: 1, backgroundColor })
           })}>
             <CrossPlatformPicker
@@ -400,6 +399,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     textAlign: 'center',
     opacity: 0.7,
+    marginBottom: 16
   },
   loadingContainer: {
     flex: 1,

@@ -1,18 +1,23 @@
 import { Stack, useLocalSearchParams, useNavigation, Link } from 'expo-router';
-import { StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { StyleSheet, ScrollView, Pressable, ActivityIndicator, Platform } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
+import { AppKitButton } from '@reown/appkit-wagmi-react-native';
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
 import { execute } from '@/lib/graphql/execute';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { blurhash, getCachedImage } from '@/lib/utils';
 import { useAccount } from 'wagmi';
 import { Ionicons } from '@expo/vector-icons';
+import { CrossPlatformPicker } from '@/components/CrossPlatformPicker';
 
 const ListQuery = graphql(`
 query List($objectId: String!, $term: terms_bool_exp, $limit: Int, $offset: Int) {
+  object: atom(term_id: $objectId) {
+    label
+  }
   triples(
     where: {
       object_id: {
@@ -39,6 +44,8 @@ query List($objectId: String!, $term: terms_bool_exp, $limit: Int, $offset: Int)
 }
 `);
 
+const sources = ['All', 'My'];
+
 interface SectionItemProps {
   item: {
     term_id: string;
@@ -59,7 +66,7 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast }) => {
   const separator = !isLast ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: separatorColor } : {}
 
   return (
-    <Link href={`/explore/atom/${item.term_id}`} asChild>
+    <Link href={`../atom/${item.term_id}`} asChild>
       <Pressable
         style={{ ...styles.sectionItem, backgroundColor, ...separator }}
       >
@@ -84,8 +91,9 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast }) => {
 
 export default function List() {
   const navigation = useNavigation();
-  const { address } = useAccount();
+  const { address, status } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
+  const [sourceIndex, setSourceIndex] = useState(0);
 
   useEffect(() => {
     navigation.setOptions({ headerShown: false });
@@ -95,10 +103,10 @@ export default function List() {
   const objectId = Array.isArray(id) ? id[0] : id;
 
   const { data, isLoading } = useQuery({
-    queryKey: ['list', objectId, address],
+    queryKey: ['list', objectId, address, sourceIndex],
     queryFn: () => execute(ListQuery, {
       objectId: objectId,
-      term: address ? {
+      term: sourceIndex === 0 ? {} : address ? {
         vaults: {
           positions: {
             account_id: {
@@ -116,53 +124,82 @@ export default function List() {
     enabled: !!objectId
   });
 
-  if (isLoading) {
-    return (
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <View style={styles.loadingContainer}>
-            <ActivityIndicator size="large" />
-            <Text style={styles.loadingText}>Loading...</Text>
-          </View>
-        </SafeAreaView>
-      </SafeAreaProvider>
-    );
-  }
+  const renderContent = () => {
+    // If "My" is selected but user is not connected, show connection prompt
+    if (sourceIndex === 1 && status !== 'connected') {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Connect your wallet</Text>
+          <Text style={styles.emptySubtext}>Connect your wallet to see your items in this list</Text>
+          <AppKitButton />
+        </View>
+      );
+    }
 
-  if (!data?.triples || data.triples.length === 0) {
+    if (isLoading) {
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+          <Text style={styles.loadingText}>Loading...</Text>
+        </View>
+      );
+    }
+
+    if (!data?.triples || data.triples.length === 0) {
+      return (
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>No Items Found</Text>
+          <Text style={styles.emptySubtext}>
+            This list doesn't contain any items yet
+          </Text>
+        </View>
+      );
+    }
+
     return (
-      <SafeAreaProvider>
-        <SafeAreaView style={styles.container} edges={['top']}>
-          <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No Items Found</Text>
-            <Text style={styles.emptySubtext}>
-              This list doesn't contain any items yet
-            </Text>
-          </View>
-        </SafeAreaView>
-      </SafeAreaProvider>
+      <View style={styles.section}>
+        <View style={styles.sectionContent}>
+          {data.triples.map((triple, index) => (
+            <SectionItem
+              key={triple.subject.term_id}
+              item={triple.subject}
+              isLast={index === data.triples.length - 1}
+            />
+          ))}
+        </View>
+      </View>
     );
-  }
+  };
 
   return (
     <SafeAreaProvider>
+      <Stack.Screen
+        options={{
+          title: data?.object?.label || 'Untitled list'
+        }}
+
+      />
       <SafeAreaView style={styles.container} edges={['top']}>
         <ScrollView
           style={[{ backgroundColor }]}
           contentContainerStyle={styles.contentContainer}
           showsVerticalScrollIndicator={false}
+          stickyHeaderIndices={[0]}
         >
-          <View style={styles.section}>
-            <View style={styles.sectionContent}>
-              {data.triples.map((triple, index) => (
-                <SectionItem
-                  key={triple.subject.term_id}
-                  item={triple.subject}
-                  isLast={index === data.triples.length - 1}
-                />
-              ))}
-            </View>
+          <View style={Platform.select({
+            ios: ({ flex: 1, backgroundColor, paddingBottom: 10, marginHorizontal: 16 }),
+            android: ({ alignItems: 'center', flex: 1, backgroundColor })
+          })}>
+            <CrossPlatformPicker
+              options={sources}
+              selectedIndex={sourceIndex}
+              onOptionSelected={({ nativeEvent: { index } }) => {
+                setSourceIndex(index);
+              }}
+              variant="segmented"
+            />
           </View>
+          {renderContent()}
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -174,7 +211,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   contentContainer: {
-    paddingVertical: 0,
+    paddingVertical: 16,
   },
   loadingContainer: {
     flex: 1,

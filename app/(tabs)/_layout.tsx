@@ -9,20 +9,20 @@ export default function TabLayout() {
   if (Platform.OS === 'ios') {
     // Use NativeTabs on iOS for better native experience
     return (
-      <NativeTabs minimizeBehavior='onScrollDown'>
+      <NativeTabs minimizeBehavior='onScrollDown' >
         <NativeTabs.Trigger name="quests">
           <Label>Quests</Label>
           <Icon sf="bolt" />
         </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="lists">
+        <NativeTabs.Trigger name="(lists)">
           <Label>Lists</Label>
           <Icon sf="list.bullet" />
         </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="account">
+        <NativeTabs.Trigger name="(me)">
           <Label>Me</Label>
           <Icon sf="person" />
         </NativeTabs.Trigger>
-        <NativeTabs.Trigger name="explore" role="search">
+        <NativeTabs.Trigger name="(explore)" role="search">
           <Label>Explore</Label>
           <Icon sf="magnifyingglass" />
         </NativeTabs.Trigger>
@@ -33,15 +33,12 @@ export default function TabLayout() {
   // Use legacy Tabs on Android for better scroll compatibility
   return (
     <Tabs
+      initialRouteName='quests'
+
       screenOptions={{
         headerShown: false,
       }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          href: null, // Hide from tab bar
-        }}
-      />
+
       <Tabs.Screen
         name="quests"
         options={{
@@ -50,24 +47,30 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="lists"
+        name="(lists)"
         options={{
           title: 'Lists',
           tabBarIcon: ({ color }) => <MaterialIcons size={28} name="list" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="account"
+        name="(me)"
         options={{
           title: 'Me',
           tabBarIcon: ({ color }) => <MaterialIcons size={28} name="person" color={color} />,
         }}
       />
       <Tabs.Screen
-        name="explore"
+        name="(explore)"
         options={{
           title: 'Explore',
           tabBarIcon: ({ color }) => <MaterialIcons size={28} name="search" color={color} />,
+        }}
+      />
+      <Tabs.Screen
+        name="index"
+        options={{
+          href: null, // Hide from tab bar
         }}
       />
     </Tabs>

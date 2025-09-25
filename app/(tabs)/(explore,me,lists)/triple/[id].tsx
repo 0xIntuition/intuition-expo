@@ -65,7 +65,7 @@ export default function Triple() {
           {isLoading && <Text>Loading</Text>}
           {data !== undefined && <View>
 
-            <Link href={`/explore/atom/${data.triple?.subject?.term_id}`} asChild>
+            <Link href={`../atom/${data.triple?.subject?.term_id}`} asChild>
               <Pressable>
                 {data.triple?.subject?.cached_image !== null &&
                   <Image
@@ -78,7 +78,7 @@ export default function Triple() {
               </Pressable>
             </Link>
 
-            <Link href={`/explore/atom/${data.triple?.predicate?.term_id}`} asChild>
+            <Link href={`../atom/${data.triple?.predicate?.term_id}`} asChild>
               <Pressable>
                 {data.triple?.predicate?.cached_image !== null &&
                   <Image
@@ -91,7 +91,7 @@ export default function Triple() {
               </Pressable>
             </Link>
 
-            <Link href={`/explore/atom/${data.triple?.object?.term_id}`} asChild>
+            <Link href={`../atom/${data.triple?.object?.term_id}`} asChild>
               <Pressable>
                 {data.triple?.object?.cached_image !== null &&
                   <Image

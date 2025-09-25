@@ -1,6 +1,6 @@
 import { Stack } from 'expo-router';
 
-export default function AccountLayout() {
+export default function MeLayout() {
   return <Stack />;
 }
 

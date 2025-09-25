@@ -203,7 +203,7 @@ const ClaimItem: React.FC<ClaimItemProps> = ({
   const separator = !isLast ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: separatorColor } : {}
 
   return (
-    <Link href={`/explore/triple/${triple.term_id}`} asChild>
+    <Link href={`/(explore)/triple/${triple.term_id}`} asChild>
       <Pressable
         style={{ ...styles.sectionItem, backgroundColor, ...separator }}
       >
@@ -276,7 +276,7 @@ export default function ExploreIndex() {
                   <SectionItem
                     key={account.id}
                     item={account}
-                    href={`/explore/account/${account.id}`}
+                    href={`/(explore)/account/${account.id}`}
                     isLast={index === data.accounts.length - 1}
                   />
                 ))}
@@ -293,7 +293,7 @@ export default function ExploreIndex() {
                   <SectionItem
                     key={atom.term_id}
                     item={atom}
-                    href={`/explore/atom/${atom.term_id}`}
+                    href={`/(explore)/atom/${atom.term_id}`}
                     isLast={index === data.atoms.length - 1}
                   />
                 ))}
@@ -330,7 +330,7 @@ export default function ExploreIndex() {
                   <SectionItem
                     key={collection.object.term_id}
                     item={collection.object}
-                    href={`/explore/list/${collection.object.term_id}`}
+                    href={`/(explore)/list/${collection.object.term_id}`}
                     isLast={index === data.collections.length - 1}
                   />
                 ))}

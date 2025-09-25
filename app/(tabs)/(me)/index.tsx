@@ -119,7 +119,7 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast }) => {
   const separator = !isLast ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: separatorColor } : {}
 
   return (
-    <Link href={`/explore/atom/${item.term_id}`} asChild>
+    <Link href={`/(me)/atom/${item.term_id}`} asChild>
       <Pressable
         style={{ ...styles.sectionItem, backgroundColor, ...separator }}
       >
@@ -142,7 +142,7 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast }) => {
   );
 };
 
-export default function AccountIndex() {
+export default function MeIndex() {
   const { address, status } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
   const [sourceIndex, setSourceIndex] = useState(0);
