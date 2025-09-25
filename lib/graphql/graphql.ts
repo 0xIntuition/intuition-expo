@@ -11639,7 +11639,7 @@ export type SavedListsQueryVariables = Exact<{
 }>;
 
 
-export type SavedListsQuery = { __typename?: 'query_root', predicate_objects_aggregate: { __typename?: 'predicate_objects_aggregate', aggregate?: { __typename?: 'predicate_objects_aggregate_fields', count: number } | null }, predicate_objects: Array<{ __typename?: 'predicate_objects', id: string, triple_count: number, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, value?: { __typename?: 'atom_values', thing?: { __typename?: 'things', description?: string | null } | null } | null, as_object_triples_aggregate: { __typename?: 'triples_aggregate', aggregate?: { __typename?: 'triples_aggregate_fields', count: number } | null }, as_object_triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> } }> };
+export type SavedListsQuery = { __typename?: 'query_root', predicate_objects_aggregate: { __typename?: 'predicate_objects_aggregate', aggregate?: { __typename?: 'predicate_objects_aggregate_fields', count: number } | null }, predicate_objects: Array<{ __typename?: 'predicate_objects', id: string, triple_count: number, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, as_object_triples_aggregate: { __typename?: 'triples_aggregate', aggregate?: { __typename?: 'triples_aggregate_fields', count: number } | null }, as_object_triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> } }> };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -11887,11 +11887,6 @@ export const SavedListsDocument = new TypedDocumentString(`
       cached_image {
         safe
         url
-      }
-      value {
-        thing {
-          description
-        }
       }
       as_object_triples_aggregate(where: $triplesWhere) {
         aggregate {

@@ -1,16 +1,18 @@
-import { StyleSheet, ActivityIndicator, Platform } from 'react-native';
+import { Link, Stack } from 'expo-router';
+import { Pressable, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { ScrollView } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { AppKitButton } from '@reown/appkit-wagmi-react-native';
-import { Stack } from 'expo-router';
 import { useAccount } from "wagmi";
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
 import { execute } from '@/lib/graphql/execute';
-import { ListCard } from '@/components/ListCard';
 import { CrossPlatformPicker } from '@/components/CrossPlatformPicker';
 import { useState } from 'react';
+import { Image } from 'expo-image';
+import { blurhash, getCachedImage } from '@/lib/utils';
+import { Ionicons } from '@expo/vector-icons';
 const SavedListsQuery = graphql(`
 query SavedLists(
   $where: predicate_objects_bool_exp
@@ -39,11 +41,6 @@ query SavedLists(
         safe
         url
       }
-      value {
-        thing {
-          description
-        }
-      }
       as_object_triples_aggregate(where: $triplesWhere) {
         aggregate {
           count
@@ -69,6 +66,176 @@ query SavedLists(
 `);
 
 const sources = ['All', 'My'];
+
+interface CachedImage {
+  safe?: boolean;
+  url?: string;
+}
+
+interface Subject {
+  term_id: string;
+  cached_image?: CachedImage;
+}
+
+interface Triple {
+  subject: Subject;
+}
+
+interface ListItemProps {
+  object: {
+    term_id: string;
+    label: string;
+    cached_image?: CachedImage;
+    as_object_triples: Triple[];
+    as_object_triples_aggregate: {
+      aggregate: {
+        count: number;
+      };
+    };
+  };
+  isLast: boolean;
+}
+
+const ComposedImage: React.FC<{ triples: Triple[] }> = ({ triples }) => {
+  const imageUrls = triples
+    .slice(0, 4)
+    .map(triple => triple.subject.cached_image?.safe ? triple.subject.cached_image.url : null)
+    .filter(Boolean);
+
+  const backgroundColor = useThemeColor({ light: '#f0f0f0', dark: '#2a2a2a' }, 'tabIconDefault');
+
+  if (imageUrls.length === 0) {
+    return (
+      <View style={[styles.composedImageContainer, { backgroundColor }]}>
+        <Ionicons name="list" size={16} color="#8e8e93" />
+      </View>
+    );
+  }
+
+  const renderImages = () => {
+    if (imageUrls.length === 1) {
+      return (
+        <Image
+          source={getCachedImage(imageUrls[0]!)}
+          placeholder={blurhash}
+          style={styles.singleImage}
+        />
+      );
+    }
+
+    if (imageUrls.length === 2) {
+      return (
+        <>
+          <View style={styles.topRow}>
+            <Image
+              source={getCachedImage(imageUrls[0]!)}
+              placeholder={blurhash}
+              style={styles.halfImage}
+            />
+            <Image
+              source={getCachedImage(imageUrls[1]!)}
+              placeholder={blurhash}
+              style={styles.halfImage}
+            />
+          </View>
+        </>
+      );
+    }
+
+    if (imageUrls.length === 3) {
+      return (
+        <>
+          <View style={styles.topRow}>
+            <Image
+              source={getCachedImage(imageUrls[0]!)}
+              placeholder={blurhash}
+              style={styles.halfImage}
+            />
+            <Image
+              source={getCachedImage(imageUrls[1]!)}
+              placeholder={blurhash}
+              style={styles.halfImage}
+            />
+          </View>
+          <View style={styles.bottomRow}>
+            <Image
+              source={getCachedImage(imageUrls[2]!)}
+              placeholder={blurhash}
+              style={styles.bottomSingleImage}
+            />
+          </View>
+        </>
+      );
+    }
+
+    return (
+      <>
+        <View style={styles.topRow}>
+          <Image
+            source={getCachedImage(imageUrls[0]!)}
+            placeholder={blurhash}
+            style={styles.quarterImage}
+          />
+          <Image
+            source={getCachedImage(imageUrls[1]!)}
+            placeholder={blurhash}
+            style={styles.quarterImage}
+          />
+        </View>
+        <View style={styles.bottomRow}>
+          <Image
+            source={getCachedImage(imageUrls[2]!)}
+            placeholder={blurhash}
+            style={styles.quarterImage}
+          />
+          <Image
+            source={getCachedImage(imageUrls[3]!)}
+            placeholder={blurhash}
+            style={styles.quarterImage}
+          />
+        </View>
+      </>
+    );
+  };
+
+  return (
+    <View style={styles.composedImageContainer}>
+      {renderImages()}
+    </View>
+  );
+};
+
+const ListItem: React.FC<ListItemProps> = ({ object, isLast }) => {
+  const backgroundColor = useThemeColor({}, 'secondaryBackground');
+  const textColor = useThemeColor({}, 'text');
+  const subtitleColor = useThemeColor({ light: '#8e8e93', dark: '#8e8e93' }, 'tabIconDefault');
+  const separatorColor = useThemeColor({ light: '#e1e1e1', dark: '#333' }, 'tabIconDefault');
+  const chevronColor = useThemeColor({ light: '#8e8e93', dark: '#8e8e93' }, 'tabIconDefault');
+  const separator = !isLast ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: separatorColor } : {}
+
+  const memberCount = object.as_object_triples_aggregate.aggregate.count;
+
+  return (
+    <Link href={`/explore/list/${object.term_id}`} asChild>
+      <Pressable
+        style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+      >
+        <View style={styles.sectionItemContent}>
+          <ComposedImage triples={object.as_object_triples} />
+          <View style={styles.textContainer}>
+            <Text style={[styles.sectionItemText, { color: textColor }]} numberOfLines={1}>
+              {object.label || 'Untitled'}
+            </Text>
+            <Text style={[styles.memberCountText, { color: subtitleColor }]} numberOfLines={1}>
+              {memberCount} {memberCount === 1 ? 'item' : 'items'}
+            </Text>
+          </View>
+          <Ionicons name="chevron-forward" size={16} color={chevronColor} />
+        </View>
+      </Pressable>
+    </Link>
+  );
+};
 
 export default function AccountIndex() {
   const { address, status } = useAccount();
@@ -159,14 +326,20 @@ export default function AccountIndex() {
       );
     }
 
-    return data.predicate_objects.map((p) => (
-      <ListCard
-        key={p.id}
-        id={p.id}
-        triple_count={p.triple_count}
-        object={p.object}
-      />
-    ));
+    return (
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Lists</Text>
+        <View style={styles.sectionContent}>
+          {data.predicate_objects.map((p, index) => (
+            <ListItem
+              key={p.id}
+              object={p.object}
+              isLast={index === data.predicate_objects.length - 1}
+            />
+          ))}
+        </View>
+      </View>
+    );
   };
 
   return (
@@ -182,18 +355,20 @@ export default function AccountIndex() {
           contentContainerStyle={styles.contentContainer}
           showsVerticalScrollIndicator={false}
           stickyHeaderIndices={[0]}
-        ><View style={Platform.select({
-
-          ios: ({ flex: 1, backgroundColor, paddingBottom: 10 }),
-          android: ({ alignItems: 'center', flex: 1, backgroundColor })
-        })}><CrossPlatformPicker
+        >
+          <View style={Platform.select({
+            ios: ({ flex: 1, backgroundColor, paddingBottom: 10 }),
+            android: ({ alignItems: 'center', flex: 1, backgroundColor })
+          })}>
+            <CrossPlatformPicker
               options={sources}
               selectedIndex={sourceIndex}
               onOptionSelected={({ nativeEvent: { index } }) => {
                 setSourceIndex(index);
               }}
               variant="segmented"
-            /></View>
+            />
+          </View>
           {renderContent()}
         </ScrollView>
       </SafeAreaView>
@@ -236,6 +411,85 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 16,
     opacity: 0.7,
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    paddingHorizontal: 16,
+    marginBottom: 8,
+    opacity: 0.6,
+  },
+  sectionContent: {
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    marginHorizontal: 16,
+    overflow: 'hidden',
+  },
+  sectionItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  sectionItemContent: {
+    paddingVertical: 3,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+  },
+  composedImageContainer: {
+    width: 29,
+    height: 29,
+    borderRadius: 6,
+    marginRight: 12,
+    overflow: 'hidden',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  singleImage: {
+    width: 29,
+    height: 29,
+    borderRadius: 6,
+  },
+  topRow: {
+    flexDirection: 'row',
+    height: 14,
+    marginBottom: 1,
+  },
+  bottomRow: {
+    flexDirection: 'row',
+    height: 14,
+  },
+  halfImage: {
+    width: 14,
+    height: 14,
+    marginRight: 1,
+  },
+  bottomSingleImage: {
+    width: 29,
+    height: 14,
+  },
+  quarterImage: {
+    width: 14,
+    height: 14,
+    marginRight: 1,
+  },
+  textContainer: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  sectionItemText: {
+    fontSize: 17,
+    fontWeight: '400',
+    marginBottom: 2,
+  },
+  memberCountText: {
+    fontSize: 13,
+    fontWeight: '400',
   },
 });
 
