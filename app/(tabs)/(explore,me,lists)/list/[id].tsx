@@ -182,7 +182,7 @@ export default function List() {
     <SafeAreaProvider>
       <Stack.Screen
         options={{
-          title: data?.object?.label || 'Untitled list',
+          title: data?.object?.label || '',
           headerLargeTitle: true,
           headerSearchBarOptions: {
             placement: 'automatic',

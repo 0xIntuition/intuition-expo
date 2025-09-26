@@ -24,9 +24,9 @@ query GetAtom($term_id: String!) {
 export default function Atom() {
   const navigation = useNavigation();
 
-  useEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
+  // useEffect(() => {
+  //   navigation.setOptions({ headerShown: false });
+  // }, [navigation]);
 
   const { id } = useLocalSearchParams();
   const termId = Array.isArray(id) ? id[0] : id
@@ -41,6 +41,13 @@ export default function Atom() {
   return (
 
     <SafeAreaProvider>
+      <Stack.Screen
+        options={{
+          title: data?.atom?.label || '',
+          headerLargeTitle: true,
+        }}
+      />
+
       <SafeAreaView style={styles.container} edges={['top']}>
         <ScrollView>
           {isLoading && <Text>Loading</Text>}

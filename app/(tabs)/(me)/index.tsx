@@ -293,7 +293,7 @@ export default function MeIndex() {
           style={[{ backgroundColor }]}
           contentContainerStyle={styles.contentContainer}
           showsVerticalScrollIndicator={false}
-          stickyHeaderIndices={status === 'connected' && data?.account?.atom ? [2] : []}
+        // stickyHeaderIndices={status === 'connected' && data?.account?.atom ? [1] : []}
         >
           {(() => {
             if (status === 'disconnected') {
@@ -330,7 +330,6 @@ export default function MeIndex() {
             const content = renderContent();
             return (
               <>
-                {content.profileHeader}
                 <View style={Platform.select({
                   android: ({ alignItems: 'center' })
                 })}>
@@ -343,6 +342,7 @@ export default function MeIndex() {
                     variant="segmented"
                   />
                 </View>
+                {content.profileHeader}
                 {content.sectionsContent}
               </>
             );

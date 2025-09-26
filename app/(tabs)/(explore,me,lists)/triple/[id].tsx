@@ -41,11 +41,7 @@ query GetTriple($term_id: String!) {
 `);
 
 export default function Triple() {
-  const navigation = useNavigation();
 
-  useEffect(() => {
-    navigation.setOptions({ headerShown: false });
-  }, [navigation]);
 
   const { id } = useLocalSearchParams();
   const termId = Array.isArray(id) ? id[0] : id
@@ -57,9 +53,17 @@ export default function Triple() {
     })
   })
 
+  const title = isLoading ? '' : data?.triple?.subject.label + ' ' + data?.triple?.predicate?.label + ' ' + data?.triple?.object?.label
+
   return (
 
     <SafeAreaProvider>
+      <Stack.Screen
+        options={{
+          title,
+          headerLargeTitle: true,
+        }}
+      />
       <SafeAreaView style={styles.container} edges={['top']}>
         <ScrollView contentContainerStyle={styles.container}>
           {isLoading && <Text>Loading</Text>}
