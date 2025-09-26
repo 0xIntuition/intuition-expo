@@ -1,14 +1,103 @@
-import { Pressable, StyleSheet } from 'react-native';
+import React from 'react';
+import { Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-import { Text, View } from '@/components/Themed';
+import { Text, View, useThemeColor } from '@/components/Themed';
+import { useQuery } from '@tanstack/react-query';
+import { getQuestions } from '@/lib/quests/questions';
+import { Link } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
+
+interface SectionItemProps {
+  item: {
+    id: number;
+    title?: string | null;
+  };
+  href: string;
+  isLast: boolean;
+}
+
+const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast }) => {
+  const backgroundColor = useThemeColor({}, 'secondaryBackground');
+  const textColor = useThemeColor({}, 'text');
+  const separatorColor = useThemeColor({ light: '#e1e1e1', dark: '#333' }, 'tabIconDefault');
+  const chevronColor = useThemeColor({ light: '#8e8e93', dark: '#8e8e93' }, 'tabIconDefault');
+  const separator = !isLast ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: separatorColor } : {}
+
+  return (
+    <Link href={href} asChild>
+      <Pressable
+        style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+      >
+        <View style={styles.sectionItemContent}>
+          <Text style={[styles.sectionItemText, { color: textColor }]}>
+            {item.title || 'Untitled'}
+          </Text>
+          <Ionicons name="chevron-forward" size={16} color={chevronColor} />
+        </View>
+      </Pressable>
+    </Link>
+  );
+};
 
 export default function QuestionsQuest() {
+  const backgroundColor = useThemeColor({}, 'background');
+
+  const { data, isLoading } = useQuery({
+    queryKey: ['getQuestions'],
+    queryFn: () => getQuestions([1, 6, 7, 8])
+  })
+
+  // Group questions by epoch_id and sort epochs in descending order
+  const groupedQuestions = React.useMemo(() => {
+    if (!data?.epoch_questions) return [];
+
+    const groups = data.epoch_questions.reduce((acc, question) => {
+      if (!acc[question.epoch_id]) {
+        acc[question.epoch_id] = [];
+      }
+      acc[question.epoch_id].push(question);
+      return acc;
+    }, {} as Record<number, typeof data.epoch_questions>);
+
+    return Object.entries(groups)
+      .map(([epochId, questions]) => ({
+        epochId: parseInt(epochId),
+        questions
+      }))
+      .sort((a, b) => b.epochId - a.epochId);
+  }, [data?.epoch_questions]);
+
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container} edges={['top']}>
-        <ScrollView>
-          <Text>This is questions quest</Text>
+        <ScrollView
+          style={[{ backgroundColor }]}
+          contentContainerStyle={styles.contentContainer}
+          showsVerticalScrollIndicator={false}
+        >
+          {isLoading && (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" />
+              <Text style={styles.loadingText}>Loading...</Text>
+            </View>
+          )}
+
+          {groupedQuestions.map((group) => (
+            <View key={group.epochId} style={styles.section}>
+              <Text style={styles.sectionTitle}>Epoch {group.epochId}</Text>
+              <View style={styles.sectionContent}>
+                {group.questions.map((question, index) => (
+                  <SectionItem
+                    key={question.id}
+                    item={question}
+                    href={`./question/${question.id}`}
+                    isLast={index === group.questions.length - 1}
+                  />
+                ))}
+              </View>
+            </View>
+          ))}
         </ScrollView>
       </SafeAreaView>
     </SafeAreaProvider>
@@ -20,10 +109,54 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 5,
-    marginTop: 10,
+  contentContainer: {
+    paddingVertical: 16,
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 64,
+  },
+  loadingText: {
+    fontSize: 16,
+    marginTop: 16,
+    opacity: 0.7,
+  },
+  section: {
+    marginBottom: 32,
+  },
+  sectionTitle: {
+    fontSize: 13,
+    fontWeight: '600',
+    textTransform: 'uppercase',
+    paddingHorizontal: 16,
+    marginBottom: 8,
+    opacity: 0.6,
+  },
+  sectionContent: {
+    backgroundColor: 'transparent',
+    borderRadius: 10,
+    marginHorizontal: 16,
+    overflow: 'hidden',
+  },
+  sectionItem: {
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    minHeight: 44,
+    justifyContent: 'center',
+  },
+  sectionItemContent: {
+    paddingVertical: 3,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    backgroundColor: 'transparent',
+  },
+  sectionItemText: {
+    flex: 1,
+    fontSize: 17,
+    fontWeight: '400',
+    lineHeight: 22,
+    paddingRight: 8,
   },
 });

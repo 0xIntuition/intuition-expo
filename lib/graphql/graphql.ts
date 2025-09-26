@@ -11642,6 +11642,17 @@ export type AccountProfileQueryVariables = Exact<{
 
 export type AccountProfileQuery = { __typename?: 'query_root', account?: { __typename?: 'accounts', atom?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, organizations: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, projects: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, skills: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, tags: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> } | null } | null };
 
+export type AnswerListQueryVariables = Exact<{
+  objectId: Scalars['String']['input'];
+  term?: InputMaybe<Terms_Bool_Exp>;
+  subject?: InputMaybe<Atoms_Bool_Exp>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type AnswerListQuery = { __typename?: 'query_root', object?: { __typename?: 'atoms', label?: string | null } | null, triples: Array<{ __typename?: 'triples', term_id: string, subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -11914,3 +11925,26 @@ export const AccountProfileDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<AccountProfileQuery, AccountProfileQueryVariables>;
+export const AnswerListDocument = new TypedDocumentString(`
+    query AnswerList($objectId: String!, $term: terms_bool_exp, $subject: atoms_bool_exp, $limit: Int, $offset: Int) {
+  object: atom(term_id: $objectId) {
+    label
+  }
+  triples(
+    where: {object_id: {_eq: $objectId}, predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, term: $term, subject: $subject}
+    limit: $limit
+    offset: $offset
+    order_by: {term: {total_market_cap: desc}}
+  ) {
+    term_id
+    subject {
+      term_id
+      label
+      cached_image {
+        safe
+        url
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<AnswerListQuery, AnswerListQueryVariables>;

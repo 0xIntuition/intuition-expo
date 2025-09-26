@@ -6,7 +6,8 @@
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen-quests": "graphql-codegen --config codegen-quests.ts"
   },
   "dependencies": {
     "@0xintuition/protocol": "^2.0.0-alpha.2",

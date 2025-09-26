@@ -6,6 +6,7 @@ export default function QuestsLayout() {
     <Stack.Screen name="questions" options={{ title: 'Questions' }} />
     <Stack.Screen name="ecosystems" options={{ title: 'Ecosystems' }} />
     <Stack.Screen name="preferences" options={{ title: 'Preferences' }} />
+    <Stack.Screen name="question" options={{ presentation: 'modal', headerShown: false }} />
   </Stack>)
 }
 
