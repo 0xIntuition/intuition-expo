@@ -130,7 +130,7 @@ export default function List() {
   });
   const [requestModalVisible, setRequetsModalVisible] = useState(false);
 
-  const { data: writeData, isPending, isSuccess, isError, writeContract } =
+  const { data: writeData, isPending, isSuccess, isError, error, writeContract } =
     useWriteContract();
 
   const handleSelect = async (termId: Hex) => {
@@ -143,7 +143,8 @@ export default function List() {
         abi: MultiVaultAbi,
         functionName: 'deposit',
         address: intuitionDeployments['MultiVault'][intuitionTestnet.id],
-        args: [address, termId, minDeposit, 0n],
+        args: [address, termId, 2n, 0n],
+        chainId: intuitionTestnet.id,
         value: minDeposit
       })
     } catch (e) {
@@ -152,6 +153,30 @@ export default function List() {
   }
 
   const renderContent = () => {
+    if (isSuccess) {
+      return (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Success!</Text>
+        </View>
+      );
+    }
+    if (isError) {
+      return (
+        <View style={styles.loadingContainer}>
+          <Text style={styles.loadingText}>Error: {error.message}</Text>
+        </View>
+      );
+    }
+
+    if (isPending) {
+
+      return (
+        <View style={styles.loadingContainer}>
+          <ActivityIndicator size="large" />
+          <Text style={styles.loadingText}>Waiting for transaction...</Text>
+        </View>
+      );
+    }
 
     if (isLoading) {
       return (
@@ -207,11 +232,6 @@ export default function List() {
           style={[{ backgroundColor }]}
           contentContainerStyle={styles.contentContainer}
         >
-          <View>
-            <Text>{isPending}</Text>
-            <Text>{isError}</Text>
-
-          </View>
           {renderContent()}
         </ScrollView>
       </SafeAreaView>

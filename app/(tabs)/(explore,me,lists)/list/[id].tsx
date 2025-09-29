@@ -95,7 +95,7 @@ export default function List() {
   const { address, status } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
   const [searchQuery, setSearhQuery] = useState('');
-  const [sourceIndex, setSourceIndex] = useState(0);
+  const [sourceIndex, setSourceIndex] = useState(1);
 
   // useEffect(() => {
   //   navigation.setOptions({ headerShown: false });

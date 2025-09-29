@@ -6,7 +6,7 @@ import { Platform } from 'react-native';
 
 export default function TabLayout() {
 
-  if (Platform.OS === 'ios') {
+  if (Platform.OS === 'ios' && Platform.constants.systemName !== 'iPadOS') {
     // Use NativeTabs on iOS for better native experience
     return (
       <NativeTabs minimizeBehavior='onScrollDown' >

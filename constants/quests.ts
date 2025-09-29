@@ -6,6 +6,8 @@ export const QUESTS = [
     link: '/quests/questions',
     enabled: true,
     index: 1,
+    icon: 'book',
+    romanNumeral: 'I',
   },
   {
     title: 'Map Crypto Ecosystems',
@@ -14,6 +16,8 @@ export const QUESTS = [
     link: '/quests/ecosystems',
     enabled: true,
     index: 2,
+    icon: 'globe',
+    romanNumeral: 'II',
   },
   {
     title: 'Personalize the Graph',
@@ -22,5 +26,7 @@ export const QUESTS = [
     link: '/quests/preferences',
     enabled: true,
     index: 3,
+    icon: 'person',
+    romanNumeral: 'III',
   },
 ]
