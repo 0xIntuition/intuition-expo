@@ -5,15 +5,14 @@ import { Text, View, useThemeColor } from '@/components/Themed';
 import { AppKitButton } from '@reown/appkit-wagmi-react-native';
 import { Stack, Link } from 'expo-router';
 import { Image } from 'expo-image';
-import { useAccount, useChainId, useSwitchChain } from "wagmi";
+import { useAccount } from "wagmi";
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
 import { execute } from '@/lib/graphql/execute';
 import { blurhash, getCachedImage } from '@/lib/utils';
 import { CrossPlatformPicker } from '@/components/CrossPlatformPicker';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
-import { intuitionTestnet } from '@0xintuition/protocol';
 const AccountProfileQuery = graphql(`
 query AccountProfile($accountId: String!, $positionsBool: positions_bool_exp) {
   account(id: $accountId) {
@@ -147,14 +146,6 @@ export default function MeIndex() {
   const { address, status } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
   const [sourceIndex, setSourceIndex] = useState(0);
-  const { switchChain } = useSwitchChain()
-  const chainId = useChainId()
-
-  useEffect(() => {
-    if (chainId !== intuitionTestnet.id) {
-      switchChain({ chainId: intuitionTestnet.id })
-    }
-  }, [chainId]);
 
   const { data, isLoading } = useQuery({
     enabled: !!address,
