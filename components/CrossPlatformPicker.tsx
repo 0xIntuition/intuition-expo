@@ -13,7 +13,6 @@ export const CrossPlatformPicker: React.FC<CrossPlatformPickerProps> = ({
   options,
   selectedIndex,
   onOptionSelected,
-  variant = "segmented"
 }) => {
   return Platform.select({
     android: (
@@ -21,7 +20,7 @@ export const CrossPlatformPicker: React.FC<CrossPlatformPickerProps> = ({
         options={options}
         selectedIndex={selectedIndex}
         onOptionSelected={onOptionSelected}
-        variant={variant}
+        variant={"segmented"}
       />
     ),
     ios: (
@@ -30,7 +29,7 @@ export const CrossPlatformPicker: React.FC<CrossPlatformPickerProps> = ({
           options={options}
           selectedIndex={selectedIndex}
           onOptionSelected={onOptionSelected}
-          variant={variant}
+          variant={"segmented"}
         />
       </Host>
     ),
@@ -39,7 +38,7 @@ export const CrossPlatformPicker: React.FC<CrossPlatformPickerProps> = ({
         options={options}
         selectedIndex={selectedIndex}
         onOptionSelected={onOptionSelected}
-        variant={variant}
+        variant={"segmented"}
       />
     )
   });

@@ -11653,6 +11653,24 @@ export type AnswerListQueryVariables = Exact<{
 
 export type AnswerListQuery = { __typename?: 'query_root', object?: { __typename?: 'atoms', label?: string | null } | null, triples: Array<{ __typename?: 'triples', term_id: string, subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> };
 
+export type GetListPositionsQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+  predicateId: Scalars['String']['input'];
+  objectId: Scalars['String']['input'];
+}>;
+
+
+export type GetListPositionsQuery = { __typename?: 'query_root', positions: Array<{ __typename?: 'positions', term: { __typename?: 'terms', triple?: { __typename?: 'triples', subject_id: string } | null } }> };
+
+export type GetQuestionsPositionsQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+  predicateId: Scalars['String']['input'];
+  object: String_Comparison_Exp;
+}>;
+
+
+export type GetQuestionsPositionsQuery = { __typename?: 'query_root', positions: Array<{ __typename?: 'positions', term: { __typename?: 'terms', triple?: { __typename?: 'triples', object_id: string } | null } }> };
+
 export class TypedDocumentString<TResult, TVariables>
   extends String
   implements DocumentTypeDecoration<TResult, TVariables>
@@ -11948,3 +11966,29 @@ export const AnswerListDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<AnswerListQuery, AnswerListQueryVariables>;
+export const GetListPositionsDocument = new TypedDocumentString(`
+    query GetListPositions($address: String!, $predicateId: String!, $objectId: String!) {
+  positions(
+    where: {account_id: {_eq: $address}, term: {triple: {predicate_id: {_eq: $predicateId}, object_id: {_eq: $objectId}}}}
+  ) {
+    term {
+      triple {
+        subject_id
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<GetListPositionsQuery, GetListPositionsQueryVariables>;
+export const GetQuestionsPositionsDocument = new TypedDocumentString(`
+    query GetQuestionsPositions($address: String!, $predicateId: String!, $object: String_comparison_exp!) {
+  positions(
+    where: {account_id: {_eq: $address}, term: {triple: {predicate_id: {_eq: $predicateId}, object_id: $object}}}
+  ) {
+    term {
+      triple {
+        object_id
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<GetQuestionsPositionsQuery, GetQuestionsPositionsQueryVariables>;

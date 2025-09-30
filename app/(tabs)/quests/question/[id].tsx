@@ -1,17 +1,18 @@
-import { Stack, useLocalSearchParams, useNavigation, Link } from 'expo-router';
-import { StyleSheet, ScrollView, Pressable, ActivityIndicator, Platform } from 'react-native';
+import { Stack, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import { StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
 import { Image } from 'expo-image';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
 import { execute } from '@/lib/graphql/execute';
-import { use, useEffect, useState } from 'react';
+import { useState } from 'react';
 import { blurhash, getCachedImage } from '@/lib/utils';
 import { useAccount, useReadContract, useWriteContract } from 'wagmi';
 import { getQuestion } from '@/lib/quests/questions';
 import { intuitionDeployments, intuitionTestnet, MultiVaultAbi } from '@0xintuition/protocol';
-import { Hex, isErc6492Signature } from 'viem';
+import { Hex } from 'viem';
+import { Ionicons } from '@expo/vector-icons';
 
 const ListQuery = graphql(`
 query AnswerList($objectId: String!, $term: terms_bool_exp, $subject: atoms_bool_exp, $limit: Int, $offset: Int) {
@@ -45,8 +46,27 @@ query AnswerList($objectId: String!, $term: terms_bool_exp, $subject: atoms_bool
   }
 }
 `);
-
-const sources = ['All', 'My'];
+const ListPositions = graphql(`
+query GetListPositions($address: String!, $predicateId: String!, $objectId: String!) {
+  positions(
+    where: {
+      account_id: { _eq: $address }
+      term: {
+        triple: {
+          predicate_id: { _eq: $predicateId }
+          object_id: { _eq: $objectId }
+        }
+      }
+    }
+  ) {
+    term {
+      triple {
+        subject_id
+      }
+    }
+  }
+}
+`)
 
 interface SectionItemProps {
   item: {
@@ -57,15 +77,16 @@ interface SectionItemProps {
       safe?: boolean;
     } | null;
   };
+  isSelected: boolean;
   isLast: boolean;
   onSelect: () => void;
 }
 
-const SectionItem: React.FC<SectionItemProps> = ({ item, isLast, onSelect }) => {
+const SectionItem: React.FC<SectionItemProps> = ({ item, isLast, isSelected, onSelect }) => {
   const backgroundColor = useThemeColor({}, 'secondaryBackground');
   const textColor = useThemeColor({}, 'text');
   const separatorColor = useThemeColor({ light: '#e1e1e1', dark: '#333' }, 'tabIconDefault');
-  const chevronColor = useThemeColor({ light: '#8e8e93', dark: '#8e8e93' }, 'tabIconDefault');
+  const chevronColor = useThemeColor({}, 'text');
   const separator = !isLast ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: separatorColor } : {}
 
   return (
@@ -85,15 +106,19 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast, onSelect }) => 
         <Text style={[styles.sectionItemText, { color: textColor }]} numberOfLines={1}>
           {item.label || 'Untitled'}
         </Text>
+        {isSelected && <Ionicons name={"checkmark"} size={16} color={chevronColor} />}
+
       </View>
     </Pressable>
   );
 };
 
 export default function List() {
-  const { address, status } = useAccount();
+  const { address } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
   const [searchQuery, setSearhQuery] = useState('');
+  const router = useRouter();
+
 
 
   const { id } = useLocalSearchParams();
@@ -108,10 +133,19 @@ export default function List() {
   const { data: question } = useQuery({
     queryKey: ['question', id],
     queryFn: () => getQuestion(questionId),
-
-  })
+  }) as any
 
   const objectId = question?.epoch_questions_by_pk.object_id;
+
+  const { data: possitionsData } = useQuery({
+    enabled: !!address && !!objectId,
+    queryKey: ['listPositions', address, objectId],
+    queryFn: () => execute(ListPositions, {
+      address: address!,
+      objectId,
+      predicateId: '0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d'
+    })
+  });
 
   const { data, isLoading } = useQuery({
     queryKey: ['list', objectId, address, searchQuery],
@@ -128,9 +162,8 @@ export default function List() {
     }),
     enabled: !!objectId
   });
-  const [requestModalVisible, setRequetsModalVisible] = useState(false);
 
-  const { data: writeData, isPending, isSuccess, isError, error, writeContract } =
+  const { isPending, isSuccess, isError, error, writeContract } =
     useWriteContract();
 
   const handleSelect = async (termId: Hex) => {
@@ -157,6 +190,9 @@ export default function List() {
       return (
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Success!</Text>
+          <Pressable onPress={() => router.dismiss(1)}>
+            <Text style={styles.loadingText}>Close</Text>
+          </Pressable>
         </View>
       );
     }
@@ -190,10 +226,6 @@ export default function List() {
     if (!data?.triples || data.triples.length === 0) {
       return (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>No Items Found</Text>
-          <Text style={styles.emptySubtext}>
-            This list doesn't contain any items yet
-          </Text>
         </View>
       );
     }
@@ -207,6 +239,7 @@ export default function List() {
               item={triple.subject}
               isLast={index === data.triples.length - 1}
               onSelect={() => handleSelect(triple.term_id as Hex)}
+              isSelected={!!possitionsData?.positions?.find(p => p.term.triple?.subject_id === triple.subject.term_id) || false}
             />
           ))}
         </View>
