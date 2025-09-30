@@ -241,7 +241,7 @@ export default function AccountIndex() {
   const { address, status } = useAccount();
   const [searchQuery, setSearhQuery] = useState('');
   const backgroundColor = useThemeColor({}, 'background');
-  const [sourceIndex, setSourceIndex] = useState(1);
+  const [sourceIndex, setSourceIndex] = useState(status === 'disconnected' ? 0 : 1);
 
   const { data, isLoading } = useQuery({
     queryKey: ['savedLists', address, sourceIndex, searchQuery],

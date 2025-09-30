@@ -8,6 +8,10 @@ export const createWeb3AppKit = () => {
     metadata,
     wagmiConfig,
     defaultChain: intuitionTestnet,
+    debug: true,
+    chainImages: {
+      13597: "https://avatars.githubusercontent.com/u/94311139?s=200&v=4",
+    },
     enableAnalytics: true,
     features: {
       email: false,
