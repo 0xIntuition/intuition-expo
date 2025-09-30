@@ -7,7 +7,31 @@ import { useQuery } from '@tanstack/react-query';
 import { getQuestions } from '@/lib/quests/questions';
 import { Link } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import { graphql } from '@/lib/graphql';
+import { useAccount } from 'wagmi';
+import { execute } from '@/lib/graphql/execute';
 
+const QuestionsPositions = graphql(`
+query GetQuestionsPositions($address: String!, $predicateId: String!, $object: String_comparison_exp!) {
+  positions(
+    where: {
+      account_id: { _eq: $address }
+      term: {
+        triple: {
+          predicate_id: { _eq: $predicateId }
+          object_id: $object
+        }
+      }
+    }
+  ) {
+    term {
+      triple {
+        object_id
+      }
+    }
+  }
+}
+`)
 interface SectionItemProps {
   item: {
     id: number;
@@ -15,9 +39,10 @@ interface SectionItemProps {
   };
   href: string;
   isLast: boolean;
+  hasPositions: boolean;
 }
 
-const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast }) => {
+const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast, hasPositions }) => {
   const backgroundColor = useThemeColor({}, 'secondaryBackground');
   const textColor = useThemeColor({}, 'text');
   const separatorColor = useThemeColor({ light: '#e1e1e1', dark: '#333' }, 'tabIconDefault');
@@ -25,7 +50,7 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast }) => {
   const separator = !isLast ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: separatorColor } : {}
 
   return (
-    <Link href={href} asChild>
+    <Link href={href as any} asChild>
       <Pressable
         style={{ ...styles.sectionItem, backgroundColor, ...separator }}
       >
@@ -33,7 +58,10 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast }) => {
           <Text style={[styles.sectionItemText, { color: textColor }]}>
             {item.title || 'Untitled'}
           </Text>
-          <Ionicons name="chevron-forward" size={16} color={chevronColor} />
+          <Ionicons
+            name={hasPositions ? "checkmark" : "chevron-forward"}
+            size={16}
+            color={hasPositions ? textColor : chevronColor} />
         </View>
       </Pressable>
     </Link>
@@ -41,18 +69,30 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast }) => {
 };
 
 export default function QuestionsQuest() {
+
+  const { address } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
 
   const { data, isLoading } = useQuery({
     queryKey: ['getQuestions'],
     queryFn: () => getQuestions([1, 6, 7, 8])
-  })
+  }) as any
+
+  const { data: possitionsData } = useQuery({
+    enabled: !!address && !!data,
+    queryKey: ['questionsPositions', address],
+    queryFn: () => execute(QuestionsPositions, {
+      address: address!,
+      object: { _in: data?.epoch_questions?.map((q: any) => q.object_id) },
+      predicateId: '0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d'
+    })
+  });
 
   // Group questions by epoch_id and sort epochs in descending order
   const groupedQuestions = React.useMemo(() => {
     if (!data?.epoch_questions) return [];
 
-    const groups = data.epoch_questions.reduce((acc, question) => {
+    const groups = data.epoch_questions.reduce((acc: any, question: any) => {
       if (!acc[question.epoch_id]) {
         acc[question.epoch_id] = [];
       }
@@ -83,16 +123,19 @@ export default function QuestionsQuest() {
             </View>
           )}
 
-          {groupedQuestions.map((group) => (
+          {groupedQuestions.map((group: any) => (
             <View key={group.epochId} style={styles.section}>
               <Text style={styles.sectionTitle}>Epoch {group.epochId}</Text>
               <View style={styles.sectionContent}>
-                {group.questions.map((question, index) => (
+                {group?.questions?.map((question: any, index: any) => (
                   <SectionItem
                     key={question.id}
                     item={question}
                     href={`./question/${question.id}`}
                     isLast={index === group.questions.length - 1}
+                    hasPositions={!!possitionsData?.positions?.find(p => p.term.triple?.object_id === question.object_id) || false}
+
+
                   />
                 ))}
               </View>
