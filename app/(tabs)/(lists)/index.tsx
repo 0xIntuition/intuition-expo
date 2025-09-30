@@ -74,7 +74,7 @@ interface CachedImage {
 
 interface Subject {
   term_id: string;
-  cached_image?: CachedImage;
+  cached_image?: CachedImage | null;
 }
 
 interface Triple {
@@ -84,13 +84,13 @@ interface Triple {
 interface ListItemProps {
   object: {
     term_id: string;
-    label: string;
-    cached_image?: CachedImage;
+    label?: string | null;
+    cached_image?: CachedImage | null;
     as_object_triples: Triple[];
     as_object_triples_aggregate: {
-      aggregate: {
+      aggregate?: {
         count: number;
-      };
+      } | null;
     };
   };
   isLast: boolean;
@@ -213,10 +213,10 @@ const ListItem: React.FC<ListItemProps> = ({ object, isLast }) => {
   const chevronColor = useThemeColor({ light: '#8e8e93', dark: '#8e8e93' }, 'tabIconDefault');
   const separator = !isLast ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: separatorColor } : {}
 
-  const memberCount = object.as_object_triples_aggregate.aggregate.count;
+  const memberCount = object.as_object_triples_aggregate.aggregate?.count;
 
   return (
-    <Link href={`/(lists)/list/${object.term_id}`} asChild>
+    <Link href={`/(lists)/list/${object.term_id}` as any} asChild>
       <Pressable
         style={{ ...styles.sectionItem, backgroundColor, ...separator }}
       >
@@ -246,7 +246,7 @@ export default function AccountIndex() {
   const { data, isLoading } = useQuery({
     queryKey: ['savedLists', address, sourceIndex, searchQuery],
     queryFn: () => execute(SavedListsQuery, {
-      "orderBy": { "triple_count": "desc" },
+      "orderBy": { "triple_count": "desc" } as any,
 
       "triplesWhere": {
         "term": sourceIndex === 0 ? {} : address ? {
@@ -380,7 +380,6 @@ export default function AccountIndex() {
               onOptionSelected={({ nativeEvent: { index } }) => {
                 setSourceIndex(index);
               }}
-              variant="segmented"
             />
           </View>
           {renderContent()}

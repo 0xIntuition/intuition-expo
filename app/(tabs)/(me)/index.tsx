@@ -120,7 +120,7 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast }) => {
   const separator = !isLast ? { borderBottomWidth: StyleSheet.hairlineWidth, borderBottomColor: separatorColor } : {}
 
   return (
-    <Link href={`/(me)/atom/${item.term_id}`} asChild>
+    <Link href={`/(me)/atom/${item.term_id}` as any} asChild>
       <Pressable
         style={{ ...styles.sectionItem, backgroundColor, ...separator }}
       >
@@ -150,7 +150,7 @@ export default function MeIndex() {
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryBackgroundColor = useThemeColor({}, 'secondaryBackground');
   const [sourceIndex, setSourceIndex] = useState(0);
-  const { open, close } = useAppKit()
+  const { open } = useAppKit()
   const isWrongChain = status === 'connected' && chainId !== intuitionTestnet.id;
 
   const { data, isLoading } = useQuery({
