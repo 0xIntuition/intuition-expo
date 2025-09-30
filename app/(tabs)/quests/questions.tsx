@@ -59,7 +59,7 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast, hasPositi
             {item.title || 'Untitled'}
           </Text>
           <Ionicons
-            name={hasPositions ? "checkmark" : "chevron-forward"}
+            name={hasPositions ? "checkmark-done-circle-sharp" : "radio-button-off"}
             size={16}
             color={hasPositions ? textColor : chevronColor} />
         </View>
