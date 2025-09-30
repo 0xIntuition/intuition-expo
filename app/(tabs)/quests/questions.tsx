@@ -60,7 +60,7 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast, hasPositi
           </Text>
           <Ionicons
             name={hasPositions ? "checkmark-done-circle-sharp" : "radio-button-off"}
-            size={16}
+            size={20}
             color={hasPositions ? textColor : chevronColor} />
         </View>
       </Pressable>

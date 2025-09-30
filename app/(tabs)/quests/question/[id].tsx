@@ -106,7 +106,7 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast, isSelected, onS
         <Text style={[styles.sectionItemText, { color: textColor }]} numberOfLines={1}>
           {item.label || 'Untitled'}
         </Text>
-        {isSelected && <Ionicons name={"checkmark"} size={16} color={chevronColor} />}
+        {isSelected && <Ionicons name={"checkmark"} size={20} color={chevronColor} />}
 
       </View>
     </Pressable>
