@@ -6,7 +6,7 @@ import { Text, View, useThemeColor } from '@/components/Themed';
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
 import { execute } from '@/lib/graphql/execute';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { blurhash, getCachedImage } from '@/lib/utils';
 import { useAccount, useReadContract, useWriteContract } from 'wagmi';
 import { getQuestion } from '@/lib/quests/questions';
@@ -117,6 +117,7 @@ export default function List() {
   const { address } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
   const [searchQuery, setSearhQuery] = useState('');
+  const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const router = useRouter();
 
 
@@ -166,11 +167,18 @@ export default function List() {
   const { isPending, isSuccess, isError, error, writeContract } =
     useWriteContract();
 
-  const handleSelect = async (termId: Hex) => {
+  useEffect(() => {
+    if (isSuccess || isError) {
+      setSelectedSubject(null);
+    }
+  }, [isSuccess, isError]);
+
+  const handleSelect = async (termId: Hex, subjectLabel: string) => {
     const minDeposit = config.data?.minDeposit
     if (!address || !minDeposit) {
       return
     }
+    setSelectedSubject(subjectLabel);
     try {
       writeContract({
         abi: MultiVaultAbi,
@@ -209,6 +217,11 @@ export default function List() {
       return (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" />
+          <Text style={styles.loadingText}>
+            {selectedSubject && data?.object?.label
+              ? `Adding ${selectedSubject} to ${data.object.label} list`
+              : ''}
+          </Text>
           <Text style={styles.loadingText}>Waiting for transaction...</Text>
         </View>
       );
@@ -238,7 +251,7 @@ export default function List() {
               key={triple.subject.term_id}
               item={triple.subject}
               isLast={index === data.triples.length - 1}
-              onSelect={() => handleSelect(triple.term_id as Hex)}
+              onSelect={() => handleSelect(triple.term_id as Hex, triple.subject.label || 'Untitled')}
               isSelected={!!possitionsData?.positions?.find(p => p.term.triple?.subject_id === triple.subject.term_id) || false}
             />
           ))}
