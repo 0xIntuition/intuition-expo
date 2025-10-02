@@ -180,6 +180,7 @@ export default function MeIndex() {
       <ScrollView
         style={[{ backgroundColor }]}
         contentContainerStyle={styles.contentContainer}
+        contentInsetAdjustmentBehavior='automatic'
         stickyHeaderIndices={[0]}
       >
         <View style={Platform.select({

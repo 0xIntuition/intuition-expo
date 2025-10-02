@@ -43,7 +43,7 @@ export default function Account() {
 
   return (
 
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} contentInsetAdjustmentBehavior='automatic'>
       {isLoading && <Text>Loading</Text>}
       {data !== undefined && <View>
 

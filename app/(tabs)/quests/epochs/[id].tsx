@@ -124,6 +124,7 @@ export default function EpochQuest() {
       <ScrollView
         style={[{ backgroundColor }]}
         contentContainerStyle={styles.contentContainer}
+        contentInsetAdjustmentBehavior='automatic'
       >
         {isLoading && (
           <View style={styles.loadingContainer}>

@@ -261,6 +261,7 @@ export default function ExploreIndex() {
       <ScrollView
         style={[{ backgroundColor }]}
         contentContainerStyle={styles.contentContainer}
+        contentInsetAdjustmentBehavior='automatic'
       >
         {isLoading && <Text style={styles.loadingText}>Loading...</Text>}
 

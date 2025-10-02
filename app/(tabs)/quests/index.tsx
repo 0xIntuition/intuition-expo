@@ -28,7 +28,7 @@ export default function Quests() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.scrollContent}>
+    <ScrollView contentContainerStyle={styles.scrollContent} contentInsetAdjustmentBehavior='automatic'>
       {QUESTS.map((quest) => (
         <View key={quest.index} style={[styles.card, { backgroundColor: cardBackground, borderColor }]}>
           <Link href={quest.link} asChild>

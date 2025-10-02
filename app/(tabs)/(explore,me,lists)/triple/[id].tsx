@@ -63,7 +63,7 @@ export default function Triple() {
           title,
         }}
       />
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.container} contentInsetAdjustmentBehavior='automatic'>
         {isLoading && <Text>Loading</Text>}
         {data !== undefined && <View>
 

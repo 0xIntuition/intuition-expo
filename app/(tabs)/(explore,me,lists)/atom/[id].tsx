@@ -47,7 +47,7 @@ export default function Atom() {
         }}
       />
 
-      <ScrollView>
+      <ScrollView contentInsetAdjustmentBehavior='automatic'>
         {isLoading && <Text>Loading</Text>}
         {data !== undefined && <View>
 

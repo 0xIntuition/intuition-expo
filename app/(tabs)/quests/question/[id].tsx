@@ -276,6 +276,7 @@ export default function List() {
       <ScrollView
         style={[{ backgroundColor }]}
         contentContainerStyle={styles.contentContainer}
+        contentInsetAdjustmentBehavior='automatic'
       >
         {renderContent()}
       </ScrollView>

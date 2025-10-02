@@ -355,7 +355,6 @@ export default function AccountIndex() {
         options={{
           title: 'Lists',
           headerSearchBarOptions: {
-            placement: 'automatic',
             placeholder: 'Search',
             onChangeText: (e) => setSearhQuery(e.nativeEvent.text),
           },
