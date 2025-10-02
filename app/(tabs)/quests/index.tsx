@@ -2,15 +2,22 @@ import { Pressable, StyleSheet, View as RNView } from 'react-native';
 import { ScrollView } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
-import { Link } from 'expo-router';
+import { Link, useNavigation } from 'expo-router';
 import { QUESTS } from '@/constants/quests';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import { useEffect } from 'react';
 
 export default function Quests() {
   const backgroundColor = useThemeColor({}, 'background');
   const cardBackground = useThemeColor({}, 'secondaryBackground');
   const borderColor = useThemeColor({}, 'border');
   const textColor = useThemeColor({}, 'text');
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({ title: 'Quests' });
+  }, []);
+
 
   const getIconName = (iconType: string) => {
     switch (iconType) {

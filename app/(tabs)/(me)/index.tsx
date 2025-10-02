@@ -175,6 +175,7 @@ export default function MeIndex() {
     <SafeAreaProvider>
       <Stack.Screen
         options={{
+          headerShown: false,
           title: '',
         }}
       />
