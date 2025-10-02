@@ -1,7 +1,6 @@
 import { Link, Stack } from 'expo-router';
 import { Pressable, StyleSheet } from 'react-native';
 import { ScrollView } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
@@ -248,7 +247,7 @@ export default function ExploreIndex() {
   })
 
   return (
-    <SafeAreaProvider>
+    <>
       <Stack.Screen
         options={{
           title: 'Explore',
@@ -259,87 +258,85 @@ export default function ExploreIndex() {
           },
         }}
       />
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <ScrollView
-          style={[{ backgroundColor }]}
-          contentContainerStyle={styles.contentContainer}
-        >
-          {isLoading && <Text style={styles.loadingText}>Loading...</Text>}
+      <ScrollView
+        style={[{ backgroundColor }]}
+        contentContainerStyle={styles.contentContainer}
+      >
+        {isLoading && <Text style={styles.loadingText}>Loading...</Text>}
 
-          {/* Accounts Section */}
-          {data?.accounts && data.accounts.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Accounts</Text>
-              <View style={styles.sectionContent}>
-                {data.accounts.map((account, index) => (
-                  <SectionItem
-                    key={account.id}
-                    item={account}
-                    href={`/(explore)/account/${account.id}`}
-                    isLast={index === data.accounts.length - 1}
-                  />
-                ))}
-              </View>
+        {/* Accounts Section */}
+        {data?.accounts && data.accounts.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Accounts</Text>
+            <View style={styles.sectionContent}>
+              {data.accounts.map((account, index) => (
+                <SectionItem
+                  key={account.id}
+                  item={account}
+                  href={`/(explore)/account/${account.id}`}
+                  isLast={index === data.accounts.length - 1}
+                />
+              ))}
             </View>
-          )}
+          </View>
+        )}
 
-          {/* Identities Section */}
-          {data?.atoms && data.atoms.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Identities</Text>
-              <View style={styles.sectionContent}>
-                {data.atoms.map((atom, index) => (
-                  <SectionItem
-                    key={atom.term_id}
-                    item={atom}
-                    href={`/(explore)/atom/${atom.term_id}`}
-                    isLast={index === data.atoms.length - 1}
-                  />
-                ))}
-              </View>
+        {/* Identities Section */}
+        {data?.atoms && data.atoms.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Identities</Text>
+            <View style={styles.sectionContent}>
+              {data.atoms.map((atom, index) => (
+                <SectionItem
+                  key={atom.term_id}
+                  item={atom}
+                  href={`/(explore)/atom/${atom.term_id}`}
+                  isLast={index === data.atoms.length - 1}
+                />
+              ))}
             </View>
-          )}
+          </View>
+        )}
 
-          {/* Claims Section */}
-          {data?.triples && data.triples.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Claims</Text>
-              <View style={styles.sectionContent}>
-                {data.triples.map((triple, index) => (
-                  <ClaimItem
-                    key={triple.term_id}
-                    triple={triple}
-                    isLast={index === data.triples.length - 1}
-                    backgroundColor={secondaryBackgroundColor}
-                    textColor={textColor}
-                    separatorColor={separatorColor}
-                    chevronColor={chevronColor}
-                  />
-                ))}
-              </View>
+        {/* Claims Section */}
+        {data?.triples && data.triples.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Claims</Text>
+            <View style={styles.sectionContent}>
+              {data.triples.map((triple, index) => (
+                <ClaimItem
+                  key={triple.term_id}
+                  triple={triple}
+                  isLast={index === data.triples.length - 1}
+                  backgroundColor={secondaryBackgroundColor}
+                  textColor={textColor}
+                  separatorColor={separatorColor}
+                  chevronColor={chevronColor}
+                />
+              ))}
             </View>
-          )}
+          </View>
+        )}
 
-          {/* Lists Section */}
-          {data?.collections && data.collections.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Lists</Text>
-              <View style={styles.sectionContent}>
-                {data.collections.map((collection, index) => (
-                  <SectionItem
-                    key={collection.object.term_id}
-                    item={collection.object}
-                    href={`/(explore)/list/${collection.object.term_id}`}
-                    isLast={index === data.collections.length - 1}
-                  />
-                ))}
-              </View>
+        {/* Lists Section */}
+        {data?.collections && data.collections.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Lists</Text>
+            <View style={styles.sectionContent}>
+              {data.collections.map((collection, index) => (
+                <SectionItem
+                  key={collection.object.term_id}
+                  item={collection.object}
+                  href={`/(explore)/list/${collection.object.term_id}`}
+                  isLast={index === data.collections.length - 1}
+                />
+              ))}
             </View>
-          )}
+          </View>
+        )}
 
-        </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </ScrollView>
+    </>
   );
 }
 

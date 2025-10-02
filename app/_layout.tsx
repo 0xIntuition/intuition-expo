@@ -8,7 +8,6 @@ import 'react-native-reanimated';
 import "@walletconnect/react-native-compat";
 import { useColorScheme } from '@/components/useColorScheme';
 import { Web3Provider } from '@/providers/Web3Provider';
-
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,

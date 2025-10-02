@@ -1,7 +1,6 @@
 import { Link, Stack } from 'expo-router';
 import { Pressable, StyleSheet, ActivityIndicator, Platform } from 'react-native';
 import { ScrollView } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { AppKitButton } from '@reown/appkit-wagmi-react-native';
 import { useAccount } from "wagmi";
@@ -351,11 +350,10 @@ export default function AccountIndex() {
   };
 
   return (
-    <SafeAreaProvider>
+    <>
       <Stack.Screen
         options={{
           title: 'Lists',
-          headerLargeTitle: true,
           headerSearchBarOptions: {
             placement: 'automatic',
             placeholder: 'Search',
@@ -363,28 +361,27 @@ export default function AccountIndex() {
           },
         }}
       />
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <ScrollView
-          style={[{ backgroundColor }]}
-          contentContainerStyle={styles.contentContainer}
-          stickyHeaderIndices={[0]}
-        >
-          <View style={Platform.select({
-            ios: ({ flex: 1, backgroundColor, paddingVertical: 10, marginHorizontal: 16 }),
-            android: ({ alignItems: 'center', flex: 1, backgroundColor })
-          })}>
-            <CrossPlatformPicker
-              options={sources}
-              selectedIndex={sourceIndex}
-              onOptionSelected={({ nativeEvent: { index } }) => {
-                setSourceIndex(index);
-              }}
-            />
-          </View>
-          {renderContent()}
-        </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      <ScrollView
+        style={[{ backgroundColor }]}
+        contentContainerStyle={styles.contentContainer}
+        contentInsetAdjustmentBehavior="automatic"
+        stickyHeaderIndices={[0]}
+      >
+        <View style={Platform.select({
+          ios: ({ flex: 1, backgroundColor, paddingVertical: 10, marginHorizontal: 16 }),
+          android: ({ alignItems: 'center', flex: 1, backgroundColor })
+        })}>
+          <CrossPlatformPicker
+            options={sources}
+            selectedIndex={sourceIndex}
+            onOptionSelected={({ nativeEvent: { index } }) => {
+              setSourceIndex(index);
+            }}
+          />
+        </View>
+        {renderContent()}
+      </ScrollView>
+    </>
   );
 }
 

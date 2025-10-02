@@ -1,7 +1,7 @@
 import { Stack, useLocalSearchParams, useNavigation, Link } from 'expo-router';
-import { StyleSheet, ScrollView, Pressable, ActivityIndicator, Platform } from 'react-native';
+import { StyleSheet, Pressable, ActivityIndicator, Platform } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Image } from 'expo-image';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { AppKitButton } from '@reown/appkit-wagmi-react-native';
 import { graphql } from '@/lib/graphql';
@@ -179,11 +179,10 @@ export default function List() {
   };
 
   return (
-    <SafeAreaProvider>
+    <>
       <Stack.Screen
         options={{
           title: data?.object?.label || '',
-          headerLargeTitle: true,
           headerSearchBarOptions: {
             placement: 'automatic',
             placeholder: 'Search',
@@ -192,29 +191,27 @@ export default function List() {
         }}
 
       />
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <ScrollView
-          style={[{ backgroundColor }]}
-          contentContainerStyle={styles.contentContainer}
-          stickyHeaderIndices={[0]}
-        >
-          <View style={Platform.select({
-            ios: ({ flex: 1, backgroundColor, paddingBottom: 10, marginHorizontal: 16 }),
-            android: ({ alignItems: 'center', flex: 1, backgroundColor })
-          })}>
-            <CrossPlatformPicker
-              options={sources}
-              selectedIndex={sourceIndex}
-              onOptionSelected={({ nativeEvent: { index } }) => {
-                setSourceIndex(index);
-              }}
-              variant="segmented"
-            />
-          </View>
-          {renderContent()}
-        </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      <ScrollView
+        style={[{ backgroundColor }]}
+        contentContainerStyle={styles.contentContainer}
+        stickyHeaderIndices={[0]}
+      >
+        <View style={Platform.select({
+          ios: ({ flex: 1, backgroundColor, paddingBottom: 10, marginHorizontal: 16 }),
+          android: ({ alignItems: 'center', flex: 1, backgroundColor })
+        })}>
+          <CrossPlatformPicker
+            options={sources}
+            selectedIndex={sourceIndex}
+            onOptionSelected={({ nativeEvent: { index } }) => {
+              setSourceIndex(index);
+            }}
+            variant="segmented"
+          />
+        </View>
+        {renderContent()}
+      </ScrollView>
+    </>
   );
 }
 

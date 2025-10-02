@@ -1,7 +1,7 @@
 import { Stack, useLocalSearchParams, useNavigation } from 'expo-router';
-import { StyleSheet, ScrollView } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Image } from 'expo-image';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View } from '@/components/Themed';
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
@@ -40,31 +40,28 @@ export default function Atom() {
 
   return (
 
-    <SafeAreaProvider>
+    <>
       <Stack.Screen
         options={{
           title: data?.atom?.label || '',
-          headerLargeTitle: true,
         }}
       />
 
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <ScrollView>
-          {isLoading && <Text>Loading</Text>}
-          {data !== undefined && <View>
+      <ScrollView>
+        {isLoading && <Text>Loading</Text>}
+        {data !== undefined && <View>
 
-            {data.atom?.cached_image !== null &&
-              <Image source={getCachedImage(data.atom?.cached_image?.url)} placeholder={blurhash}
-                blurRadius={data.atom?.cached_image?.safe ? 0 : 5}
-                style={styles.image} />}
-            <Text style={styles.title}>{data.atom?.label}</Text>
+          {data.atom?.cached_image !== null &&
+            <Image source={getCachedImage(data.atom?.cached_image?.url)} placeholder={blurhash}
+              blurRadius={data.atom?.cached_image?.safe ? 0 : 5}
+              style={styles.image} />}
+          <Text style={styles.title}>{data.atom?.label}</Text>
 
-          </View>}
+        </View>}
 
 
-        </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      </ScrollView>
+    </>
   );
 }
 

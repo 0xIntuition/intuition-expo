@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { useQuery } from '@tanstack/react-query';
 import { getQuestions } from '@/lib/quests/questions';
@@ -121,40 +120,38 @@ export default function EpochQuest() {
   }, [data?.epoch_questions]);
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <ScrollView
-          style={[{ backgroundColor }]}
-          contentContainerStyle={styles.contentContainer}
-        >
-          {isLoading && (
-            <View style={styles.loadingContainer}>
-              <ActivityIndicator size="large" />
-              <Text style={styles.loadingText}>Loading...</Text>
+    <>
+      <ScrollView
+        style={[{ backgroundColor }]}
+        contentContainerStyle={styles.contentContainer}
+      >
+        {isLoading && (
+          <View style={styles.loadingContainer}>
+            <ActivityIndicator size="large" />
+            <Text style={styles.loadingText}>Loading...</Text>
+          </View>
+        )}
+
+        {groupedQuestions.map((group: any) => (
+          <View key={group.epochId} style={styles.section}>
+            <Text style={styles.sectionTitle}>Epoch {group.epochId}</Text>
+            <View style={styles.sectionContent}>
+              {group?.questions?.map((question: any, index: any) => (
+                <SectionItem
+                  key={question.id}
+                  item={question}
+                  href={`/quests/question/${question.id}`}
+                  isLast={index === group.questions.length - 1}
+                  hasPositions={!!possitionsData?.positions?.find(p => p.term.triple?.object_id === question.object_id) || false}
+
+
+                />
+              ))}
             </View>
-          )}
-
-          {groupedQuestions.map((group: any) => (
-            <View key={group.epochId} style={styles.section}>
-              <Text style={styles.sectionTitle}>Epoch {group.epochId}</Text>
-              <View style={styles.sectionContent}>
-                {group?.questions?.map((question: any, index: any) => (
-                  <SectionItem
-                    key={question.id}
-                    item={question}
-                    href={`/quests/question/${question.id}`}
-                    isLast={index === group.questions.length - 1}
-                    hasPositions={!!possitionsData?.positions?.find(p => p.term.triple?.object_id === question.object_id) || false}
-
-
-                  />
-                ))}
-              </View>
-            </View>
-          ))}
-        </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+          </View>
+        ))}
+      </ScrollView>
+    </>
   );
 }
 

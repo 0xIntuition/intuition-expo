@@ -1,6 +1,5 @@
 import { StyleSheet, ActivityIndicator, Pressable, Platform } from 'react-native';
 import { ScrollView } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { AppKitButton, useAppKit } from '@reown/appkit-wagmi-react-native';
 import { Stack, Link } from 'expo-router';
@@ -172,170 +171,167 @@ export default function MeIndex() {
 
 
   return (
-    <SafeAreaProvider>
+    <>
       <Stack.Screen
         options={{
-          headerShown: false,
-          title: '',
+          title: 'Me',
         }}
       />
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <ScrollView
-          style={[{ backgroundColor }]}
-          contentContainerStyle={styles.contentContainer}
-          stickyHeaderIndices={[0]}
-        >
-          <View style={Platform.select({
-            ios: ({ flex: 1, backgroundColor, paddingBottom: 10, marginHorizontal: 16 }),
-            android: ({ alignItems: 'center', flex: 1, backgroundColor })
-          })}>
-            <CrossPlatformPicker
-              options={sources}
-              selectedIndex={sourceIndex}
-              onOptionSelected={({ nativeEvent: { index } }) => {
-                setSourceIndex(index);
-              }}
-              variant="segmented"
-            />
-          </View>
-          {(() => {
-            if (status === 'disconnected') {
-              return (
-                <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>Connect Your Wallet</Text>
-                  <Text style={styles.emptySubtext}>
-                    Connect your wallet to view your profile and contributions to the knowledge graph
-                  </Text>
-                  <AppKitButton />
-                </View>
-              );
-            }
-
-            if (isWrongChain) {
-              return (
-                <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>Wrong Network</Text>
-                  <Text style={styles.emptySubtext}>
-                    Please switch to Intuition Testnet to view your profile
-                  </Text>
-                  <Pressable
-                    style={styles.switchChainButton}
-                    onPress={handleSwitchChain}
-                  >
-                    <Text style={styles.switchChainButtonText}>Add & Switch to Intuition Testnet</Text>
-                  </Pressable>
-                </View>
-              );
-            }
-
-            if (isLoading) {
-              return (
-                <View style={styles.loadingContainer}>
-                  <ActivityIndicator size="large" />
-                  <Text style={styles.loadingText}>Loading profile information...</Text>
-                </View>
-              );
-            }
-
-            if (!data?.account?.atom) {
-              return (
-                <View style={styles.emptyContainer}>
-                  <Text style={styles.emptyText}>No Profile Found</Text>
-                  <Text style={styles.emptySubtext}>
-                    This wallet address doesn't have a profile in the knowledge graph yet
-                  </Text>
-                </View>
-              );
-            }
-
-            const atom = data.account.atom;
+      <ScrollView
+        style={[{ backgroundColor }]}
+        contentContainerStyle={styles.contentContainer}
+        stickyHeaderIndices={[0]}
+      >
+        <View style={Platform.select({
+          ios: ({ flex: 1, backgroundColor, paddingVertical: 10, marginHorizontal: 16 }),
+          android: ({ alignItems: 'center', flex: 1, backgroundColor })
+        })}>
+          <CrossPlatformPicker
+            options={sources}
+            selectedIndex={sourceIndex}
+            onOptionSelected={({ nativeEvent: { index } }) => {
+              setSourceIndex(index);
+            }}
+            variant="segmented"
+          />
+        </View>
+        {(() => {
+          if (status === 'disconnected') {
             return (
-              <>
-                <View style={styles.profileHeader}>
-                  {atom.cached_image?.url && (
-                    <Image
-                      source={getCachedImage(atom.cached_image.url)}
-                      placeholder={blurhash}
-                      blurRadius={atom.cached_image?.safe ? 0 : 5}
-                      style={styles.profileImage}
-                    />
-                  )}
-                  <Pressable onPress={() => open()}>
-                    <Text style={{ ...styles.profileName, backgroundColor: secondaryBackgroundColor }}>
-                      {atom.label}
-                    </Text>
-                  </Pressable>
-                </View>
-
-                {/* Organizations Section */}
-                {atom.organizations.length > 0 && (
-                  <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Organizations</Text>
-                    <View style={styles.sectionContent}>
-                      {atom.organizations.map((org, index) => (
-                        <SectionItem
-                          key={org.object.term_id}
-                          item={org.object}
-                          isLast={index === atom.organizations.length - 1}
-                        />
-                      ))}
-                    </View>
-                  </View>
-                )}
-
-                {/* Projects Section */}
-                {atom.projects.length > 0 && (
-                  <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Projects</Text>
-                    <View style={styles.sectionContent}>
-                      {atom.projects.map((project, index) => (
-                        <SectionItem
-                          key={project.object.term_id}
-                          item={project.object}
-                          isLast={index === atom.projects.length - 1}
-                        />
-                      ))}
-                    </View>
-                  </View>
-                )}
-
-                {/* Skills Section */}
-                {atom.skills.length > 0 && (
-                  <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Skills</Text>
-                    <View style={styles.sectionContent}>
-                      {atom.skills.map((skill, index) => (
-                        <SectionItem
-                          key={skill.object.term_id}
-                          item={skill.object}
-                          isLast={index === atom.skills.length - 1}
-                        />
-                      ))}
-                    </View>
-                  </View>
-                )}
-
-                {/* Tags Section */}
-                {atom.tags.length > 0 && (
-                  <View style={styles.section}>
-                    <Text style={styles.sectionTitle}>Tags</Text>
-                    <View style={styles.sectionContent}>
-                      {atom.tags.map((tag, index) => (
-                        <SectionItem
-                          key={tag.object.term_id}
-                          item={tag.object}
-                          isLast={index === atom.tags.length - 1}
-                        />
-                      ))}
-                    </View>
-                  </View>
-                )}
-              </>
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>Connect Your Wallet</Text>
+                <Text style={styles.emptySubtext}>
+                  Connect your wallet to view your profile and contributions to the knowledge graph
+                </Text>
+                <AppKitButton />
+              </View>
             );
-          })()}
-        </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+          }
+
+          if (isWrongChain) {
+            return (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>Wrong Network</Text>
+                <Text style={styles.emptySubtext}>
+                  Please switch to Intuition Testnet to view your profile
+                </Text>
+                <Pressable
+                  style={styles.switchChainButton}
+                  onPress={handleSwitchChain}
+                >
+                  <Text style={styles.switchChainButtonText}>Add & Switch to Intuition Testnet</Text>
+                </Pressable>
+              </View>
+            );
+          }
+
+          if (isLoading) {
+            return (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" />
+                <Text style={styles.loadingText}>Loading profile information...</Text>
+              </View>
+            );
+          }
+
+          if (!data?.account?.atom) {
+            return (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.emptyText}>No Profile Found</Text>
+                <Text style={styles.emptySubtext}>
+                  This wallet address doesn't have a profile in the knowledge graph yet
+                </Text>
+              </View>
+            );
+          }
+
+          const atom = data.account.atom;
+          return (
+            <>
+              <View style={styles.profileHeader}>
+                {atom.cached_image?.url && (
+                  <Image
+                    source={getCachedImage(atom.cached_image.url)}
+                    placeholder={blurhash}
+                    blurRadius={atom.cached_image?.safe ? 0 : 5}
+                    style={styles.profileImage}
+                  />
+                )}
+                <Pressable onPress={() => open()}>
+                  <Text style={{ ...styles.profileName, backgroundColor: secondaryBackgroundColor }}>
+                    {atom.label}
+                  </Text>
+                </Pressable>
+              </View>
+
+              {/* Organizations Section */}
+              {atom.organizations.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Organizations</Text>
+                  <View style={styles.sectionContent}>
+                    {atom.organizations.map((org, index) => (
+                      <SectionItem
+                        key={org.object.term_id}
+                        item={org.object}
+                        isLast={index === atom.organizations.length - 1}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Projects Section */}
+              {atom.projects.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Projects</Text>
+                  <View style={styles.sectionContent}>
+                    {atom.projects.map((project, index) => (
+                      <SectionItem
+                        key={project.object.term_id}
+                        item={project.object}
+                        isLast={index === atom.projects.length - 1}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Skills Section */}
+              {atom.skills.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Skills</Text>
+                  <View style={styles.sectionContent}>
+                    {atom.skills.map((skill, index) => (
+                      <SectionItem
+                        key={skill.object.term_id}
+                        item={skill.object}
+                        isLast={index === atom.skills.length - 1}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+
+              {/* Tags Section */}
+              {atom.tags.length > 0 && (
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Tags</Text>
+                  <View style={styles.sectionContent}>
+                    {atom.tags.map((tag, index) => (
+                      <SectionItem
+                        key={tag.object.term_id}
+                        item={tag.object}
+                        isLast={index === atom.tags.length - 1}
+                      />
+                    ))}
+                  </View>
+                </View>
+              )}
+            </>
+          );
+        })()}
+      </ScrollView>
+    </>
   );
 }
 

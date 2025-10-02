@@ -1,7 +1,7 @@
 import { Stack, useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
-import { StyleSheet, ScrollView, Pressable, ActivityIndicator } from 'react-native';
+import { StyleSheet, Pressable, ActivityIndicator } from 'react-native';
+import { ScrollView } from 'react-native';
 import { Image } from 'expo-image';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
@@ -261,7 +261,7 @@ export default function List() {
   };
 
   return (
-    <SafeAreaProvider>
+    <>
       <Stack.Screen
         options={{
           title: question?.epoch_questions_by_pk?.title || '',
@@ -273,15 +273,13 @@ export default function List() {
         }}
 
       />
-      <SafeAreaView style={styles.container} edges={['top']}>
-        <ScrollView
-          style={[{ backgroundColor }]}
-          contentContainerStyle={styles.contentContainer}
-        >
-          {renderContent()}
-        </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+      <ScrollView
+        style={[{ backgroundColor }]}
+        contentContainerStyle={styles.contentContainer}
+      >
+        {renderContent()}
+      </ScrollView>
+    </>
   );
 }
 

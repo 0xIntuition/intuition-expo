@@ -1,6 +1,5 @@
 import { Pressable, StyleSheet, View as RNView } from 'react-native';
 import { ScrollView } from 'react-native';
-import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { Link, useNavigation } from 'expo-router';
 import { QUESTS } from '@/constants/quests';
@@ -29,31 +28,27 @@ export default function Quests() {
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={[styles.container, { backgroundColor }]} edges={['top']}>
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {QUESTS.map((quest) => (
-            <View key={quest.index} style={[styles.card, { backgroundColor: cardBackground, borderColor }]}>
-              <Link href={quest.link} asChild>
-                <Pressable style={styles.cardContent}>
-                  <View style={[styles.iconContainer]}>
-                    <MaterialIcons
-                      name={getIconName(quest.icon)}
-                      size={26}
-                      color={textColor}
-                    />
-                  </View>
-                  <RNView style={styles.textContent}>
-                    <Text style={[styles.title, { color: textColor }]}>{quest.title}</Text>
-                    <Text style={[styles.description, { color: textColor }]}>{quest.description}</Text>
-                  </RNView>
-                </Pressable>
-              </Link>
-            </View>
-          ))}
-        </ScrollView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+    <ScrollView contentContainerStyle={styles.scrollContent}>
+      {QUESTS.map((quest) => (
+        <View key={quest.index} style={[styles.card, { backgroundColor: cardBackground, borderColor }]}>
+          <Link href={quest.link} asChild>
+            <Pressable style={styles.cardContent}>
+              <View style={[styles.iconContainer]}>
+                <MaterialIcons
+                  name={getIconName(quest.icon)}
+                  size={26}
+                  color={textColor}
+                />
+              </View>
+              <RNView style={styles.textContent}>
+                <Text style={[styles.title, { color: textColor }]}>{quest.title}</Text>
+                <Text style={[styles.description, { color: textColor }]}>{quest.description}</Text>
+              </RNView>
+            </Pressable>
+          </Link>
+        </View>
+      ))}
+    </ScrollView>
   );
 }
 
