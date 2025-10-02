@@ -367,11 +367,10 @@ export default function AccountIndex() {
         <ScrollView
           style={[{ backgroundColor }]}
           contentContainerStyle={styles.contentContainer}
-          showsVerticalScrollIndicator={false}
           stickyHeaderIndices={[0]}
         >
           <View style={Platform.select({
-            ios: ({ flex: 1, backgroundColor, paddingBottom: 10, marginHorizontal: 16 }),
+            ios: ({ flex: 1, backgroundColor, paddingVertical: 10, marginHorizontal: 16 }),
             android: ({ alignItems: 'center', flex: 1, backgroundColor })
           })}>
             <CrossPlatformPicker

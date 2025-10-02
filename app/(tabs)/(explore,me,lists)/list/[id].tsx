@@ -196,7 +196,6 @@ export default function List() {
         <ScrollView
           style={[{ backgroundColor }]}
           contentContainerStyle={styles.contentContainer}
-          showsVerticalScrollIndicator={false}
           stickyHeaderIndices={[0]}
         >
           <View style={Platform.select({

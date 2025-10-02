@@ -252,7 +252,6 @@ export default function ExploreIndex() {
       <Stack.Screen
         options={{
           title: 'Explore',
-          headerLargeTitle: true,
           headerSearchBarOptions: {
             placement: 'automatic',
             placeholder: 'Search',
@@ -264,7 +263,6 @@ export default function ExploreIndex() {
         <ScrollView
           style={[{ backgroundColor }]}
           contentContainerStyle={styles.contentContainer}
-          showsVerticalScrollIndicator={false}
         >
           {isLoading && <Text style={styles.loadingText}>Loading...</Text>}
 

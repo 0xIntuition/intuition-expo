@@ -36,15 +36,12 @@ export default function Quests() {
             <View key={quest.index} style={[styles.card, { backgroundColor: cardBackground, borderColor }]}>
               <Link href={quest.link} asChild>
                 <Pressable style={styles.cardContent}>
-                  <View style={[styles.iconContainer, { borderColor }]}>
+                  <View style={[styles.iconContainer]}>
                     <MaterialIcons
                       name={getIconName(quest.icon)}
-                      size={32}
+                      size={26}
                       color={textColor}
                     />
-                    <Text style={[styles.romanNumeral, { color: textColor }]}>
-                      {quest.romanNumeral}
-                    </Text>
                   </View>
                   <RNView style={styles.textContent}>
                     <Text style={[styles.title, { color: textColor }]}>{quest.title}</Text>
@@ -66,32 +63,26 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    padding: 8,
+    paddingTop: 16,
     gap: 16,
   },
   card: {
     borderRadius: 16,
-    borderWidth: 1,
     overflow: 'hidden',
   },
   cardContent: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     padding: 20,
   },
   iconContainer: {
-    width: 80,
-    height: 80,
+    width: 60,
+    height: 60,
     borderRadius: 16,
-    borderWidth: 1,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
-  },
-  romanNumeral: {
-    fontSize: 12,
-    fontWeight: '600',
-    marginTop: 4,
   },
   textContent: {
     flex: 1,
