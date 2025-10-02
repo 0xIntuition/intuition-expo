@@ -1,11 +1,11 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Pressable, StyleSheet, ActivityIndicator } from 'react-native';
 import { ScrollView } from 'react-native';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { Text, View, useThemeColor } from '@/components/Themed';
 import { useQuery } from '@tanstack/react-query';
 import { getQuestions } from '@/lib/quests/questions';
-import { Link } from 'expo-router';
+import { Link, useLocalSearchParams, useNavigation } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { graphql } from '@/lib/graphql';
 import { useAccount } from 'wagmi';
@@ -68,14 +68,26 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast, hasPositi
   );
 };
 
-export default function QuestionsQuest() {
-
+export default function EpochQuest() {
+  const { id } = useLocalSearchParams<{ id: string }>();
   const { address } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    navigation.setOptions({ title: `` });
+  }, []);
+
+  // Parse epoch IDs from route parameter (e.g., "1-6-7-8" -> [1, 6, 7, 8])
+  const epochIds = React.useMemo(() => {
+    if (!id) return [];
+    return id.split('-').map(Number);
+  }, [id]);
 
   const { data, isLoading } = useQuery({
-    queryKey: ['getQuestions'],
-    queryFn: () => getQuestions([1, 6, 7, 8])
+    queryKey: ['getQuestions', epochIds],
+    queryFn: () => getQuestions(epochIds),
+    enabled: epochIds.length > 0
   }) as any
 
   const { data: possitionsData } = useQuery({
@@ -131,7 +143,7 @@ export default function QuestionsQuest() {
                   <SectionItem
                     key={question.id}
                     item={question}
-                    href={`./question/${question.id}`}
+                    href={`/quests/question/${question.id}`}
                     isLast={index === group.questions.length - 1}
                     hasPositions={!!possitionsData?.positions?.find(p => p.term.triple?.object_id === question.object_id) || false}
 
