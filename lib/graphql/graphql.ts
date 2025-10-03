@@ -11600,10 +11600,11 @@ export type GetAccountQuery = { __typename?: 'query_root', account?: { __typenam
 
 export type GetAtomQueryVariables = Exact<{
   term_id: Scalars['String']['input'];
+  positionsBool?: InputMaybe<Positions_Bool_Exp>;
 }>;
 
 
-export type GetAtomQuery = { __typename?: 'query_root', atom?: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null };
+export type GetAtomQuery = { __typename?: 'query_root', atom?: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null, value?: { __typename?: 'atom_values', account_id?: string | null, json?: { __typename?: 'json_objects', description: any, url: any } | null } | null, tags: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> } | null };
 
 export type ListQueryVariables = Exact<{
   objectId: Scalars['String']['input'];
@@ -11642,6 +11643,15 @@ export type AccountProfileQueryVariables = Exact<{
 
 export type AccountProfileQuery = { __typename?: 'query_root', account?: { __typename?: 'accounts', atom?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, organizations: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, projects: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, skills: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, tags: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> } | null } | null };
 
+export type GetQuestionsPositionsQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+  predicateId: Scalars['String']['input'];
+  object: String_Comparison_Exp;
+}>;
+
+
+export type GetQuestionsPositionsQuery = { __typename?: 'query_root', positions: Array<{ __typename?: 'positions', term: { __typename?: 'terms', triple?: { __typename?: 'triples', object_id: string } | null } }> };
+
 export type AnswerListQueryVariables = Exact<{
   objectId: Scalars['String']['input'];
   term?: InputMaybe<Terms_Bool_Exp>;
@@ -11661,15 +11671,6 @@ export type GetListPositionsQueryVariables = Exact<{
 
 
 export type GetListPositionsQuery = { __typename?: 'query_root', positions: Array<{ __typename?: 'positions', term: { __typename?: 'terms', triple?: { __typename?: 'triples', subject_id: string } | null } }> };
-
-export type GetQuestionsPositionsQueryVariables = Exact<{
-  address: Scalars['String']['input'];
-  predicateId: Scalars['String']['input'];
-  object: String_Comparison_Exp;
-}>;
-
-
-export type GetQuestionsPositionsQuery = { __typename?: 'query_root', positions: Array<{ __typename?: 'positions', term: { __typename?: 'terms', triple?: { __typename?: 'triples', object_id: string } | null } }> };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -11775,12 +11776,31 @@ export const GetAccountDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<GetAccountQuery, GetAccountQueryVariables>;
 export const GetAtomDocument = new TypedDocumentString(`
-    query GetAtom($term_id: String!) {
+    query GetAtom($term_id: String!, $positionsBool: positions_bool_exp) {
   atom(term_id: $term_id) {
     label
     cached_image {
       url
       safe
+    }
+    value {
+      account_id
+      json: json_object {
+        description: data(path: "description")
+        url: data(path: "url")
+      }
+    }
+    tags: as_subject_triples(
+      where: {predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, positions: $positionsBool}
+    ) {
+      object {
+        term_id
+        label
+        cached_image {
+          url
+          safe
+        }
+      }
     }
   }
 }
@@ -11943,6 +11963,19 @@ export const AccountProfileDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<AccountProfileQuery, AccountProfileQueryVariables>;
+export const GetQuestionsPositionsDocument = new TypedDocumentString(`
+    query GetQuestionsPositions($address: String!, $predicateId: String!, $object: String_comparison_exp!) {
+  positions(
+    where: {account_id: {_eq: $address}, term: {triple: {predicate_id: {_eq: $predicateId}, object_id: $object}}}
+  ) {
+    term {
+      triple {
+        object_id
+      }
+    }
+  }
+}
+    `) as unknown as TypedDocumentString<GetQuestionsPositionsQuery, GetQuestionsPositionsQueryVariables>;
 export const AnswerListDocument = new TypedDocumentString(`
     query AnswerList($objectId: String!, $term: terms_bool_exp, $subject: atoms_bool_exp, $limit: Int, $offset: Int) {
   object: atom(term_id: $objectId) {
@@ -11979,16 +12012,3 @@ export const GetListPositionsDocument = new TypedDocumentString(`
   }
 }
     `) as unknown as TypedDocumentString<GetListPositionsQuery, GetListPositionsQueryVariables>;
-export const GetQuestionsPositionsDocument = new TypedDocumentString(`
-    query GetQuestionsPositions($address: String!, $predicateId: String!, $object: String_comparison_exp!) {
-  positions(
-    where: {account_id: {_eq: $address}, term: {triple: {predicate_id: {_eq: $predicateId}, object_id: $object}}}
-  ) {
-    term {
-      triple {
-        object_id
-      }
-    }
-  }
-}
-    `) as unknown as TypedDocumentString<GetQuestionsPositionsQuery, GetQuestionsPositionsQueryVariables>;
