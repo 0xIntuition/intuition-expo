@@ -8,6 +8,7 @@ import 'react-native-reanimated';
 import "@walletconnect/react-native-compat";
 import { useColorScheme } from '@/components/useColorScheme';
 import { Web3Provider } from '@/providers/Web3Provider';
+import { SourcePickerProvider } from '@/providers/SourcePickerProvider';
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -50,12 +51,14 @@ function RootLayoutNav() {
 
   return (
     <Web3Provider>
-      <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-        </Stack>
-      </ThemeProvider>
+      <SourcePickerProvider>
+        <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
+          <Stack>
+            <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+            <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
+          </Stack>
+        </ThemeProvider>
+      </SourcePickerProvider>
     </Web3Provider>
   );
 }

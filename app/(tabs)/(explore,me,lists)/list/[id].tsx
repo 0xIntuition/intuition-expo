@@ -11,7 +11,8 @@ import { useEffect, useState } from 'react';
 import { blurhash, getCachedImage } from '@/lib/utils';
 import { useAccount } from 'wagmi';
 import { Ionicons } from '@expo/vector-icons';
-import { CrossPlatformPicker } from '@/components/CrossPlatformPicker';
+import { SourcePicker } from '@/components/SourcePicker';
+import { useSourcePicker } from '@/providers/SourcePickerProvider';
 
 const ListQuery = graphql(`
 query List($objectId: String!, $term: terms_bool_exp, $subject: atoms_bool_exp, $limit: Int, $offset: Int) {
@@ -95,7 +96,7 @@ export default function List() {
   const { address, status } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
   const [searchQuery, setSearhQuery] = useState('');
-  const [sourceIndex, setSourceIndex] = useState(1);
+  const { sourceIndex, setSourceIndex } = useSourcePicker();
 
   // useEffect(() => {
   //   navigation.setOptions({ headerShown: false });
@@ -201,7 +202,7 @@ export default function List() {
           ios: ({ flex: 1, backgroundColor, paddingBottom: 10, marginHorizontal: 16 }),
           android: ({ alignItems: 'center', flex: 1, backgroundColor })
         })}>
-          <CrossPlatformPicker
+          <SourcePicker
             options={sources}
             selectedIndex={sourceIndex}
             onOptionSelected={({ nativeEvent: { index } }) => {

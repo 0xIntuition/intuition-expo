@@ -9,8 +9,8 @@ import { execute } from '@/lib/graphql/execute';
 import { blurhash, getCachedImage, shortLink } from '@/lib/utils';
 import { ExternalLink } from '@/components/ExternalLink';
 import { Ionicons } from '@expo/vector-icons';
-import { CrossPlatformPicker } from '@/components/CrossPlatformPicker';
-import { useState } from 'react';
+import { SourcePicker } from '@/components/SourcePicker';
+import { useSourcePicker } from '@/providers/SourcePickerProvider';
 import { useAccount } from 'wagmi';
 
 const GetAtomQuery = graphql(`
@@ -100,7 +100,7 @@ export default function Atom() {
   const termId = Array.isArray(id) ? id[0] : id
   const { address } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
-  const [sourceIndex, setSourceIndex] = useState(0);
+  const { sourceIndex, setSourceIndex } = useSourcePicker();
 
   const { data, isLoading } = useQuery({
     queryKey: ['getAtom', id, sourceIndex, address],
@@ -143,7 +143,7 @@ export default function Atom() {
             />}
           <View style={styles.dataContainer}>
 
-            {!!data?.atom?.value?.json?.description && <Text style={styles.description}>{data?.atom?.value?.json?.description}</Text>}
+            {!!data?.atom?.value?.json?.description && data?.atom?.value?.json?.description !== "null" && <Text style={styles.description}>{data?.atom?.value?.json?.description}</Text>}
             {/* Additional text display for json value */}
             {!!data?.atom?.value?.json?.url && data?.atom?.value?.json?.url !== "null" && <ExternalLink href={data.atom.value.json.url}>
               <Text>{shortLink(data?.atom?.value?.json?.url)}</Text>
@@ -158,7 +158,7 @@ export default function Atom() {
             ios: ({ flex: 1, backgroundColor, paddingVertical: 10, marginHorizontal: 16 }),
             android: ({ alignItems: 'center', flex: 1, backgroundColor })
           })}>
-            <CrossPlatformPicker
+            <SourcePicker
               options={sources}
               selectedIndex={sourceIndex}
               onOptionSelected={({ nativeEvent: { index } }) => {

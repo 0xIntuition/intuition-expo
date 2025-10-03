@@ -2,14 +2,14 @@ import { Platform } from 'react-native';
 import { Picker as AndroidPicker } from '@expo/ui/jetpack-compose';
 import { Host, Picker as IOSPicker } from '@expo/ui/swift-ui';
 
-interface CrossPlatformPickerProps {
+interface SourcePickerProps {
   options: string[];
   selectedIndex: number;
   onOptionSelected: ({ nativeEvent }: { nativeEvent: { index: number } }) => void;
   variant?: string;
 }
 
-export const CrossPlatformPicker: React.FC<CrossPlatformPickerProps> = ({
+export const SourcePicker: React.FC<SourcePickerProps> = ({
   options,
   selectedIndex,
   onOptionSelected,

@@ -7,7 +7,8 @@ import { useAccount } from "wagmi";
 import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
 import { execute } from '@/lib/graphql/execute';
-import { CrossPlatformPicker } from '@/components/CrossPlatformPicker';
+import { SourcePicker } from '@/components/SourcePicker';
+import { useSourcePicker } from '@/providers/SourcePickerProvider';
 import { useState } from 'react';
 import { Image } from 'expo-image';
 import { blurhash, getCachedImage } from '@/lib/utils';
@@ -240,7 +241,7 @@ export default function AccountIndex() {
   const { address, status } = useAccount();
   const [searchQuery, setSearhQuery] = useState('');
   const backgroundColor = useThemeColor({}, 'background');
-  const [sourceIndex, setSourceIndex] = useState(status === 'disconnected' ? 0 : 1);
+  const { sourceIndex, setSourceIndex } = useSourcePicker();
 
   const { data, isLoading } = useQuery({
     queryKey: ['savedLists', address, sourceIndex, searchQuery],
@@ -370,7 +371,7 @@ export default function AccountIndex() {
           ios: ({ flex: 1, backgroundColor, paddingVertical: 10, marginHorizontal: 16 }),
           android: ({ alignItems: 'center', flex: 1, backgroundColor })
         })}>
-          <CrossPlatformPicker
+          <SourcePicker
             options={sources}
             selectedIndex={sourceIndex}
             onOptionSelected={({ nativeEvent: { index } }) => {

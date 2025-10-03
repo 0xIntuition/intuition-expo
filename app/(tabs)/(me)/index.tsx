@@ -10,7 +10,8 @@ import { graphql } from '@/lib/graphql';
 import { useQuery } from '@tanstack/react-query';
 import { execute } from '@/lib/graphql/execute';
 import { blurhash, getCachedImage } from '@/lib/utils';
-import { CrossPlatformPicker } from '@/components/CrossPlatformPicker';
+import { SourcePicker } from '@/components/SourcePicker';
+import { useSourcePicker } from '@/providers/SourcePickerProvider';
 import { useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 const AccountProfileQuery = graphql(`
@@ -148,7 +149,7 @@ export default function MeIndex() {
   const { switchChain } = useSwitchChain();
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryBackgroundColor = useThemeColor({}, 'secondaryBackground');
-  const [sourceIndex, setSourceIndex] = useState(0);
+  const { sourceIndex, setSourceIndex } = useSourcePicker();
   const { open } = useAppKit()
   const isWrongChain = status === 'connected' && chainId !== intuitionTestnet.id;
 
@@ -187,7 +188,7 @@ export default function MeIndex() {
           ios: ({ flex: 1, backgroundColor, paddingVertical: 10, marginHorizontal: 16 }),
           android: ({ alignItems: 'center', flex: 1, backgroundColor })
         })}>
-          <CrossPlatformPicker
+          <SourcePicker
             options={sources}
             selectedIndex={sourceIndex}
             onOptionSelected={({ nativeEvent: { index } }) => {
