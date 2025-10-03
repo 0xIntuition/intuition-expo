@@ -13,6 +13,7 @@ import { useAccount } from 'wagmi';
 import { Ionicons } from '@expo/vector-icons';
 import { SourcePicker } from '@/components/SourcePicker';
 import { useSourcePicker } from '@/providers/SourcePickerProvider';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const ListQuery = graphql(`
 query List($objectId: String!, $term: terms_bool_exp, $subject: atoms_bool_exp, $limit: Int, $offset: Int) {
@@ -96,6 +97,7 @@ export default function List() {
   const { address, status } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
   const [searchQuery, setSearhQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const { sourceIndex, setSourceIndex } = useSourcePicker();
 
   // useEffect(() => {
@@ -106,12 +108,12 @@ export default function List() {
   const objectId = Array.isArray(id) ? id[0] : id;
 
   const { data, isLoading } = useQuery({
-    queryKey: ['list', objectId, address, sourceIndex, searchQuery],
+    queryKey: ['list', objectId, address, sourceIndex, debouncedSearchQuery],
     queryFn: () => execute(ListQuery, {
       objectId: objectId,
-      subject: searchQuery.length > 0 ? {
+      subject: debouncedSearchQuery.length > 0 ? {
         label: {
-          _ilike: `%${searchQuery}%`
+          _ilike: `%${debouncedSearchQuery}%`
         }
       } : {},
       term: sourceIndex === 0 ? {} : address ? {

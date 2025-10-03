@@ -9,6 +9,7 @@ import { useState } from 'react';
 import { Image } from 'expo-image';
 import { blurhash, getCachedImage } from '@/lib/utils';
 import { Ionicons } from '@expo/vector-icons';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const SEARCH_QUERY = graphql(`
 query GlobalSearch(
@@ -229,6 +230,7 @@ const ClaimItem: React.FC<ClaimItemProps> = ({
 
 export default function ExploreIndex() {
   const [searchQuery, setSearhQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const backgroundColor = useThemeColor({}, 'background');
   const secondaryBackgroundColor = useThemeColor({}, 'secondaryBackground');
   const textColor = useThemeColor({}, 'text');
@@ -236,9 +238,9 @@ export default function ExploreIndex() {
   const chevronColor = useThemeColor({ light: '#8e8e93', dark: '#8e8e93' }, 'tabIconDefault');
 
   const { data, isLoading } = useQuery({
-    queryKey: ['globalSearch', searchQuery],
+    queryKey: ['globalSearch', debouncedSearchQuery],
     queryFn: () => execute(SEARCH_QUERY, {
-      likeStr: `${searchQuery}%`,
+      likeStr: `${debouncedSearchQuery}%`,
       atomsLimit: 5,
       accountsLimit: 5,
       triplesLimit: 5,

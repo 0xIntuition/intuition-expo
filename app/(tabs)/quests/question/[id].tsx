@@ -13,6 +13,7 @@ import { getQuestion } from '@/lib/quests/questions';
 import { intuitionDeployments, intuitionTestnet, MultiVaultAbi } from '@0xintuition/protocol';
 import { Hex } from 'viem';
 import { Ionicons } from '@expo/vector-icons';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const ListQuery = graphql(`
 query AnswerList($objectId: String!, $term: terms_bool_exp, $subject: atoms_bool_exp, $limit: Int, $offset: Int) {
@@ -117,6 +118,7 @@ export default function List() {
   const { address } = useAccount();
   const backgroundColor = useThemeColor({}, 'background');
   const [searchQuery, setSearhQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [selectedSubject, setSelectedSubject] = useState<string | null>(null);
   const router = useRouter();
 
@@ -149,12 +151,12 @@ export default function List() {
   });
 
   const { data, isLoading } = useQuery({
-    queryKey: ['list', objectId, address, searchQuery],
+    queryKey: ['list', objectId, address, debouncedSearchQuery],
     queryFn: () => execute(ListQuery, {
       objectId: objectId,
-      subject: searchQuery.length > 0 ? {
+      subject: debouncedSearchQuery.length > 0 ? {
         label: {
-          _ilike: `%${searchQuery}%`
+          _ilike: `%${debouncedSearchQuery}%`
         }
       } : {},
       term: {},

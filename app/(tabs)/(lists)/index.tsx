@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { Image } from 'expo-image';
 import { blurhash, getCachedImage } from '@/lib/utils';
 import { Ionicons } from '@expo/vector-icons';
+import { useDebounce } from '@/hooks/useDebounce';
 const SavedListsQuery = graphql(`
 query SavedLists(
   $where: predicate_objects_bool_exp
@@ -240,11 +241,12 @@ const ListItem: React.FC<ListItemProps> = ({ object, isLast }) => {
 export default function AccountIndex() {
   const { address, status } = useAccount();
   const [searchQuery, setSearhQuery] = useState('');
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const backgroundColor = useThemeColor({}, 'background');
   const { sourceIndex, setSourceIndex } = useSourcePicker();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['savedLists', address, sourceIndex, searchQuery],
+    queryKey: ['savedLists', address, sourceIndex, debouncedSearchQuery],
     queryFn: () => execute(SavedListsQuery, {
       "orderBy": { "triple_count": "desc" } as any,
 
@@ -270,9 +272,9 @@ export default function AccountIndex() {
             }
           },
           {
-            "object": searchQuery.length > 0 ? {
+            "object": debouncedSearchQuery.length > 0 ? {
               "label": {
-                "_ilike": "%" + searchQuery + "%"
+                "_ilike": "%" + debouncedSearchQuery + "%"
               }
             } : {}
           },
