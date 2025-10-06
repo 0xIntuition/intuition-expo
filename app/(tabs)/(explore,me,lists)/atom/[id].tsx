@@ -14,7 +14,7 @@ import { useSourcePicker } from '@/providers/SourcePickerProvider';
 import { useAccount } from 'wagmi';
 
 const GetAtomQuery = graphql(`
-query GetAtom($term_id: String!, $positionsBool: positions_bool_exp) {
+query GetAtom($term_id: String!) {
   atom(term_id: $term_id) {
     label
     cached_image {
@@ -28,24 +28,29 @@ query GetAtom($term_id: String!, $positionsBool: positions_bool_exp) {
         url: data(path: "url")
       }
     }
+  }
+}
+`);
+const GetAtomDetails = graphql(`
+query GetAtomDetails($term_id: String!, $positionsBool: positions_bool_exp) {
+  atom(term_id: $term_id) {
     tags: as_subject_triples(
-        where: {
-          predicate_id: {
-            _eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"
-          }
-          positions: $positionsBool
+      where: {
+        predicate_id: {
+          _eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"
         }
-      ) {
-        object {
-          term_id
-          label
-          cached_image {
-            url
-            safe
-          }
+        positions: $positionsBool
+      }
+    ) {
+      object {
+        term_id
+        label
+        cached_image {
+          url
+          safe
         }
       }
-
+    }
   }
 }
 `);
@@ -103,8 +108,14 @@ export default function Atom() {
   const { sourceIndex, setSourceIndex } = useSourcePicker();
 
   const { data, isLoading } = useQuery({
-    queryKey: ['getAtom', id, sourceIndex, address],
+    queryKey: ['getAtom', id, address],
     queryFn: () => execute(GetAtomQuery, {
+      term_id: termId
+    })
+  })
+  const { data: details, isLoading: isLoadingDetails } = useQuery({
+    queryKey: ['getAtomDetails', termId, sourceIndex, address],
+    queryFn: () => execute(GetAtomDetails, {
       term_id: termId,
       positionsBool: sourceIndex === 0 ? {} : {
         account_id: {
@@ -113,7 +124,6 @@ export default function Atom() {
       }
     })
   })
-
   return (
 
     <>
@@ -124,7 +134,7 @@ export default function Atom() {
       />
 
       <ScrollView contentInsetAdjustmentBehavior='automatic'>
-        {isLoading && <Text>Loading</Text>}
+        {isLoading && data === undefined && <Text>Loading</Text>}
         {data !== undefined && <View >
 
           {data.atom?.cached_image !== null &&
@@ -169,15 +179,15 @@ export default function Atom() {
           </View>
 
           {/* Tags Section */}
-          {data.atom?.tags && data.atom.tags.length > 0 && (
+          {details?.atom?.tags && details?.atom.tags.length > 0 && (
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>In Lists</Text>
               <View style={styles.sectionContent}>
-                {data.atom.tags.map((tag, index) => (
+                {details.atom.tags.map((tag, index) => (
                   <SectionItem
                     key={tag.object.term_id}
                     item={tag.object}
-                    isLast={index === (data.atom?.tags?.length ?? 0) - 1}
+                    isLast={index === (details.atom?.tags?.length ?? 0) - 1}
                   />
                 ))}
               </View>

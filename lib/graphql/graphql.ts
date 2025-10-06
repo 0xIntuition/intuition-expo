@@ -11600,11 +11600,18 @@ export type GetAccountQuery = { __typename?: 'query_root', account?: { __typenam
 
 export type GetAtomQueryVariables = Exact<{
   term_id: Scalars['String']['input'];
+}>;
+
+
+export type GetAtomQuery = { __typename?: 'query_root', atom?: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null, value?: { __typename?: 'atom_values', account_id?: string | null, json?: { __typename?: 'json_objects', description: any, url: any } | null } | null } | null };
+
+export type GetAtomDetailsQueryVariables = Exact<{
+  term_id: Scalars['String']['input'];
   positionsBool?: InputMaybe<Positions_Bool_Exp>;
 }>;
 
 
-export type GetAtomQuery = { __typename?: 'query_root', atom?: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null, value?: { __typename?: 'atom_values', account_id?: string | null, json?: { __typename?: 'json_objects', description: any, url: any } | null } | null, tags: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> } | null };
+export type GetAtomDetailsQuery = { __typename?: 'query_root', atom?: { __typename?: 'atoms', tags: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> } | null };
 
 export type ListQueryVariables = Exact<{
   objectId: Scalars['String']['input'];
@@ -11776,7 +11783,7 @@ export const GetAccountDocument = new TypedDocumentString(`
 }
     `) as unknown as TypedDocumentString<GetAccountQuery, GetAccountQueryVariables>;
 export const GetAtomDocument = new TypedDocumentString(`
-    query GetAtom($term_id: String!, $positionsBool: positions_bool_exp) {
+    query GetAtom($term_id: String!) {
   atom(term_id: $term_id) {
     label
     cached_image {
@@ -11790,6 +11797,12 @@ export const GetAtomDocument = new TypedDocumentString(`
         url: data(path: "url")
       }
     }
+  }
+}
+    `) as unknown as TypedDocumentString<GetAtomQuery, GetAtomQueryVariables>;
+export const GetAtomDetailsDocument = new TypedDocumentString(`
+    query GetAtomDetails($term_id: String!, $positionsBool: positions_bool_exp) {
+  atom(term_id: $term_id) {
     tags: as_subject_triples(
       where: {predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, positions: $positionsBool}
     ) {
@@ -11804,7 +11817,7 @@ export const GetAtomDocument = new TypedDocumentString(`
     }
   }
 }
-    `) as unknown as TypedDocumentString<GetAtomQuery, GetAtomQueryVariables>;
+    `) as unknown as TypedDocumentString<GetAtomDetailsQuery, GetAtomDetailsQueryVariables>;
 export const ListDocument = new TypedDocumentString(`
     query List($objectId: String!, $term: terms_bool_exp, $subject: atoms_bool_exp, $limit: Int, $offset: Int) {
   object: atom(term_id: $objectId) {
