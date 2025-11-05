@@ -551,7 +551,7 @@ export type Atom_Values = {
   account?: Maybe<Accounts>;
   account_id?: Maybe<Scalars['String']['output']>;
   /** An object relationship */
-  atom: Atoms;
+  atom?: Maybe<Atoms>;
   /** An object relationship */
   book?: Maybe<Books>;
   book_id?: Maybe<Scalars['String']['output']>;
@@ -761,7 +761,7 @@ export type Atoms = {
   controller?: Maybe<Accounts>;
   created_at: Scalars['timestamptz']['output'];
   /** An object relationship */
-  creator: Accounts;
+  creator?: Maybe<Accounts>;
   creator_id: Scalars['String']['output'];
   data?: Maybe<Scalars['String']['output']>;
   emoji?: Maybe<Scalars['String']['output']>;
@@ -779,7 +779,7 @@ export type Atoms = {
   /** An aggregate relationship */
   signals_aggregate: Signals_Aggregate;
   /** An object relationship */
-  term: Terms;
+  term?: Maybe<Terms>;
   term_id: Scalars['String']['output'];
   transaction_hash: Scalars['String']['output'];
   type: Scalars['atom_type']['output'];
@@ -1839,14 +1839,14 @@ export type Deposits = {
   id: Scalars['String']['output'];
   log_index: Scalars['bigint']['output'];
   /** An object relationship */
-  receiver: Accounts;
+  receiver?: Maybe<Accounts>;
   receiver_id: Scalars['String']['output'];
   /** An object relationship */
   sender?: Maybe<Accounts>;
   sender_id: Scalars['String']['output'];
   shares: Scalars['numeric']['output'];
   /** An object relationship */
-  term: Terms;
+  term?: Maybe<Terms>;
   term_id: Scalars['String']['output'];
   total_shares: Scalars['numeric']['output'];
   transaction_hash: Scalars['String']['output'];
@@ -2490,7 +2490,7 @@ export type Fee_Transfers = {
   created_at: Scalars['timestamptz']['output'];
   id: Scalars['String']['output'];
   /** An object relationship */
-  receiver: Accounts;
+  receiver?: Maybe<Accounts>;
   receiver_id: Scalars['String']['output'];
   /** An object relationship */
   sender?: Maybe<Accounts>;
@@ -3215,7 +3215,7 @@ export type Positions = {
   log_index: Scalars['bigint']['output'];
   shares: Scalars['numeric']['output'];
   /** An object relationship */
-  term: Terms;
+  term?: Maybe<Terms>;
   term_id: Scalars['String']['output'];
   total_deposit_assets_after_total_fees: Scalars['numeric']['output'];
   total_redeem_assets_for_receiver: Scalars['numeric']['output'];
@@ -3641,14 +3641,39 @@ export type Positions_Variance_Order_By = {
 /** columns and relationships of "predicate_object" */
 export type Predicate_Objects = {
   __typename?: 'predicate_objects';
-  id: Scalars['String']['output'];
   /** An object relationship */
-  object: Atoms;
+  object?: Maybe<Atoms>;
   object_id: Scalars['String']['output'];
   /** An object relationship */
-  predicate: Atoms;
+  predicate?: Maybe<Atoms>;
   predicate_id: Scalars['String']['output'];
+  total_market_cap: Scalars['numeric']['output'];
+  total_position_count: Scalars['Int']['output'];
   triple_count: Scalars['Int']['output'];
+  /** An array relationship */
+  triples: Array<Triples>;
+  /** An aggregate relationship */
+  triples_aggregate: Triples_Aggregate;
+};
+
+
+/** columns and relationships of "predicate_object" */
+export type Predicate_ObjectsTriplesArgs = {
+  distinct_on?: InputMaybe<Array<Triples_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Triples_Order_By>>;
+  where?: InputMaybe<Triples_Bool_Exp>;
+};
+
+
+/** columns and relationships of "predicate_object" */
+export type Predicate_ObjectsTriples_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Triples_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Triples_Order_By>>;
+  where?: InputMaybe<Triples_Bool_Exp>;
 };
 
 /** aggregated selection of "predicate_object" */
@@ -3710,11 +3735,15 @@ export type Predicate_Objects_Aggregate_Order_By = {
 /** aggregate avg on columns */
 export type Predicate_Objects_Avg_Fields = {
   __typename?: 'predicate_objects_avg_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
   triple_count?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by avg() on columns of table "predicate_object" */
 export type Predicate_Objects_Avg_Order_By = {
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
 };
 
@@ -3723,66 +3752,77 @@ export type Predicate_Objects_Bool_Exp = {
   _and?: InputMaybe<Array<Predicate_Objects_Bool_Exp>>;
   _not?: InputMaybe<Predicate_Objects_Bool_Exp>;
   _or?: InputMaybe<Array<Predicate_Objects_Bool_Exp>>;
-  id?: InputMaybe<String_Comparison_Exp>;
   object?: InputMaybe<Atoms_Bool_Exp>;
   object_id?: InputMaybe<String_Comparison_Exp>;
   predicate?: InputMaybe<Atoms_Bool_Exp>;
   predicate_id?: InputMaybe<String_Comparison_Exp>;
+  total_market_cap?: InputMaybe<Numeric_Comparison_Exp>;
+  total_position_count?: InputMaybe<Int_Comparison_Exp>;
   triple_count?: InputMaybe<Int_Comparison_Exp>;
+  triples?: InputMaybe<Triples_Bool_Exp>;
+  triples_aggregate?: InputMaybe<Triples_Aggregate_Bool_Exp>;
 };
 
 /** aggregate max on columns */
 export type Predicate_Objects_Max_Fields = {
   __typename?: 'predicate_objects_max_fields';
-  id?: Maybe<Scalars['String']['output']>;
   object_id?: Maybe<Scalars['String']['output']>;
   predicate_id?: Maybe<Scalars['String']['output']>;
+  total_market_cap?: Maybe<Scalars['numeric']['output']>;
+  total_position_count?: Maybe<Scalars['Int']['output']>;
   triple_count?: Maybe<Scalars['Int']['output']>;
 };
 
 /** order by max() on columns of table "predicate_object" */
 export type Predicate_Objects_Max_Order_By = {
-  id?: InputMaybe<Order_By>;
   object_id?: InputMaybe<Order_By>;
   predicate_id?: InputMaybe<Order_By>;
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
 };
 
 /** aggregate min on columns */
 export type Predicate_Objects_Min_Fields = {
   __typename?: 'predicate_objects_min_fields';
-  id?: Maybe<Scalars['String']['output']>;
   object_id?: Maybe<Scalars['String']['output']>;
   predicate_id?: Maybe<Scalars['String']['output']>;
+  total_market_cap?: Maybe<Scalars['numeric']['output']>;
+  total_position_count?: Maybe<Scalars['Int']['output']>;
   triple_count?: Maybe<Scalars['Int']['output']>;
 };
 
 /** order by min() on columns of table "predicate_object" */
 export type Predicate_Objects_Min_Order_By = {
-  id?: InputMaybe<Order_By>;
   object_id?: InputMaybe<Order_By>;
   predicate_id?: InputMaybe<Order_By>;
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
 };
 
 /** Ordering options when selecting data from "predicate_object". */
 export type Predicate_Objects_Order_By = {
-  id?: InputMaybe<Order_By>;
   object?: InputMaybe<Atoms_Order_By>;
   object_id?: InputMaybe<Order_By>;
   predicate?: InputMaybe<Atoms_Order_By>;
   predicate_id?: InputMaybe<Order_By>;
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
+  triples_aggregate?: InputMaybe<Triples_Aggregate_Order_By>;
 };
 
 /** select columns of table "predicate_object" */
 export enum Predicate_Objects_Select_Column {
   /** column name */
-  Id = 'id',
-  /** column name */
   ObjectId = 'object_id',
   /** column name */
   PredicateId = 'predicate_id',
+  /** column name */
+  TotalMarketCap = 'total_market_cap',
+  /** column name */
+  TotalPositionCount = 'total_position_count',
   /** column name */
   TripleCount = 'triple_count'
 }
@@ -3790,33 +3830,45 @@ export enum Predicate_Objects_Select_Column {
 /** aggregate stddev on columns */
 export type Predicate_Objects_Stddev_Fields = {
   __typename?: 'predicate_objects_stddev_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
   triple_count?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by stddev() on columns of table "predicate_object" */
 export type Predicate_Objects_Stddev_Order_By = {
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
 };
 
 /** aggregate stddev_pop on columns */
 export type Predicate_Objects_Stddev_Pop_Fields = {
   __typename?: 'predicate_objects_stddev_pop_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
   triple_count?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by stddev_pop() on columns of table "predicate_object" */
 export type Predicate_Objects_Stddev_Pop_Order_By = {
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
 };
 
 /** aggregate stddev_samp on columns */
 export type Predicate_Objects_Stddev_Samp_Fields = {
   __typename?: 'predicate_objects_stddev_samp_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
   triple_count?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by stddev_samp() on columns of table "predicate_object" */
 export type Predicate_Objects_Stddev_Samp_Order_By = {
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
 };
 
@@ -3830,53 +3882,70 @@ export type Predicate_Objects_Stream_Cursor_Input = {
 
 /** Initial value of the column from where the streaming should start */
 export type Predicate_Objects_Stream_Cursor_Value_Input = {
-  id?: InputMaybe<Scalars['String']['input']>;
   object_id?: InputMaybe<Scalars['String']['input']>;
   predicate_id?: InputMaybe<Scalars['String']['input']>;
+  total_market_cap?: InputMaybe<Scalars['numeric']['input']>;
+  total_position_count?: InputMaybe<Scalars['Int']['input']>;
   triple_count?: InputMaybe<Scalars['Int']['input']>;
 };
 
 /** aggregate sum on columns */
 export type Predicate_Objects_Sum_Fields = {
   __typename?: 'predicate_objects_sum_fields';
+  total_market_cap?: Maybe<Scalars['numeric']['output']>;
+  total_position_count?: Maybe<Scalars['Int']['output']>;
   triple_count?: Maybe<Scalars['Int']['output']>;
 };
 
 /** order by sum() on columns of table "predicate_object" */
 export type Predicate_Objects_Sum_Order_By = {
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
 };
 
 /** aggregate var_pop on columns */
 export type Predicate_Objects_Var_Pop_Fields = {
   __typename?: 'predicate_objects_var_pop_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
   triple_count?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by var_pop() on columns of table "predicate_object" */
 export type Predicate_Objects_Var_Pop_Order_By = {
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
 };
 
 /** aggregate var_samp on columns */
 export type Predicate_Objects_Var_Samp_Fields = {
   __typename?: 'predicate_objects_var_samp_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
   triple_count?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by var_samp() on columns of table "predicate_object" */
 export type Predicate_Objects_Var_Samp_Order_By = {
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
 };
 
 /** aggregate variance on columns */
 export type Predicate_Objects_Variance_Fields = {
   __typename?: 'predicate_objects_variance_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
   triple_count?: Maybe<Scalars['Float']['output']>;
 };
 
 /** order by variance() on columns of table "predicate_object" */
 export type Predicate_Objects_Variance_Order_By = {
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
   triple_count?: InputMaybe<Order_By>;
 };
 
@@ -4038,6 +4107,12 @@ export type Query_Root = {
   stats: Array<Stats>;
   /** fetch aggregated fields from the table: "stats" */
   stats_aggregate: Stats_Aggregate;
+  /** fetch data from the table: "subject_predicate" */
+  subject_predicates: Array<Subject_Predicates>;
+  /** fetch aggregated fields from the table: "subject_predicate" */
+  subject_predicates_aggregate: Subject_Predicates_Aggregate;
+  /** fetch data from the table: "subject_predicate" using primary key columns */
+  subject_predicates_by_pk?: Maybe<Subject_Predicates>;
   /** fetch data from the table: "term" using primary key columns */
   term?: Maybe<Terms>;
   /** fetch data from the table: "term_total_state_change_stats_daily" */
@@ -4475,7 +4550,8 @@ export type Query_RootPredicate_Objects_AggregateArgs = {
 
 
 export type Query_RootPredicate_Objects_By_PkArgs = {
-  id: Scalars['String']['input'];
+  object_id: Scalars['String']['input'];
+  predicate_id: Scalars['String']['input'];
 };
 
 
@@ -4727,6 +4803,30 @@ export type Query_RootStats_AggregateArgs = {
 };
 
 
+export type Query_RootSubject_PredicatesArgs = {
+  distinct_on?: InputMaybe<Array<Subject_Predicates_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Subject_Predicates_Order_By>>;
+  where?: InputMaybe<Subject_Predicates_Bool_Exp>;
+};
+
+
+export type Query_RootSubject_Predicates_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Subject_Predicates_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Subject_Predicates_Order_By>>;
+  where?: InputMaybe<Subject_Predicates_Bool_Exp>;
+};
+
+
+export type Query_RootSubject_Predicates_By_PkArgs = {
+  predicate_id: Scalars['String']['input'];
+  subject_id: Scalars['String']['input'];
+};
+
+
 export type Query_RootTermArgs = {
   id: Scalars['String']['input'];
 };
@@ -4927,14 +5027,14 @@ export type Redemptions = {
   id: Scalars['String']['output'];
   log_index: Scalars['bigint']['output'];
   /** An object relationship */
-  receiver: Accounts;
+  receiver?: Maybe<Accounts>;
   receiver_id: Scalars['String']['output'];
   /** An object relationship */
   sender?: Maybe<Accounts>;
   sender_id: Scalars['String']['output'];
   shares: Scalars['numeric']['output'];
   /** An object relationship */
-  term: Terms;
+  term?: Maybe<Terms>;
   term_id: Scalars['String']['output'];
   total_shares: Scalars['numeric']['output'];
   transaction_hash: Scalars['String']['output'];
@@ -6134,7 +6234,7 @@ export type Share_Price_Changes = {
   log_index: Scalars['bigint']['output'];
   share_price: Scalars['numeric']['output'];
   /** An object relationship */
-  term: Terms;
+  term?: Maybe<Terms>;
   term_id: Scalars['String']['output'];
   total_assets: Scalars['numeric']['output'];
   total_shares: Scalars['numeric']['output'];
@@ -6841,7 +6941,7 @@ export type Signals = {
   redemption?: Maybe<Redemptions>;
   redemption_id?: Maybe<Scalars['String']['output']>;
   /** An object relationship */
-  term: Terms;
+  term?: Maybe<Terms>;
   term_id: Scalars['String']['output'];
   transaction_hash: Scalars['String']['output'];
   triple_id?: Maybe<Scalars['String']['output']>;
@@ -7550,6 +7650,217 @@ export type Stats_Variance_Fields = {
   total_triples?: Maybe<Scalars['Float']['output']>;
 };
 
+/** columns and relationships of "subject_predicate" */
+export type Subject_Predicates = {
+  __typename?: 'subject_predicates';
+  /** An object relationship */
+  predicate?: Maybe<Atoms>;
+  predicate_id: Scalars['String']['output'];
+  /** An object relationship */
+  subject?: Maybe<Atoms>;
+  subject_id: Scalars['String']['output'];
+  total_market_cap: Scalars['numeric']['output'];
+  total_position_count: Scalars['Int']['output'];
+  triple_count: Scalars['Int']['output'];
+  /** An array relationship */
+  triples: Array<Triples>;
+  /** An aggregate relationship */
+  triples_aggregate: Triples_Aggregate;
+};
+
+
+/** columns and relationships of "subject_predicate" */
+export type Subject_PredicatesTriplesArgs = {
+  distinct_on?: InputMaybe<Array<Triples_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Triples_Order_By>>;
+  where?: InputMaybe<Triples_Bool_Exp>;
+};
+
+
+/** columns and relationships of "subject_predicate" */
+export type Subject_PredicatesTriples_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Triples_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Triples_Order_By>>;
+  where?: InputMaybe<Triples_Bool_Exp>;
+};
+
+/** aggregated selection of "subject_predicate" */
+export type Subject_Predicates_Aggregate = {
+  __typename?: 'subject_predicates_aggregate';
+  aggregate?: Maybe<Subject_Predicates_Aggregate_Fields>;
+  nodes: Array<Subject_Predicates>;
+};
+
+/** aggregate fields of "subject_predicate" */
+export type Subject_Predicates_Aggregate_Fields = {
+  __typename?: 'subject_predicates_aggregate_fields';
+  avg?: Maybe<Subject_Predicates_Avg_Fields>;
+  count: Scalars['Int']['output'];
+  max?: Maybe<Subject_Predicates_Max_Fields>;
+  min?: Maybe<Subject_Predicates_Min_Fields>;
+  stddev?: Maybe<Subject_Predicates_Stddev_Fields>;
+  stddev_pop?: Maybe<Subject_Predicates_Stddev_Pop_Fields>;
+  stddev_samp?: Maybe<Subject_Predicates_Stddev_Samp_Fields>;
+  sum?: Maybe<Subject_Predicates_Sum_Fields>;
+  var_pop?: Maybe<Subject_Predicates_Var_Pop_Fields>;
+  var_samp?: Maybe<Subject_Predicates_Var_Samp_Fields>;
+  variance?: Maybe<Subject_Predicates_Variance_Fields>;
+};
+
+
+/** aggregate fields of "subject_predicate" */
+export type Subject_Predicates_Aggregate_FieldsCountArgs = {
+  columns?: InputMaybe<Array<Subject_Predicates_Select_Column>>;
+  distinct?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+/** aggregate avg on columns */
+export type Subject_Predicates_Avg_Fields = {
+  __typename?: 'subject_predicates_avg_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
+  triple_count?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Boolean expression to filter rows from the table "subject_predicate". All fields are combined with a logical 'AND'. */
+export type Subject_Predicates_Bool_Exp = {
+  _and?: InputMaybe<Array<Subject_Predicates_Bool_Exp>>;
+  _not?: InputMaybe<Subject_Predicates_Bool_Exp>;
+  _or?: InputMaybe<Array<Subject_Predicates_Bool_Exp>>;
+  predicate?: InputMaybe<Atoms_Bool_Exp>;
+  predicate_id?: InputMaybe<String_Comparison_Exp>;
+  subject?: InputMaybe<Atoms_Bool_Exp>;
+  subject_id?: InputMaybe<String_Comparison_Exp>;
+  total_market_cap?: InputMaybe<Numeric_Comparison_Exp>;
+  total_position_count?: InputMaybe<Int_Comparison_Exp>;
+  triple_count?: InputMaybe<Int_Comparison_Exp>;
+  triples?: InputMaybe<Triples_Bool_Exp>;
+  triples_aggregate?: InputMaybe<Triples_Aggregate_Bool_Exp>;
+};
+
+/** aggregate max on columns */
+export type Subject_Predicates_Max_Fields = {
+  __typename?: 'subject_predicates_max_fields';
+  predicate_id?: Maybe<Scalars['String']['output']>;
+  subject_id?: Maybe<Scalars['String']['output']>;
+  total_market_cap?: Maybe<Scalars['numeric']['output']>;
+  total_position_count?: Maybe<Scalars['Int']['output']>;
+  triple_count?: Maybe<Scalars['Int']['output']>;
+};
+
+/** aggregate min on columns */
+export type Subject_Predicates_Min_Fields = {
+  __typename?: 'subject_predicates_min_fields';
+  predicate_id?: Maybe<Scalars['String']['output']>;
+  subject_id?: Maybe<Scalars['String']['output']>;
+  total_market_cap?: Maybe<Scalars['numeric']['output']>;
+  total_position_count?: Maybe<Scalars['Int']['output']>;
+  triple_count?: Maybe<Scalars['Int']['output']>;
+};
+
+/** Ordering options when selecting data from "subject_predicate". */
+export type Subject_Predicates_Order_By = {
+  predicate?: InputMaybe<Atoms_Order_By>;
+  predicate_id?: InputMaybe<Order_By>;
+  subject?: InputMaybe<Atoms_Order_By>;
+  subject_id?: InputMaybe<Order_By>;
+  total_market_cap?: InputMaybe<Order_By>;
+  total_position_count?: InputMaybe<Order_By>;
+  triple_count?: InputMaybe<Order_By>;
+  triples_aggregate?: InputMaybe<Triples_Aggregate_Order_By>;
+};
+
+/** select columns of table "subject_predicate" */
+export enum Subject_Predicates_Select_Column {
+  /** column name */
+  PredicateId = 'predicate_id',
+  /** column name */
+  SubjectId = 'subject_id',
+  /** column name */
+  TotalMarketCap = 'total_market_cap',
+  /** column name */
+  TotalPositionCount = 'total_position_count',
+  /** column name */
+  TripleCount = 'triple_count'
+}
+
+/** aggregate stddev on columns */
+export type Subject_Predicates_Stddev_Fields = {
+  __typename?: 'subject_predicates_stddev_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
+  triple_count?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_pop on columns */
+export type Subject_Predicates_Stddev_Pop_Fields = {
+  __typename?: 'subject_predicates_stddev_pop_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
+  triple_count?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate stddev_samp on columns */
+export type Subject_Predicates_Stddev_Samp_Fields = {
+  __typename?: 'subject_predicates_stddev_samp_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
+  triple_count?: Maybe<Scalars['Float']['output']>;
+};
+
+/** Streaming cursor of the table "subject_predicates" */
+export type Subject_Predicates_Stream_Cursor_Input = {
+  /** Stream column input with initial value */
+  initial_value: Subject_Predicates_Stream_Cursor_Value_Input;
+  /** cursor ordering */
+  ordering?: InputMaybe<Cursor_Ordering>;
+};
+
+/** Initial value of the column from where the streaming should start */
+export type Subject_Predicates_Stream_Cursor_Value_Input = {
+  predicate_id?: InputMaybe<Scalars['String']['input']>;
+  subject_id?: InputMaybe<Scalars['String']['input']>;
+  total_market_cap?: InputMaybe<Scalars['numeric']['input']>;
+  total_position_count?: InputMaybe<Scalars['Int']['input']>;
+  triple_count?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** aggregate sum on columns */
+export type Subject_Predicates_Sum_Fields = {
+  __typename?: 'subject_predicates_sum_fields';
+  total_market_cap?: Maybe<Scalars['numeric']['output']>;
+  total_position_count?: Maybe<Scalars['Int']['output']>;
+  triple_count?: Maybe<Scalars['Int']['output']>;
+};
+
+/** aggregate var_pop on columns */
+export type Subject_Predicates_Var_Pop_Fields = {
+  __typename?: 'subject_predicates_var_pop_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
+  triple_count?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate var_samp on columns */
+export type Subject_Predicates_Var_Samp_Fields = {
+  __typename?: 'subject_predicates_var_samp_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
+  triple_count?: Maybe<Scalars['Float']['output']>;
+};
+
+/** aggregate variance on columns */
+export type Subject_Predicates_Variance_Fields = {
+  __typename?: 'subject_predicates_variance_fields';
+  total_market_cap?: Maybe<Scalars['Float']['output']>;
+  total_position_count?: Maybe<Scalars['Float']['output']>;
+  triple_count?: Maybe<Scalars['Float']['output']>;
+};
+
 export type Subscription_Root = {
   __typename?: 'subscription_root';
   /** fetch data from the table: "account" using primary key columns */
@@ -7766,6 +8077,14 @@ export type Subscription_Root = {
   stats_aggregate: Stats_Aggregate;
   /** fetch data from the table in a streaming manner: "stats" */
   stats_stream: Array<Stats>;
+  /** fetch data from the table: "subject_predicate" */
+  subject_predicates: Array<Subject_Predicates>;
+  /** fetch aggregated fields from the table: "subject_predicate" */
+  subject_predicates_aggregate: Subject_Predicates_Aggregate;
+  /** fetch data from the table: "subject_predicate" using primary key columns */
+  subject_predicates_by_pk?: Maybe<Subject_Predicates>;
+  /** fetch data from the table in a streaming manner: "subject_predicate" */
+  subject_predicates_stream: Array<Subject_Predicates>;
   /** fetch data from the table: "term" using primary key columns */
   term?: Maybe<Terms>;
   /** fetch data from the table: "term_total_state_change_stats_daily" */
@@ -8332,7 +8651,8 @@ export type Subscription_RootPredicate_Objects_AggregateArgs = {
 
 
 export type Subscription_RootPredicate_Objects_By_PkArgs = {
-  id: Scalars['String']['input'];
+  object_id: Scalars['String']['input'];
+  predicate_id: Scalars['String']['input'];
 };
 
 
@@ -8679,6 +8999,37 @@ export type Subscription_RootStats_StreamArgs = {
   batch_size: Scalars['Int']['input'];
   cursor: Array<InputMaybe<Stats_Stream_Cursor_Input>>;
   where?: InputMaybe<Stats_Bool_Exp>;
+};
+
+
+export type Subscription_RootSubject_PredicatesArgs = {
+  distinct_on?: InputMaybe<Array<Subject_Predicates_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Subject_Predicates_Order_By>>;
+  where?: InputMaybe<Subject_Predicates_Bool_Exp>;
+};
+
+
+export type Subscription_RootSubject_Predicates_AggregateArgs = {
+  distinct_on?: InputMaybe<Array<Subject_Predicates_Select_Column>>;
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  offset?: InputMaybe<Scalars['Int']['input']>;
+  order_by?: InputMaybe<Array<Subject_Predicates_Order_By>>;
+  where?: InputMaybe<Subject_Predicates_Bool_Exp>;
+};
+
+
+export type Subscription_RootSubject_Predicates_By_PkArgs = {
+  predicate_id: Scalars['String']['input'];
+  subject_id: Scalars['String']['input'];
+};
+
+
+export type Subscription_RootSubject_Predicates_StreamArgs = {
+  batch_size: Scalars['Int']['input'];
+  cursor: Array<InputMaybe<Subject_Predicates_Stream_Cursor_Input>>;
+  where?: InputMaybe<Subject_Predicates_Bool_Exp>;
 };
 
 
@@ -9715,6 +10066,7 @@ export type Terms = {
   /** An object relationship */
   atomById?: Maybe<Atoms>;
   atom_id?: Maybe<Scalars['String']['output']>;
+  created_at: Scalars['timestamptz']['output'];
   /** An array relationship */
   deposits: Array<Deposits>;
   /** An aggregate relationship */
@@ -10023,6 +10375,7 @@ export type Terms_Bool_Exp = {
   atom?: InputMaybe<Atoms_Bool_Exp>;
   atomById?: InputMaybe<Atoms_Bool_Exp>;
   atom_id?: InputMaybe<String_Comparison_Exp>;
+  created_at?: InputMaybe<Timestamptz_Comparison_Exp>;
   deposits?: InputMaybe<Deposits_Bool_Exp>;
   deposits_aggregate?: InputMaybe<Deposits_Aggregate_Bool_Exp>;
   id?: InputMaybe<String_Comparison_Exp>;
@@ -10058,6 +10411,7 @@ export type Terms_Bool_Exp = {
 export type Terms_Max_Fields = {
   __typename?: 'terms_max_fields';
   atom_id?: Maybe<Scalars['String']['output']>;
+  created_at?: Maybe<Scalars['timestamptz']['output']>;
   id?: Maybe<Scalars['String']['output']>;
   total_assets?: Maybe<Scalars['numeric']['output']>;
   total_market_cap?: Maybe<Scalars['numeric']['output']>;
@@ -10070,6 +10424,7 @@ export type Terms_Max_Fields = {
 export type Terms_Min_Fields = {
   __typename?: 'terms_min_fields';
   atom_id?: Maybe<Scalars['String']['output']>;
+  created_at?: Maybe<Scalars['timestamptz']['output']>;
   id?: Maybe<Scalars['String']['output']>;
   total_assets?: Maybe<Scalars['numeric']['output']>;
   total_market_cap?: Maybe<Scalars['numeric']['output']>;
@@ -10083,6 +10438,7 @@ export type Terms_Order_By = {
   atom?: InputMaybe<Atoms_Order_By>;
   atomById?: InputMaybe<Atoms_Order_By>;
   atom_id?: InputMaybe<Order_By>;
+  created_at?: InputMaybe<Order_By>;
   deposits_aggregate?: InputMaybe<Deposits_Aggregate_Order_By>;
   id?: InputMaybe<Order_By>;
   positions_aggregate?: InputMaybe<Positions_Aggregate_Order_By>;
@@ -10112,6 +10468,8 @@ export type Terms_Order_By = {
 export enum Terms_Select_Column {
   /** column name */
   AtomId = 'atom_id',
+  /** column name */
+  CreatedAt = 'created_at',
   /** column name */
   Id = 'id',
   /** column name */
@@ -10158,6 +10516,7 @@ export type Terms_Stream_Cursor_Input = {
 /** Initial value of the column from where the streaming should start */
 export type Terms_Stream_Cursor_Value_Input = {
   atom_id?: InputMaybe<Scalars['String']['input']>;
+  created_at?: InputMaybe<Scalars['timestamptz']['input']>;
   id?: InputMaybe<Scalars['String']['input']>;
   total_assets?: InputMaybe<Scalars['numeric']['input']>;
   total_market_cap?: InputMaybe<Scalars['numeric']['input']>;
@@ -10404,10 +10763,10 @@ export type Timestamptz_Comparison_Exp = {
 export type Triple_Term = {
   __typename?: 'triple_term';
   /** An object relationship */
-  counter_term: Terms;
+  counter_term?: Maybe<Terms>;
   counter_term_id: Scalars['String']['output'];
   /** An object relationship */
-  term: Terms;
+  term?: Maybe<Terms>;
   term_id: Scalars['String']['output'];
   total_assets: Scalars['numeric']['output'];
   total_market_cap: Scalars['numeric']['output'];
@@ -10592,17 +10951,17 @@ export type Triples = {
   creator?: Maybe<Accounts>;
   creator_id: Scalars['String']['output'];
   /** An object relationship */
-  object: Atoms;
+  object?: Maybe<Atoms>;
   object_id: Scalars['String']['output'];
   /** An array relationship */
   positions: Array<Positions>;
   /** An aggregate relationship */
   positions_aggregate: Positions_Aggregate;
   /** An object relationship */
-  predicate: Atoms;
+  predicate?: Maybe<Atoms>;
   predicate_id: Scalars['String']['output'];
   /** An object relationship */
-  subject: Atoms;
+  subject?: Maybe<Atoms>;
   subject_id: Scalars['String']['output'];
   /** An object relationship */
   term?: Maybe<Terms>;
@@ -10998,7 +11357,7 @@ export type Vaults = {
   /** An aggregate relationship */
   signals_aggregate: Signals_Aggregate;
   /** An object relationship */
-  term: Terms;
+  term?: Maybe<Terms>;
   term_id: Scalars['String']['output'];
   total_assets: Scalars['numeric']['output'];
   total_shares: Scalars['numeric']['output'];
@@ -11589,7 +11948,7 @@ export type GlobalSearchQueryVariables = Exact<{
 }>;
 
 
-export type GlobalSearchQuery = { __typename?: 'query_root', accounts: Array<{ __typename?: 'accounts', id: string, label: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }>, atoms: Array<{ __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }>, triples: Array<{ __typename?: 'triples', term_id: string, object: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, predicate: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, subject: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, collections: Array<{ __typename?: 'predicate_objects', object: { __typename?: 'atoms', label?: string | null, term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> };
+export type GlobalSearchQuery = { __typename?: 'query_root', accounts: Array<{ __typename?: 'accounts', id: string, label: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }>, atoms: Array<{ __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }>, triples: Array<{ __typename?: 'triples', term_id: string, object?: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null, predicate?: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null, subject?: { __typename?: 'atoms', label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null }>, collections: Array<{ __typename?: 'predicate_objects', object?: { __typename?: 'atoms', label?: string | null, term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null }> };
 
 export type GetAccountQueryVariables = Exact<{
   id: Scalars['String']['input'];
@@ -11611,7 +11970,7 @@ export type GetAtomDetailsQueryVariables = Exact<{
 }>;
 
 
-export type GetAtomDetailsQuery = { __typename?: 'query_root', atom?: { __typename?: 'atoms', tags: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> } | null };
+export type GetAtomDetailsQuery = { __typename?: 'query_root', atom?: { __typename?: 'atoms', tags: Array<{ __typename?: 'triples', object?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null }> } | null };
 
 export type ListQueryVariables = Exact<{
   objectId: Scalars['String']['input'];
@@ -11622,14 +11981,14 @@ export type ListQueryVariables = Exact<{
 }>;
 
 
-export type ListQuery = { __typename?: 'query_root', object?: { __typename?: 'atoms', label?: string | null } | null, triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> };
+export type ListQuery = { __typename?: 'query_root', object?: { __typename?: 'atoms', label?: string | null } | null, triples: Array<{ __typename?: 'triples', subject?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } | null }> };
 
 export type GetTripleQueryVariables = Exact<{
   term_id: Scalars['String']['input'];
 }>;
 
 
-export type GetTripleQuery = { __typename?: 'query_root', triple?: { __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, predicate: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null }, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } } | null };
+export type GetTripleQuery = { __typename?: 'query_root', triple?: { __typename?: 'triples', subject?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null, predicate?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null, object?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null } | null };
 
 export type SavedListsQueryVariables = Exact<{
   where?: InputMaybe<Predicate_Objects_Bool_Exp>;
@@ -11640,7 +11999,7 @@ export type SavedListsQueryVariables = Exact<{
 }>;
 
 
-export type SavedListsQuery = { __typename?: 'query_root', predicate_objects_aggregate: { __typename?: 'predicate_objects_aggregate', aggregate?: { __typename?: 'predicate_objects_aggregate_fields', count: number } | null }, predicate_objects: Array<{ __typename?: 'predicate_objects', id: string, triple_count: number, object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, as_object_triples_aggregate: { __typename?: 'triples_aggregate', aggregate?: { __typename?: 'triples_aggregate_fields', count: number } | null }, as_object_triples: Array<{ __typename?: 'triples', subject: { __typename?: 'atoms', term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> } }> };
+export type SavedListsQuery = { __typename?: 'query_root', predicate_objects_aggregate: { __typename?: 'predicate_objects_aggregate', aggregate?: { __typename?: 'predicate_objects_aggregate_fields', count: number } | null }, predicate_objects: Array<{ __typename?: 'predicate_objects', triple_count: number, object?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, as_object_triples_aggregate: { __typename?: 'triples_aggregate', aggregate?: { __typename?: 'triples_aggregate_fields', count: number } | null }, as_object_triples: Array<{ __typename?: 'triples', subject?: { __typename?: 'atoms', term_id: string, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } | null }> } | null }> };
 
 export type AccountProfileQueryVariables = Exact<{
   accountId: Scalars['String']['input'];
@@ -11648,7 +12007,7 @@ export type AccountProfileQueryVariables = Exact<{
 }>;
 
 
-export type AccountProfileQuery = { __typename?: 'query_root', account?: { __typename?: 'accounts', atom?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, organizations: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, projects: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, skills: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }>, tags: Array<{ __typename?: 'triples', object: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } }> } | null } | null };
+export type AccountProfileQuery = { __typename?: 'query_root', account?: { __typename?: 'accounts', atom?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null, organizations: Array<{ __typename?: 'triples', object?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null }>, projects: Array<{ __typename?: 'triples', object?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null }>, skills: Array<{ __typename?: 'triples', object?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null }>, tags: Array<{ __typename?: 'triples', object?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null }> } | null } | null };
 
 export type GetQuestionsPositionsQueryVariables = Exact<{
   address: Scalars['String']['input'];
@@ -11657,7 +12016,7 @@ export type GetQuestionsPositionsQueryVariables = Exact<{
 }>;
 
 
-export type GetQuestionsPositionsQuery = { __typename?: 'query_root', positions: Array<{ __typename?: 'positions', term: { __typename?: 'terms', triple?: { __typename?: 'triples', object_id: string } | null } }> };
+export type GetQuestionsPositionsQuery = { __typename?: 'query_root', positions: Array<{ __typename?: 'positions', term?: { __typename?: 'terms', triple?: { __typename?: 'triples', object_id: string } | null } | null }> };
 
 export type AnswerListQueryVariables = Exact<{
   objectId: Scalars['String']['input'];
@@ -11668,7 +12027,7 @@ export type AnswerListQueryVariables = Exact<{
 }>;
 
 
-export type AnswerListQuery = { __typename?: 'query_root', object?: { __typename?: 'atoms', label?: string | null } | null, triples: Array<{ __typename?: 'triples', term_id: string, subject: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } }> };
+export type AnswerListQuery = { __typename?: 'query_root', object?: { __typename?: 'atoms', label?: string | null } | null, triples: Array<{ __typename?: 'triples', term_id: string, subject?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', safe: boolean, url: string } | null } | null }> };
 
 export type GetListPositionsQueryVariables = Exact<{
   address: Scalars['String']['input'];
@@ -11677,7 +12036,7 @@ export type GetListPositionsQueryVariables = Exact<{
 }>;
 
 
-export type GetListPositionsQuery = { __typename?: 'query_root', positions: Array<{ __typename?: 'positions', term: { __typename?: 'terms', triple?: { __typename?: 'triples', subject_id: string } | null } }> };
+export type GetListPositionsQuery = { __typename?: 'query_root', positions: Array<{ __typename?: 'positions', term?: { __typename?: 'terms', triple?: { __typename?: 'triples', subject_id: string } | null } | null }> };
 
 export class TypedDocumentString<TResult, TVariables>
   extends String
@@ -11804,7 +12163,7 @@ export const GetAtomDetailsDocument = new TypedDocumentString(`
     query GetAtomDetails($term_id: String!, $positionsBool: positions_bool_exp) {
   atom(term_id: $term_id) {
     tags: as_subject_triples(
-      where: {predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, positions: $positionsBool}
+      where: {predicate_id: {_eq: "0x7ec36d201c842dc787b45cb5bb753bea4cf849be3908fb1b0a7d067c3c3cc1f5"}, positions: $positionsBool}
     ) {
       object {
         term_id
@@ -11824,7 +12183,7 @@ export const ListDocument = new TypedDocumentString(`
     label
   }
   triples(
-    where: {object_id: {_eq: $objectId}, predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, term: $term, subject: $subject}
+    where: {object_id: {_eq: $objectId}, predicate_id: {_eq: "0x7ec36d201c842dc787b45cb5bb753bea4cf849be3908fb1b0a7d067c3c3cc1f5"}, term: $term, subject: $subject}
     limit: $limit
     offset: $offset
     order_by: {term: {total_market_cap: desc}}
@@ -11883,7 +12242,6 @@ export const SavedListsDocument = new TypedDocumentString(`
     offset: $offset
     order_by: $orderBy
   ) {
-    id
     triple_count
     object {
       term_id
@@ -11961,7 +12319,7 @@ export const AccountProfileDocument = new TypedDocumentString(`
         }
       }
       tags: as_subject_triples(
-        where: {predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, positions: $positionsBool}
+        where: {predicate_id: {_eq: "0x7ec36d201c842dc787b45cb5bb753bea4cf849be3908fb1b0a7d067c3c3cc1f5"}, positions: $positionsBool}
       ) {
         object {
           term_id
@@ -11995,7 +12353,7 @@ export const AnswerListDocument = new TypedDocumentString(`
     label
   }
   triples(
-    where: {object_id: {_eq: $objectId}, predicate_id: {_eq: "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"}, term: $term, subject: $subject}
+    where: {object_id: {_eq: $objectId}, predicate_id: {_eq: "0x7ec36d201c842dc787b45cb5bb753bea4cf849be3908fb1b0a7d067c3c3cc1f5"}, term: $term, subject: $subject}
     limit: $limit
     offset: $offset
     order_by: {term: {total_market_cap: desc}}

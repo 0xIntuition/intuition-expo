@@ -4,7 +4,7 @@ export async function execute<TResult, TVariables>(
   query: TypedDocumentString<TResult, TVariables>,
   ...[variables]: TVariables extends Record<string, never> ? [] : [TVariables]
 ) {
-  const response = await fetch('https://testnet.intuition.sh/v1/graphql', {
+  const response = await fetch('https://mainnet.intuition.sh/v1/graphql', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

@@ -1,7 +1,7 @@
 import type { CodegenConfig } from '@graphql-codegen/cli'
 
 const config: CodegenConfig = {
-  schema: 'https://testnet.intuition.sh/v1/graphql',
+  schema: 'https://mainnet.intuition.sh/v1/graphql',
   documents: ['./app/**/*.ts*'],
   ignoreNoDocuments: true,
   generates: {

@@ -33,7 +33,6 @@ query SavedLists(
     offset: $offset
     order_by: $orderBy
   ) {
-    id
     triple_count
     object {
       term_id
@@ -248,7 +247,7 @@ export default function AccountIndex() {
   const { data, isLoading } = useQuery({
     queryKey: ['savedLists', address, sourceIndex, debouncedSearchQuery],
     queryFn: () => execute(SavedListsQuery, {
-      "orderBy": { "triple_count": "desc" } as any,
+      "orderBy": { "total_market_cap": "desc" } as any,
 
       "triplesWhere": {
         "term": sourceIndex === 0 ? {} : address ? {
@@ -268,7 +267,7 @@ export default function AccountIndex() {
         "_and": [
           {
             "predicate_id": {
-              "_eq": "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"
+              "_eq": "0x7ec36d201c842dc787b45cb5bb753bea4cf849be3908fb1b0a7d067c3c3cc1f5"
             }
           },
           {
@@ -282,7 +281,7 @@ export default function AccountIndex() {
             "object": {
               "as_object_triples": {
                 "predicate_id": {
-                  "_eq": "0x49487b1d5bf2734d497d6d9cfcd72cdfbaefb4d4f03ddc310398b24639173c9d"
+                  "_eq": "0x7ec36d201c842dc787b45cb5bb753bea4cf849be3908fb1b0a7d067c3c3cc1f5"
                 },
 
                 "term": sourceIndex === 0 ? {} : address ? {
