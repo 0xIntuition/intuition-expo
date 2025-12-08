@@ -68,27 +68,33 @@ query SavedLists(
 const sources = ['All', 'My'];
 
 interface CachedImage {
-  safe?: boolean;
-  url?: string;
+  __typename?: 'cached_images_cached_image';
+  safe: boolean;
+  url: string;
 }
 
 interface Subject {
+  __typename?: 'atoms';
   term_id: string;
   cached_image?: CachedImage | null;
 }
 
 interface Triple {
-  subject: Subject;
+  __typename?: 'triples';
+  subject?: Subject | null;
 }
 
 interface ListItemProps {
   object: {
+    __typename?: 'atoms';
     term_id: string;
     label?: string | null;
     cached_image?: CachedImage | null;
     as_object_triples: Triple[];
     as_object_triples_aggregate: {
+      __typename?: 'triples_aggregate';
       aggregate?: {
+        __typename?: 'triples_aggregate_fields';
         count: number;
       } | null;
     };
@@ -99,7 +105,7 @@ interface ListItemProps {
 const ComposedImage: React.FC<{ triples: Triple[] }> = ({ triples }) => {
   const imageUrls = triples
     .slice(0, 4)
-    .map(triple => triple.subject.cached_image?.safe ? triple.subject.cached_image.url : null)
+    .map(triple => triple.subject?.cached_image?.safe ? triple.subject.cached_image.url : null)
     .filter(Boolean);
 
   const backgroundColor = useThemeColor({ light: '#f0f0f0', dark: '#2a2a2a' }, 'tabIconDefault');
@@ -339,13 +345,15 @@ export default function AccountIndex() {
     return (
       <View style={styles.section}>
         <View style={styles.sectionContent}>
-          {data.predicate_objects.map((p, index) => (
-            <ListItem
-              key={p.id}
-              object={p.object}
-              isLast={index === data.predicate_objects.length - 1}
-            />
-          ))}
+          {data.predicate_objects
+            .filter(p => p.object != null)
+            .map((p, index, filtered) => (
+              <ListItem
+                key={p.object?.term_id}
+                object={p.object!}
+                isLast={index === filtered.length - 1}
+              />
+            ))}
         </View>
       </View>
     );

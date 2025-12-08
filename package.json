@@ -10,7 +10,7 @@
     "codegen-quests": "graphql-codegen --config codegen-quests.ts"
   },
   "dependencies": {
-    "@0xintuition/protocol": "^2.0.0-alpha.2",
+    "@0xintuition/protocol": "^2.0.1",
     "@expo/ui": "~0.2.0-beta.4",
     "@expo/vector-icons": "^15.0.2",
     "@react-native-async-storage/async-storage": "2.2.0",
