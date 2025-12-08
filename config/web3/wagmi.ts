@@ -1,7 +1,8 @@
 import { defaultWagmiConfig } from "@reown/appkit-wagmi-react-native";
 import { authConnector } from "@reown/appkit-auth-wagmi-react-native";
-import { intuitionTestnet } from "@0xintuition/protocol";
+import { intuitionTestnet, intuitionMainnet } from "@0xintuition/protocol";
 import { mainnet } from "viem/chains";
+
 
 export const projectId = "9894a080a383df0833d5e82404186fdd";
 
@@ -16,7 +17,7 @@ export const metadata = {
   },
 };
 
-export const chains = [mainnet, intuitionTestnet] as const;
+export const chains = [mainnet, intuitionTestnet, intuitionMainnet] as const;
 
 export const auth = authConnector({ projectId, metadata });
 

@@ -1,0 +1,29 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`ComposedImage should filter out unsafe images 1`] = `null`;
+
+exports[`ComposedImage should handle null subjects without crashing 1`] = `null`;
+
+exports[`ComposedImage should render 2-image layout 1`] = `null`;
+
+exports[`ComposedImage should render 3-image layout 1`] = `null`;
+
+exports[`ComposedImage should render 4-image grid layout 1`] = `null`;
+
+exports[`ComposedImage should render fallback icon when no images 1`] = `null`;
+
+exports[`ComposedImage should render single image layout 1`] = `null`;
+
+exports[`ListItem should handle null aggregate count 1`] = `null`;
+
+exports[`ListItem should handle object with null label 1`] = `null`;
+
+exports[`ListItem should render correct member count (plural) 1`] = `null`;
+
+exports[`ListItem should render correct member count (singular) 1`] = `null`;
+
+exports[`ListItem should render list item correctly 1`] = `null`;
+
+exports[`ListItem should render list item with null triples 1`] = `null`;
+
+exports[`ListItem should render list item without separator when isLast is true 1`] = `null`;
