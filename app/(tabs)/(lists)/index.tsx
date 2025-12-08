@@ -102,7 +102,7 @@ interface ListItemProps {
   isLast: boolean;
 }
 
-const ComposedImage: React.FC<{ triples: Triple[] }> = ({ triples }) => {
+export const ComposedImage: React.FC<{ triples: Triple[] }> = ({ triples }) => {
   const imageUrls = triples
     .slice(0, 4)
     .map(triple => triple.subject?.cached_image?.safe ? triple.subject.cached_image.url : null)
@@ -211,7 +211,7 @@ const ComposedImage: React.FC<{ triples: Triple[] }> = ({ triples }) => {
   );
 };
 
-const ListItem: React.FC<ListItemProps> = ({ object, isLast }) => {
+export const ListItem: React.FC<ListItemProps> = ({ object, isLast }) => {
   const backgroundColor = useThemeColor({}, 'secondaryBackground');
   const textColor = useThemeColor({}, 'text');
   const subtitleColor = useThemeColor({ light: '#8e8e93', dark: '#8e8e93' }, 'tabIconDefault');
@@ -245,7 +245,7 @@ const ListItem: React.FC<ListItemProps> = ({ object, isLast }) => {
 
 export default function AccountIndex() {
   const { address, status } = useAccount();
-  const [searchQuery, setSearhQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const backgroundColor = useThemeColor({}, 'background');
   const { sourceIndex, setSourceIndex } = useSourcePicker();
@@ -346,11 +346,11 @@ export default function AccountIndex() {
       <View style={styles.section}>
         <View style={styles.sectionContent}>
           {data.predicate_objects
-            .filter(p => p.object != null)
+            .filter((p): p is typeof p & { object: NonNullable<typeof p.object> } => p.object != null)
             .map((p, index, filtered) => (
               <ListItem
-                key={p.object?.term_id}
-                object={p.object!}
+                key={p.object.term_id}
+                object={p.object}
                 isLast={index === filtered.length - 1}
               />
             ))}
@@ -366,7 +366,7 @@ export default function AccountIndex() {
           title: 'Lists',
           headerSearchBarOptions: {
             placeholder: 'Search',
-            onChangeText: (e) => setSearhQuery(e.nativeEvent.text),
+            onChangeText: (e) => setSearchQuery(e.nativeEvent.text),
           },
         }}
       />
