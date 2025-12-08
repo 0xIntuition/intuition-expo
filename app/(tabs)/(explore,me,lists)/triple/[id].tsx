@@ -9,6 +9,61 @@ import { execute } from '@/lib/graphql/execute';
 import { blurhash, getCachedImage, formatTrust, formatNumber, shortenAddress } from '@/lib/utils';
 import { Ionicons } from '@expo/vector-icons';
 
+/**
+ * Calculate percentage from wei values using BigInt for precision
+ * @param part - The numerator (support or oppose amount in wei)
+ * @param whole - The denominator (total amount in wei)
+ * @returns Percentage as a number (0-100)
+ */
+function calculateWeiPercentage(part: string | null | undefined, whole: string | null | undefined): number {
+  if (!part || !whole) return 0;
+
+  try {
+    const partBigInt = BigInt(part);
+    const wholeBigInt = BigInt(whole);
+
+    if (wholeBigInt === 0n) return 0;
+
+    // Multiply by 10000 to preserve 2 decimal places, then divide
+    // This gives us precision like 4532 which represents 45.32%
+    const percentage = (partBigInt * 10000n) / wholeBigInt;
+
+    // Convert to number and divide by 100 to get actual percentage
+    return Number(percentage) / 100;
+  } catch (error) {
+    console.warn('Failed to calculate percentage from wei values:', error);
+    return 0;
+  }
+}
+
+/**
+ * Calculate staking percentages for support and oppose positions
+ * @param supportShares - Support position shares in wei
+ * @param opposeShares - Oppose position shares in wei
+ * @returns Object with supportPercentage and opposePercentage
+ */
+function calculateStakingPercentages(supportShares: string | null | undefined, opposeShares: string | null | undefined) {
+  const support = supportShares || '0';
+  const oppose = opposeShares || '0';
+
+  try {
+    const supportBigInt = BigInt(support);
+    const opposeBigInt = BigInt(oppose);
+    const total = (supportBigInt + opposeBigInt).toString();
+
+    return {
+      supportPercentage: calculateWeiPercentage(support, total),
+      opposePercentage: calculateWeiPercentage(oppose, total),
+    };
+  } catch (error) {
+    console.warn('Failed to calculate staking percentages:', error);
+    return {
+      supportPercentage: 0,
+      opposePercentage: 0,
+    };
+  }
+}
+
 const GetTripleQuery = graphql(`
 query GetTriple($term_id: String!) {
   triple(term_id: $term_id) {
@@ -81,24 +136,25 @@ interface SectionItemProps {
 }
 
 interface ProgressBarProps {
-  supportAmount: number;
-  opposeAmount: number;
+  supportPercentage: number;
+  opposePercentage: number;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ supportAmount, opposeAmount }) => {
+const ProgressBar: React.FC<ProgressBarProps> = ({ supportPercentage, opposePercentage }) => {
   const supportColor = useThemeColor({ light: '#34C759', dark: '#30D158' }, 'tint');
   const opposeColor = useThemeColor({ light: '#FF3B30', dark: '#FF453A' }, 'text');
   const backgroundColor = useThemeColor({}, 'border');
 
-  const total = supportAmount + opposeAmount;
-  const supportPercentage = total > 0 ? (supportAmount / total) * 100 : 50;
-  const opposePercentage = total > 0 ? (opposeAmount / total) * 100 : 50;
+  // Percentages are already calculated, just use them
+  // Handle edge case where both are 0 (show 50/50 split)
+  const displaySupportPercentage = supportPercentage === 0 && opposePercentage === 0 ? 50 : supportPercentage;
+  const displayOpposePercentage = supportPercentage === 0 && opposePercentage === 0 ? 50 : opposePercentage;
 
   return (
     <View style={styles.progressBarContainer}>
       <View style={[styles.progressBarBackground, { backgroundColor }]}>
-        <View style={[styles.progressBarFill, { backgroundColor: supportColor, width: `${supportPercentage}%` }]} />
-        <View style={[styles.progressBarFill, { backgroundColor: opposeColor, width: `${opposePercentage}%` }]} />
+        <View style={[styles.progressBarFill, { backgroundColor: supportColor, width: `${displaySupportPercentage}%` }]} />
+        <View style={[styles.progressBarFill, { backgroundColor: opposeColor, width: `${displayOpposePercentage}%` }]} />
       </View>
     </View>
   );
@@ -296,8 +352,10 @@ export default function Triple() {
                   />
                 </View>
                 <ProgressBar
-                  supportAmount={parseFloat(data.triple.positions_aggregate?.aggregate?.sum?.shares || '0')}
-                  opposeAmount={parseFloat(data.triple.counter_positions_aggregate?.aggregate?.sum?.shares || '0')}
+                  {...calculateStakingPercentages(
+                    data.triple.positions_aggregate?.aggregate?.sum?.shares,
+                    data.triple.counter_positions_aggregate?.aggregate?.sum?.shares
+                  )}
                 />
               </View>
             )}

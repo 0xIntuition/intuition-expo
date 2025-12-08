@@ -64,8 +64,16 @@ export function formatTrust(amount: number | string | null | undefined): string 
       return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     }
 
+    // Validate string before BigInt conversion
+    // BigInt expects a string with only digits (and optional leading minus)
+    const trimmed = amountStr.trim();
+    if (!trimmed || !/^-?\d+$/.test(trimmed)) {
+      console.warn('formatTrust: Invalid BigInt string format:', amountStr);
+      return '0.00';
+    }
+
     // Convert from wei to ether using viem's formatEther
-    const etherValue = formatEther(BigInt(amountStr));
+    const etherValue = formatEther(BigInt(trimmed));
     const num = parseFloat(etherValue);
 
     if (isNaN(num)) return '0.00';
@@ -73,6 +81,7 @@ export function formatTrust(amount: number | string | null | undefined): string 
     // Format with commas and 2 decimal places
     return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   } catch (error) {
+    console.warn('formatTrust: Unexpected error formatting amount:', amount, error);
     return '0.00';
   }
 }
@@ -83,7 +92,9 @@ export function formatTrust(amount: number | string | null | undefined): string 
  */
 export function formatNumber(num: number | string | null | undefined): string {
   if (num === null || num === undefined) return '0';
-  const value = typeof num === 'string' ? parseInt(num, 10) : num;
+  // Use parseFloat instead of parseInt to handle decimal strings properly
+  // Then floor to ensure whole number display
+  const value = typeof num === 'string' ? Math.floor(parseFloat(num)) : Math.floor(num);
   if (isNaN(value)) return '0';
   return value.toLocaleString('en-US');
 }
