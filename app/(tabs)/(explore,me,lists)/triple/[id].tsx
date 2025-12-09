@@ -138,23 +138,30 @@ interface SectionItemProps {
 interface ProgressBarProps {
   supportPercentage: number;
   opposePercentage: number;
+  supportColor: string;
+  opposeColor: string;
 }
 
-const ProgressBar: React.FC<ProgressBarProps> = ({ supportPercentage, opposePercentage }) => {
-  const supportColor = useThemeColor({ light: '#34C759', dark: '#30D158' }, 'tint');
-  const opposeColor = useThemeColor({ light: '#FF3B30', dark: '#FF453A' }, 'text');
+const ProgressBar: React.FC<ProgressBarProps> = ({ supportPercentage, opposePercentage, supportColor, opposeColor }) => {
   const backgroundColor = useThemeColor({}, 'border');
+  const neutralColor = useThemeColor({ light: '#8e8e93', dark: '#636366' }, 'tabIconDefault');
 
-  // Percentages are already calculated, just use them
-  // Handle edge case where both are 0 (show 50/50 split)
-  const displaySupportPercentage = supportPercentage === 0 && opposePercentage === 0 ? 50 : supportPercentage;
-  const displayOpposePercentage = supportPercentage === 0 && opposePercentage === 0 ? 50 : opposePercentage;
+  // Check if there's no staking data
+  const hasNoData = supportPercentage === 0 && opposePercentage === 0;
 
   return (
     <View style={styles.progressBarContainer}>
       <View style={[styles.progressBarBackground, { backgroundColor }]}>
-        <View style={[styles.progressBarFill, { backgroundColor: supportColor, width: `${displaySupportPercentage}%` }]} />
-        <View style={[styles.progressBarFill, { backgroundColor: opposeColor, width: `${displayOpposePercentage}%` }]} />
+        {hasNoData ? (
+          // Show neutral state when there's no staking data
+          <View style={[styles.progressBarFill, { backgroundColor: neutralColor, width: '100%', opacity: 0.3 }]} />
+        ) : (
+          // Show actual staking distribution
+          <>
+            <View style={[styles.progressBarFill, { backgroundColor: supportColor, width: `${supportPercentage}%` }]} />
+            <View style={[styles.progressBarFill, { backgroundColor: opposeColor, width: `${opposePercentage}%`, position: 'absolute', right: 0 }]} />
+          </>
+        )}
       </View>
     </View>
   );
@@ -293,7 +300,10 @@ export default function Triple() {
   const supportColor = useThemeColor({ light: '#34C759', dark: '#30D158' }, 'tint');
   const opposeColor = useThemeColor({ light: '#FF3B30', dark: '#FF453A' }, 'text');
 
-  const title = isLoading ? '' : data?.triple?.subject?.label + ' ' + data?.triple?.predicate?.label + ' ' + data?.triple?.object?.label
+  const title = isLoading ? '' :
+    [data?.triple?.subject?.label, data?.triple?.predicate?.label, data?.triple?.object?.label]
+      .filter(Boolean)
+      .join(' ')
 
   return (
     <>
@@ -356,6 +366,8 @@ export default function Triple() {
                     data.triple.positions_aggregate?.aggregate?.sum?.shares,
                     data.triple.counter_positions_aggregate?.aggregate?.sum?.shares
                   )}
+                  supportColor={supportColor}
+                  opposeColor={opposeColor}
                 />
               </View>
             )}
