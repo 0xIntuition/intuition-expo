@@ -71,7 +71,12 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast }) => {
   return (
     <Link href={`../atom/${item.term_id}`} asChild>
       <Pressable
-        style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+        style={({ pressed }) => [
+          styles.sectionItem,
+          { backgroundColor },
+          separator,
+          pressed && styles.sectionItemPressed,
+        ]}
       >
         <View style={styles.sectionItemContent}>
           {item.cached_image?.url && (
@@ -269,6 +274,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: 44,
     justifyContent: 'center',
+  },
+  sectionItemPressed: {
+    opacity: 0.7,
   },
   sectionItemContent: {
     paddingVertical: 3,

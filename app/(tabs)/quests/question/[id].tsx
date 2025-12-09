@@ -92,7 +92,12 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast, isSelected, onS
 
   return (
     <Pressable
-      style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+      style={({ pressed }) => [
+        styles.sectionItem,
+        { backgroundColor },
+        separator,
+        pressed && styles.sectionItemPressed,
+      ]}
       onPress={onSelect}
     >
       <View style={styles.sectionItemContent}>
@@ -200,8 +205,14 @@ export default function List() {
       return (
         <View style={styles.loadingContainer}>
           <Text style={styles.loadingText}>Success!</Text>
-          <Pressable onPress={() => router.dismiss(1)}>
-            <Text style={styles.loadingText}>Close</Text>
+          <Pressable
+            style={({ pressed }) => [
+              styles.closeButton,
+              pressed && styles.closeButtonPressed,
+            ]}
+            onPress={() => router.dismiss(1)}
+          >
+            <Text style={styles.closeButtonText}>Close</Text>
           </Pressable>
         </View>
       );
@@ -336,6 +347,25 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: 44,
     justifyContent: 'center',
+  },
+  sectionItemPressed: {
+    opacity: 0.7,
+  },
+  closeButton: {
+    marginTop: 16,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    backgroundColor: '#007AFF',
+    borderRadius: 8,
+  },
+  closeButtonPressed: {
+    opacity: 0.7,
+  },
+  closeButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    textAlign: 'center',
   },
   sectionItemContent: {
     paddingVertical: 3,

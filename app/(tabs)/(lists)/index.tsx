@@ -224,7 +224,12 @@ export const ListItem: React.FC<ListItemProps> = ({ object, isLast }) => {
   return (
     <Link href={`/(lists)/list/${object.term_id}` as any} asChild>
       <Pressable
-        style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+        style={({ pressed }) => [
+          styles.sectionItem,
+          { backgroundColor },
+          separator,
+          pressed && styles.sectionItemPressed,
+        ]}
       >
         <View style={styles.sectionItemContent}>
           <ComposedImage triples={object.as_object_triples} />
@@ -453,6 +458,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: 44,
     justifyContent: 'center',
+  },
+  sectionItemPressed: {
+    opacity: 0.7,
   },
   sectionItemContent: {
     paddingVertical: 3,

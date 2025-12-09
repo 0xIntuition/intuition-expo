@@ -225,7 +225,13 @@ const CreatorSection: React.FC<{
 
   return (
     <Link href={`../account/${creator.id}` as any} asChild>
-      <Pressable style={[styles.creatorItem, { backgroundColor }]}>
+      <Pressable
+        style={({ pressed }) => [
+          styles.creatorItem,
+          { backgroundColor },
+          pressed && styles.creatorItemPressed,
+        ]}
+      >
         <View style={styles.creatorContent}>
           {creator.cached_image?.url && (
             <Image
@@ -255,7 +261,12 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast }) => {
   return (
     <Link href={`../atom/${item.term_id}` as any} asChild>
       <Pressable
-        style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+        style={({ pressed }) => [
+          styles.sectionItem,
+          { backgroundColor },
+          separator,
+          pressed && styles.sectionItemPressed,
+        ]}
       >
         <View style={styles.sectionItemContent}>
           {item.cached_image?.url && (
@@ -421,6 +432,9 @@ const styles = StyleSheet.create({
     minHeight: 44,
     justifyContent: 'center',
   },
+  sectionItemPressed: {
+    opacity: 0.7,
+  },
   sectionItemContent: {
     paddingVertical: 3,
     flexDirection: 'row',
@@ -515,6 +529,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: 44,
     borderRadius: 10,
+  },
+  creatorItemPressed: {
+    opacity: 0.7,
   },
   creatorContent: {
     flexDirection: 'row',

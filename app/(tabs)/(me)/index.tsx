@@ -122,7 +122,12 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, isLast }) => {
   return (
     <Link href={`/(me)/atom/${item.term_id}` as any} asChild>
       <Pressable
-        style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+        style={({ pressed }) => [
+          styles.sectionItem,
+          { backgroundColor },
+          separator,
+          pressed && styles.sectionItemPressed,
+        ]}
       >
         <View style={styles.sectionItemContent}>
           {item.cached_image?.url && (
@@ -218,7 +223,10 @@ export default function MeIndex() {
                   Please switch to Intuition Testnet to view your profile
                 </Text>
                 <Pressable
-                  style={styles.switchChainButton}
+                  style={({ pressed }) => [
+                    styles.switchChainButton,
+                    pressed && styles.switchChainButtonPressed,
+                  ]}
                   onPress={handleSwitchChain}
                 >
                   <Text style={styles.switchChainButtonText}>Add & Switch to Intuition Testnet</Text>
@@ -417,7 +425,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   sectionItemPressed: {
-    opacity: 0.5,
+    opacity: 0.7,
   },
   sectionItemContent: {
     paddingVertical: 3,
@@ -442,6 +450,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     backgroundColor: '#007AFF',
     borderRadius: 8,
+  },
+  switchChainButtonPressed: {
+    opacity: 0.7,
   },
   switchChainButtonText: {
     color: '#FFFFFF',

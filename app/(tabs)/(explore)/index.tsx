@@ -157,7 +157,12 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast }) => {
   return (
     <Link href={href} asChild>
       <Pressable
-        style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+        style={({ pressed }) => [
+          styles.sectionItem,
+          { backgroundColor },
+          separator,
+          pressed && styles.sectionItemPressed,
+        ]}
       >
         <View style={styles.sectionItemContent}>
           {item.cached_image?.url && (
@@ -205,7 +210,12 @@ const ClaimItem: React.FC<ClaimItemProps> = ({
   return (
     <Link href={`/(explore)/triple/${triple.term_id}`} asChild>
       <Pressable
-        style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+        style={({ pressed }) => [
+          styles.sectionItem,
+          { backgroundColor },
+          separator,
+          pressed && styles.sectionItemPressed,
+        ]}
       >
         <View style={styles.sectionItemContent}>
           <View style={styles.claimTextContainer}>
@@ -378,6 +388,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: 44,
     justifyContent: 'center',
+  },
+  sectionItemPressed: {
+    opacity: 0.7,
   },
   sectionItemContent: {
     paddingVertical: 3,

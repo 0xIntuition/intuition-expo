@@ -51,7 +51,12 @@ const SectionItem: React.FC<SectionItemProps> = ({ item, href, isLast, hasPositi
   return (
     <Link href={href as any} asChild>
       <Pressable
-        style={{ ...styles.sectionItem, backgroundColor, ...separator }}
+        style={({ pressed }) => [
+          styles.sectionItem,
+          { backgroundColor },
+          separator,
+          pressed && styles.sectionItemPressed,
+        ]}
       >
         <View style={styles.sectionItemContent}>
           <Text style={[styles.sectionItemText, { color: textColor }]}>
@@ -197,6 +202,9 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     minHeight: 44,
     justifyContent: 'center',
+  },
+  sectionItemPressed: {
+    opacity: 0.7,
   },
   sectionItemContent: {
     paddingVertical: 3,

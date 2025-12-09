@@ -32,7 +32,12 @@ export default function Quests() {
       {QUESTS.map((quest) => (
         <View key={quest.index} style={[styles.card, { backgroundColor: cardBackground, borderColor }]}>
           <Link href={quest.link} asChild>
-            <Pressable style={styles.cardContent}>
+            <Pressable
+              style={({ pressed }) => [
+                styles.cardContent,
+                pressed && styles.cardContentPressed,
+              ]}
+            >
               <View style={[styles.iconContainer]}>
                 <MaterialIcons
                   name={getIconName(quest.icon)}
@@ -70,6 +75,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     padding: 20,
+  },
+  cardContentPressed: {
+    opacity: 0.7,
   },
   iconContainer: {
     width: 60,
