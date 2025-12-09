@@ -9,6 +9,9 @@ import { execute } from '@/lib/graphql/execute';
 import { blurhash, getCachedImage, formatTrust, formatNumber, shortenAddress } from '@/lib/utils';
 import { Ionicons } from '@expo/vector-icons';
 
+// Constants
+const NEUTRAL_BAR_OPACITY = 0.3;
+
 /**
  * Calculate percentage from wei values using BigInt for precision
  * @param part - The numerator (support or oppose amount in wei)
@@ -154,12 +157,12 @@ const ProgressBar: React.FC<ProgressBarProps> = ({ supportPercentage, opposePerc
       <View style={[styles.progressBarBackground, { backgroundColor }]}>
         {hasNoData ? (
           // Show neutral state when there's no staking data
-          <View style={[styles.progressBarFill, { backgroundColor: neutralColor, width: '100%', opacity: 0.3 }]} />
+          <View style={[styles.progressBarFill, { backgroundColor: neutralColor, width: '100%', opacity: NEUTRAL_BAR_OPACITY }]} />
         ) : (
           // Show actual staking distribution
           <>
-            <View style={[styles.progressBarFill, { backgroundColor: supportColor, width: `${supportPercentage}%` }]} />
-            <View style={[styles.progressBarFill, { backgroundColor: opposeColor, width: `${opposePercentage}%`, position: 'absolute', right: 0 }]} />
+            <View style={[styles.progressBarFill, { backgroundColor: supportColor, flex: supportPercentage }]} />
+            <View style={[styles.progressBarFill, { backgroundColor: opposeColor, flex: opposePercentage }]} />
           </>
         )}
       </View>
