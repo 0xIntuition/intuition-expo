@@ -1,0 +1,14 @@
+appId: systems.intuition.mobile
+---
+
+- launchApp
+- assertVisible: 'Quests'
+
+- tapOn: 'Lists'
+- assertVisible: 'Lists'
+
+- tapOn: 'Me'
+- assertVisible: 'Me'
+
+- tapOn: 'Quests'
+- assertVisible: 'Quests'
