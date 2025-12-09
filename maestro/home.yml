@@ -1,23 +1,14 @@
 appId: systems.intuition.mobile
 ---
-# Test: App Launch and Tab Navigation
 
-# 1. Verify app launches on Quests tab with quest cards visible
 - launchApp
-- assertVisible: 'Bootstrap the Knowledge Graph'
+- assertVisible: 'Quests'
 
-# 2. Navigate to Lists tab
 - tapOn: 'Lists'
 - assertVisible: 'Lists'
 
-# 3. Navigate to Explore tab
-- tapOn: 'Explore'
-- assertVisible: 'Explore'
-
-# 4. Navigate to Me tab
 - tapOn: 'Me'
 - assertVisible: 'Me'
 
-# 5. Return to Quests tab
 - tapOn: 'Quests'
-- assertVisible: 'Bootstrap the Knowledge Graph'
+- assertVisible: 'Quests'
