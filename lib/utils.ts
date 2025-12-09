@@ -1,3 +1,4 @@
+import { formatEther } from 'viem';
 
 export function getCachedImage(url?: string | null) {
   if (url === null) {
@@ -42,5 +43,69 @@ export function shortLink(url?: string | null): string | undefined {
     }
     return `${parts[0]}/.../${parts[parts.length - 1]}`;
   }
+}
+
+/**
+ * Format TRUST token amounts for display
+ * Converts from wei to ether and formats with commas
+ * Examples: 2,328.33, 8.33, 7,823.29
+ */
+export function formatTrust(amount: number | string | null | undefined): string {
+  if (amount === null || amount === undefined) return '0.00';
+
+  try {
+    // Convert string to bigint for formatEther
+    const amountStr = typeof amount === 'number' ? amount.toString() : amount;
+
+    // Handle decimal values - if it contains a decimal point, treat as already formatted
+    if (amountStr.includes('.')) {
+      const num = parseFloat(amountStr);
+      if (isNaN(num)) return '0.00';
+      return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    // Validate string before BigInt conversion
+    // BigInt expects a string with only digits (and optional leading minus)
+    const trimmed = amountStr.trim();
+    if (!trimmed || !/^-?\d+$/.test(trimmed)) {
+      console.warn('formatTrust: Invalid BigInt string format:', amountStr);
+      return '0.00';
+    }
+
+    // Convert from wei to ether using viem's formatEther
+    const etherValue = formatEther(BigInt(trimmed));
+    const num = parseFloat(etherValue);
+
+    if (isNaN(num)) return '0.00';
+
+    // Format with commas and 2 decimal places
+    return num.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  } catch (error) {
+    console.warn('formatTrust: Unexpected error formatting amount:', amount, error);
+    return '0.00';
+  }
+}
+
+/**
+ * Format large numbers with comma separators
+ * Examples: 34,126 or 8,752
+ */
+export function formatNumber(num: number | string | null | undefined): string {
+  if (num === null || num === undefined) return '0';
+  // Use parseFloat instead of parseInt to handle decimal strings properly
+  // Then floor to ensure whole number display
+  const value = typeof num === 'string' ? Math.floor(parseFloat(num)) : Math.floor(num);
+  if (isNaN(value)) return '0';
+  return value.toLocaleString('en-US');
+}
+
+/**
+ * Shorten Ethereum addresses for display
+ * Example: 0x7fd8...e4d0
+ */
+export function shortenAddress(address: string | null | undefined): string {
+  if (!address) return '';
+  if (address.length < 10) return address;
+  return `${address.slice(0, 6)}...${address.slice(-4)}`;
 }
 

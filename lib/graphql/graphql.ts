@@ -12044,7 +12044,7 @@ export type GetTripleQueryVariables = Exact<{
 }>;
 
 
-export type GetTripleQuery = { __typename?: 'query_root', triple?: { __typename?: 'triples', subject?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null, predicate?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null, object?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null } | null };
+export type GetTripleQuery = { __typename?: 'query_root', triple?: { __typename?: 'triples', subject?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null, predicate?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null, object?: { __typename?: 'atoms', term_id: string, label?: string | null, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null, creator?: { __typename?: 'accounts', id: string, label: string, cached_image?: { __typename?: 'cached_images_cached_image', url: string, safe: boolean } | null } | null, triple_term?: { __typename?: 'triple_term', total_market_cap: any, total_position_count: any } | null, positions_aggregate: { __typename?: 'positions_aggregate', aggregate?: { __typename?: 'positions_aggregate_fields', count: number, sum?: { __typename?: 'positions_sum_fields', shares?: any | null } | null } | null }, counter_positions_aggregate: { __typename?: 'positions_aggregate', aggregate?: { __typename?: 'positions_aggregate_fields', count: number, sum?: { __typename?: 'positions_sum_fields', shares?: any | null } | null } | null } } | null };
 
 export type SavedListsQueryVariables = Exact<{
   where?: InputMaybe<Predicate_Objects_Bool_Exp>;
@@ -12280,6 +12280,34 @@ export const GetTripleDocument = new TypedDocumentString(`
       cached_image {
         url
         safe
+      }
+    }
+    creator {
+      id
+      label
+      cached_image {
+        url
+        safe
+      }
+    }
+    triple_term {
+      total_market_cap
+      total_position_count
+    }
+    positions_aggregate {
+      aggregate {
+        count
+        sum {
+          shares
+        }
+      }
+    }
+    counter_positions_aggregate {
+      aggregate {
+        count
+        sum {
+          shares
+        }
       }
     }
   }
